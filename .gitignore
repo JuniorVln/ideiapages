@@ -1,0 +1,81 @@
+# =====================================================
+# Workspace .gitignore (raiz)
+# =====================================================
+# Cada subprojeto (ideiapages/, SEO-Apresentacao/) tem
+# seu próprio .gitignore com regras específicas.
+
+# -----------------------------------------------------
+# Sandbox local — nunca commitar
+# -----------------------------------------------------
+_scratch/
+
+# -----------------------------------------------------
+# Repos legados (clones de referência, não fazem parte do workspace versionado)
+# -----------------------------------------------------
+temp_repos/
+
+# -----------------------------------------------------
+# Configs de ferramentas locais
+# -----------------------------------------------------
+.firecrawl/
+.qwen/
+.cursor/
+.vscode/
+.idea/
+
+# -----------------------------------------------------
+# Variáveis de ambiente
+# -----------------------------------------------------
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# -----------------------------------------------------
+# Sistema operacional
+# -----------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+
+# -----------------------------------------------------
+# Logs e crashes
+# -----------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -----------------------------------------------------
+# Caches genéricos
+# -----------------------------------------------------
+.cache/
+.tmp/
+tmp/
+
+# -----------------------------------------------------
+# Saídas de build (cobre subprojetos sem precisar de gitignore deles)
+# -----------------------------------------------------
+node_modules/
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/out/
+**/coverage/
+**/.turbo/
+**/.vercel/
+
+# Python (caso tenha venvs órfãs no workspace)
+**/__pycache__/
+**/*.pyc
+**/.venv/
+**/venv/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.pytest_cache/
+**/*.egg-info/

@@ -1,0 +1,41 @@
+{
+  "nicho": "ideia-chat",
+  "produto": "Ideia Chat",
+  "url_produto": "https://ideiamultichat.com.br/",
+  "publico_alvo_principal": [
+    "escritórios contábeis",
+    "empresas com atendimento ao cliente"
+  ],
+  "concorrentes_diretos": [
+    "Take Blip",
+    "Zenvia",
+    "Octadesk",
+    "Z-API",
+    "Twilio"
+  ],
+  "seeds_termos": [
+    "atendimento whatsapp",
+    "whatsapp para empresas",
+    "multiplos atendentes whatsapp",
+    "whatsapp api oficial",
+    "centralizar atendimento whatsapp",
+    "atendimento whatsapp escritorio contabil",
+    "agente de ia whatsapp",
+    "automacao whatsapp empresa",
+    "whatsapp business api",
+    "chatbot whatsapp"
+  ],
+  "verticais_expansao": [
+    "clínicas e consultórios",
+    "escritórios de advocacia",
+    "e-commerce",
+    "imobiliárias",
+    "educação"
+  ],
+  "objetivos_pesquisa": [
+    "Identificar 100-200 termos de alta intenção comercial",
+    "Identificar gaps de conteúdo nos top concorrentes",
+    "Mapear clusters temáticos para criar hubs de conteúdo",
+    "Priorizar 20-50 termos para a primeira leva de páginas"
+  ]
+}

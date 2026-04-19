@@ -1,0 +1,68 @@
+[project]
+name = "ideiapages-research"
+version = "0.1.0"
+description = "Módulo de pesquisa e análise de termos para IDeiaPages"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [
+  { name = "Rede Ideia" }
+]
+dependencies = [
+  "anthropic>=0.39.0",
+  "apify-client>=1.8.0",
+  "firecrawl-py>=1.5.0",
+  "google-genai>=0.3.0",
+  "httpx>=0.27.0",
+  "openai>=1.50.0",
+  "pydantic>=2.7.0",
+  "pydantic-settings>=2.4.0",
+  "pytrends>=4.9.2",
+  "python-dotenv>=1.0.0",
+  "structlog>=24.4.0",
+  "supabase>=2.8.0",
+  "tenacity>=9.0.0",
+  "typer>=0.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.10.0",
+  "pytest>=8.3.0",
+  "pytest-asyncio>=0.24.0",
+  "pytest-mock>=3.14.0",
+  "ruff>=0.6.0",
+]
+
+[project.scripts]
+ideiapages-research = "ideiapages_research.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ideiapages_research"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "ASYNC", "S", "C4", "SIM", "ARG"]
+ignore = ["S101"]  # allow assert in tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "ARG"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
