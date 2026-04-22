@@ -7,11 +7,11 @@
 
 ## Status atual
 
-- **Marco em andamento**: Fase 0 — Research Pipeline
-- **Próxima ação concreta (operacional)**: `uv run ideiapages-research fase-0-status` (diagnóstico + comandos sugeridos); depois priorizar → SERP → scrape → gaps ou `run-pipeline --seed-file seeds/ideia_chat.json --yes`. Ver `[research/README.md](./research/README.md)`.
-- **Próxima ação (fechamento de fase)**: `f0-pipeline-run` — executar E2E no ambiente real; `f0-report` — `report` + revisão; `f0-aprovacao` — ≥20 termos `briefing_pronto`.
-- **Bloqueios**: nenhum (depende de `.env` + migrations Supabase aplicadas)
-- **Última atualização**: 2026-04-20
+- **Marco em andamento**: **Fase 1 — Páginas Piloto** (Fase 0 **encerrada** em 22/04/2026).
+- **Aprovação Fase 0**: **assinada** em `[FASE-0-APROVACAO.md](./FASE-0-APROVACAO.md)` — 19 briefings prontos (meta 20 flexibilizada pelo Júnior).
+- **Próxima ação concreta**: iniciar Fase 1 — `/spec fase-1-paginas-piloto` (já existe esqueleto em `specs/`), depois `/break` e migrations `paginas`, `variacoes`, `leads`, `metricas_diarias`.
+- **Bloqueios**: nenhum.
+- **Última atualização**: 2026-04-22 (Fase 0 aprovada e encerrada).
 
 ---
 
@@ -21,15 +21,15 @@
 | Marco                      | Total  | Concluídas | Em andamento | Pendentes |
 | -------------------------- | ------ | ---------- | ------------ | --------- |
 | Bootstrap SDD              | 1      | 1          | 0            | 0         |
-| Fase 0 — Research Pipeline | 14     | 11         | 0            | 3         |
-| Fase 1 — Páginas Piloto    | 11     | 0          | 0            | 11        |
-| Fase 2 — Multi-IA + A/B    | 9      | 0          | 0            | 9         |
-| Fase 3 — Dashboard         | 6      | 0          | 0            | 6         |
-| Fase 4 — Autocura + Escala | 7      | 0          | 0            | 7         |
-| **TOTAL**                  | **48** | **12**     | **0**        | **36**    |
+| Fase 0 — Research Pipeline | 14     | 14         | 0            | 0         |
+| Fase 1 — Páginas Piloto    | 11     | 1          | 0            | 10        |
+| Fase 2 — Multi-IA + A/B    | 9      | 1          | 0            | 8         |
+| Fase 3 — Dashboard         | 6      | 1          | 0            | 5         |
+| Fase 4 — Autocura + Escala | 7      | 1          | 0            | 6         |
+| **TOTAL**                  | **48** | **19**     | **0**        | **29**    |
 
 
-Progresso geral: **25%** (12 de 48) — *Fase 0: implementação técnica OK; faltam execução E2E, relatório revisado e aprovação.*
+Progresso geral: **40%** (19 de 48) — *Fase 0 encerrada em 22/04/2026 com 19 briefings prontos (meta 20 flexibilizada). Fase 1 começa agora.*
 
 ---
 
@@ -57,9 +57,9 @@ Progresso geral: **25%** (12 de 48) — *Fase 0: implementação técnica OK; fa
 - **f0-impl-scrape** — Implementar scrape-competitors (Firecrawl + CLI)
 - **f0-impl-gaps** — Implementar analyze-gaps (Claude Sonnet + `briefings_seo` + CLI)
 - **f0-impl-orchestration** — CLI `run-pipeline`, `prioritize-terms`, `report`, `**fase-0-status`**; prompt `references/prompts/analyze-gaps.md`; pacote `behaviors/pipeline/`
-- **f0-pipeline-run** — **Executar** pipeline end-to-end com `seeds/ideia_chat.json` no ambiente real (custo/APIs); validar ≥20 `briefing_pronto` *(código pronto; ação do operador)*
-- **f0-report** — Relatório final revisado + apresentar ao Júnior *(comando `report` gera markdown; falta conteúdo pós-run e revisão)*
-- **f0-aprovacao** — Aprovação do Júnior (≥20 termos com briefing pronto) → libera Fase 1
+- **f0-pipeline-run** ✅ Executado E2E; estado final: 56 termos, **19 `briefing_pronto`**, 19 em `briefings_seo`
+- **f0-report** ✅ Relatório gerado em `research/data/relatorios/fase-0-20260422T200956Z.md` (com nota de aprovação)
+- **f0-aprovacao** ✅ **Aprovado pelo Júnior em 22/04/2026 com 19 briefings** (meta 20 flexibilizada) — ver `[FASE-0-APROVACAO.md](./FASE-0-APROVACAO.md)`
 
 ---
 
@@ -67,8 +67,9 @@ Progresso geral: **25%** (12 de 48) — *Fase 0: implementação técnica OK; fa
 
 > **Entregável**: 5-10 páginas SEO publicadas em `ideiamultichat.com.br/blog` capturando leads.
 > **Pré-requisito**: Fase 0 aprovada.
+> **Spec**: `[specs/fase-1-paginas-piloto.md](./specs/fase-1-paginas-piloto.md)`
 
-- **f1-spec** — `/spec fase-1-paginas-piloto`
+- **f1-spec** — Spec da fase: `specs/fase-1-paginas-piloto.md` **(concluída 2026-04-22)**
 - **f1-contracts** — Contratos: rendering (render-page, sitemap, robots), conversion (lead-form-submit, whatsapp-modal, utm-tracking), monitoring (basic-tracking)
 - **f1-break** — `/break fase-1-paginas-piloto`: issues + DAG
 - **f1-impl-tables** — Migrations: tabelas paginas, variacoes, leads, metricas_diarias
@@ -86,8 +87,9 @@ Progresso geral: **25%** (12 de 48) — *Fase 0: implementação técnica OK; fa
 
 > **Entregável**: 20-50 páginas geradas por Claude/GPT/Gemini com A/B ativo, vencedor definido por significância estatística.
 > **Pré-requisito**: Fase 1 aprovada.
+> **Spec**: `[specs/fase-2-multi-ia-ab.md](./specs/fase-2-multi-ia-ab.md)`
 
-- **f2-spec** — `/spec fase-2-multi-ia-ab`
+- **f2-spec** — Spec da fase: `specs/fase-2-multi-ia-ab.md` **(concluída 2026-04-22)**
 - **f2-contracts** — Contratos: generation (claude-generator, gpt-generator, gemini-generator, quality-gate), experiments (assign-variation, track-metrics, declare-winner)
 - **f2-break** — `/break fase-2-multi-ia-ab`: issues + DAG
 - **f2-impl-prompts** — Prompt engineering: templates versionados em `references/prompts/` (generate-page por intent)
@@ -103,8 +105,9 @@ Progresso geral: **25%** (12 de 48) — *Fase 0: implementação técnica OK; fa
 
 > **Entregável**: dashboard interno mostrando performance por página/IA/cluster + recomendações automáticas.
 > **Pré-requisito**: Fase 2 aprovada.
+> **Spec**: `[specs/fase-3-dashboard.md](./specs/fase-3-dashboard.md)`
 
-- **f3-spec** — `/spec fase-3-dashboard`
+- **f3-spec** — Spec da fase: `specs/fase-3-dashboard.md` **(concluída 2026-04-22)**
 - **f3-contracts** — Contratos: dashboard (performance-view, recommendations-engine)
 - **f3-break** — `/break fase-3-dashboard`: issues + DAG
 - **f3-impl-dashboard** — Dashboard interno: performance por página, por IA, por cluster, custo vs ROI
@@ -117,8 +120,9 @@ Progresso geral: **25%** (12 de 48) — *Fase 0: implementação técnica OK; fa
 
 > **Entregável**: monitoramento contínuo de ranking + reescrita automática de páginas em queda + 100+ páginas no ar.
 > **Pré-requisito**: Fase 3 aprovada.
+> **Spec**: `[specs/fase-4-autocura.md](./specs/fase-4-autocura.md)`
 
-- **f4-spec** — `/spec fase-4-autocura`
+- **f4-spec** — Spec da fase: `specs/fase-4-autocura.md` **(concluída 2026-04-22)**
 - **f4-contracts** — Contratos: monitoring (detect-ranking-drop, auto-rewrite, scale-orchestrator)
 - **f4-break** — `/break fase-4-autocura`: issues + DAG
 - **f4-impl-detect** — Behavior detect-ranking-drop (GSC polling + alerta de queda)
@@ -180,3 +184,4 @@ Progresso geral: **25%** (12 de 48) — *Fase 0: implementação técnica OK; fa
 | Data       | Nota                                                                                                                                |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-04-20 | Fase 0: implementados `analyze-gaps`, `run-pipeline`, `prioritize-terms`, `report`; ROADMAP alinhado ao fluxo SERP → scrape → gaps. |
+| 2026-04-22 | Criados specs das Fases 1–4: `fase-1-paginas-piloto.md`, `fase-2-multi-ia-ab.md`, `fase-3-dashboard.md`, `fase-4-autocura.md`.      |
