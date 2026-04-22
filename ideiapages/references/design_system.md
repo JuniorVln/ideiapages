@@ -60,13 +60,15 @@ colors: {
 
 Escala (mobile / desktop):
 
+
 | Token | Mobile | Desktop |
-|-------|--------|---------|
-| h1 | 32px | 48px |
-| h2 | 24px | 36px |
-| h3 | 20px | 28px |
-| body | 16px | 16px |
-| small | 14px | 14px |
+| ----- | ------ | ------- |
+| h1    | 32px   | 48px    |
+| h2    | 24px   | 36px    |
+| h3    | 20px   | 28px    |
+| body  | 16px   | 16px    |
+| small | 14px   | 14px    |
+
 
 Line-height: 1.2 (headings), 1.6 (body).
 
@@ -154,3 +156,4 @@ WhatsApp button fixo flutuante no canto inferior direito em mobile.
 - **NUNCA** animação que atrasa LCP ou interaction.
 - Sem framer-motion no MVP — CSS transitions nativas bastam.
 - Respeitar `prefers-reduced-motion`.
+

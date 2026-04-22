@@ -66,4 +66,7 @@ supabase/.temp/
 # Reports gerados
 research/reports/output/
 research/data/raw/
+research/data/logs/
 research/data/processed/
+research/data/briefings/
+research/data/relatorios/

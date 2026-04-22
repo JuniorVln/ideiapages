@@ -7,7 +7,7 @@
 ## Identificação
 
 - **Nome**: Ideia Chat
-- **URL**: https://ideiamultichat.com.br/
+- **URL**: [https://ideiamultichat.com.br/](https://ideiamultichat.com.br/)
 - **Empresa**: Rede Ideia
 - **Categoria**: SaaS de atendimento WhatsApp multi-atendentes / omnichannel
 
@@ -46,12 +46,14 @@ Plataforma de comunicação via WhatsApp para empresas, com:
 
 ## Planos e preços (atualizados em 14/04/2026)
 
-| Plano | Preço/mês | Usuários | Notas |
-|-------|-----------|----------|-------|
-| **Essencial** | R$ 179,90 | 2 | Entrada |
-| **Profissional** (intermediário) | a confirmar | a confirmar | a confirmar |
-| **Elite** | R$ 489,00 | 20 | Topo |
-| **Corporativo** | sob consulta | ilimitado/customizável | Enterprise |
+
+| Plano                            | Preço/mês    | Usuários               | Notas       |
+| -------------------------------- | ------------ | ---------------------- | ----------- |
+| **Essencial**                    | R$ 179,90    | 2                      | Entrada     |
+| **Profissional** (intermediário) | a confirmar  | a confirmar            | a confirmar |
+| **Elite**                        | R$ 489,00    | 20                     | Topo        |
+| **Corporativo**                  | sob consulta | ilimitado/customizável | Enterprise  |
+
 
 > Quando faltar dado preciso (ex: planos intermediários), o LLM deve dizer "consulte o site" ou pedir para o lead, NUNCA inventar.
 

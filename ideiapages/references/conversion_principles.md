@@ -24,11 +24,13 @@ Capturamos dados **antes** de qualquer ação que possa fazer o usuário sair do
 
 ### 2. Form mínimo
 
-| Campo | Obrigatório | Validação |
-|-------|-------------|-----------|
-| Nome | sim | mínimo 2 chars |
-| Email | sim | regex válido + dispostable detection (lista) |
-| Telefone | sim | máscara BR + DDD |
+
+| Campo    | Obrigatório | Validação                                    |
+| -------- | ----------- | -------------------------------------------- |
+| Nome     | sim         | mínimo 2 chars                               |
+| Email    | sim         | regex válido + dispostable detection (lista) |
+| Telefone | sim         | máscara BR + DDD                             |
+
 
 Não pedir CNPJ, cargo, empresa, tamanho da empresa **no formulário inicial**. Esses dados vêm na conversa do WhatsApp.
 
@@ -42,13 +44,15 @@ Não pedir CNPJ, cargo, empresa, tamanho da empresa **no formulário inicial**. 
 
 Toda página gera/lê UTMs e os salva com o lead:
 
-| UTM | Origem |
-|-----|--------|
-| `utm_source` | sempre `google` para tráfego orgânico (default) |
-| `utm_medium` | `organic` (default) ou valor da query string |
-| `utm_campaign` | `ideiapages` (default) |
-| `utm_term` | termo-alvo da página |
-| `utm_content` | id da variação A/B vista |
+
+| UTM            | Origem                                          |
+| -------------- | ----------------------------------------------- |
+| `utm_source`   | sempre `google` para tráfego orgânico (default) |
+| `utm_medium`   | `organic` (default) ou valor da query string    |
+| `utm_campaign` | `ideiapages` (default)                          |
+| `utm_term`     | termo-alvo da página                            |
+| `utm_content`  | id da variação A/B vista                        |
+
 
 Salvos em cookie no primeiro touch + replicados no lead final.
 
@@ -79,12 +83,14 @@ Cada página tem UM objetivo de conversão. Não competir entre "preencha o form
 
 ## Performance da conversão
 
-| Métrica | Como medir | Alvo MVP |
-|---------|------------|----------|
-| Lead conversion rate | leads / sessões | > 3% |
-| WhatsApp click rate | cliques no CTA WhatsApp / sessões | > 8% |
-| Captura → envio WhatsApp | leads que abriram WhatsApp / leads totais | > 70% |
-| Form abandon | starts sem submit / starts | < 50% |
+
+| Métrica                  | Como medir                                | Alvo MVP |
+| ------------------------ | ----------------------------------------- | -------- |
+| Lead conversion rate     | leads / sessões                           | > 3%     |
+| WhatsApp click rate      | cliques no CTA WhatsApp / sessões         | > 8%     |
+| Captura → envio WhatsApp | leads que abriram WhatsApp / leads totais | > 70%    |
+| Form abandon             | starts sem submit / starts                | < 50%    |
+
 
 ---
 
@@ -118,3 +124,4 @@ Rodapé: Seus dados ficam seguros. Política de Privacidade.
 ```
 Olá! Vim do site através da página sobre {termo_alvo}. Quero saber mais sobre o Ideia Chat.
 ```
+

@@ -115,50 +115,63 @@ erDiagram
   }
 ```
 
+
+
 ---
 
 ## Tabelas detalhadas
 
 ### `termos`
+
 Pesquisa: cada termo descoberto + análise.
 
-| Coluna | Tipo | Notas |
-|--------|------|-------|
-| `id` | uuid | PK |
-| `keyword` | text | UNIQUE, NOT NULL, lowercase |
-| `fonte` | text | `autocomplete`, `paa`, `seed`, `related` |
-| `volume_estimado` | int | nullable (vem do pytrends/inferência LLM) |
-| `tendencia_pytrends` | jsonb | série temporal + relacionados |
-| `dificuldade` | int | 1-100, inferida pelo LLM |
-| `intencao` | text | `informacional`, `transacional`, `comparativa`, `navegacional` |
-| `score_conversao` | int | 1-10, definido pelo LLM |
-| `cluster` | text | agrupamento temático |
-| `tipo_pagina_recomendado` | text | `landing`, `blog`, `comparison`, `faq`, `guide` |
-| `status` | text | `coletado`, `analisado`, `priorizado`, `descartado` |
+
+| Coluna                    | Tipo  | Notas                                                          |
+| ------------------------- | ----- | -------------------------------------------------------------- |
+| `id`                      | uuid  | PK                                                             |
+| `keyword`                 | text  | UNIQUE, NOT NULL, lowercase                                    |
+| `fonte`                   | text  | `autocomplete`, `paa`, `seed`, `related`                       |
+| `volume_estimado`         | int   | nullable (vem do pytrends/inferência LLM)                      |
+| `tendencia_pytrends`      | jsonb | série temporal + relacionados                                  |
+| `dificuldade`             | int   | 1-100, inferida pelo LLM                                       |
+| `intencao`                | text  | `informacional`, `transacional`, `comparativa`, `navegacional` |
+| `score_conversao`         | int   | 1-10, definido pelo LLM                                        |
+| `cluster`                 | text  | agrupamento temático                                           |
+| `tipo_pagina_recomendado` | text  | `landing`, `blog`, `comparison`, `faq`, `guide`                |
+| `status`                  | text  | `coletado`, `analisado`, `priorizado`, `descartado`            |
+
 
 ### `serp_snapshots`
+
 Top resultados do Google por termo no momento da coleta.
 
 ### `conteudo_concorrente`
+
 Conteúdo raspado dos top URLs (Firecrawl) para análise de gaps.
 
 ### `paginas`
+
 Cada página publicada (uma página tem N variações, mas 1 ativa).
 
-| Coluna | Tipo | Notas |
-|--------|------|-------|
-| `slug` | text | UNIQUE, lowercase, hífen |
-| `tipo` | text | `landing`, `blog`, `comparison`, `faq`, `guide` |
-| `status` | text | `draft`, `review`, `published`, `archived` |
-| `dominio` | text | default `ideiamultichat.com.br` |
+
+| Coluna    | Tipo | Notas                                           |
+| --------- | ---- | ----------------------------------------------- |
+| `slug`    | text | UNIQUE, lowercase, hífen                        |
+| `tipo`    | text | `landing`, `blog`, `comparison`, `faq`, `guide` |
+| `status`  | text | `draft`, `review`, `published`, `archived`      |
+| `dominio` | text | default `ideiamultichat.com.br`                 |
+
 
 ### `variacoes`
+
 A/B testing: cada página pode ter 2-3 variações de copy.
 
 ### `leads`
+
 Captura de leads — sempre **antes** de redirecionar para WhatsApp.
 
 ### `metricas_diarias`
+
 Snapshot diário de performance para dashboard e autocura.
 
 ---

@@ -1,0 +1,102 @@
+"""Schema do briefing SEO (analyze-gaps)."""
+
+from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+EvidenceTipo = Literal["estatistica", "case", "cita"]
+
+
+class H2Block(BaseModel):
+    """Um bloco H2 com sub-H3."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    h2: str = Field(..., min_length=1, max_length=300)
+    h3s: list[str] = Field(default_factory=list)
+
+
+class FAQItem(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    pergunta: str = Field(..., min_length=1, max_length=500)
+    resposta_curta: str = Field(..., min_length=1, max_length=800)
+
+
+class EvidenciaExterna(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    tipo: EvidenceTipo
+    descricao: str = Field(..., min_length=1, max_length=600)
+
+
+class InformationGainBlock(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    topicos_unicos_que_concorrentes_nao_tem: list[str] = Field(default_factory=list)
+    angulo_diferenciado: str = Field(..., min_length=1, max_length=1200)
+
+
+class BriefingSEO(BaseModel):
+    """JSON raiz exigido do modelo (v1)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    version: Literal[1] = 1
+    title_seo: str = Field(..., min_length=1, max_length=60)
+    meta_description: str = Field(..., min_length=1, max_length=155)
+    h1_sugerido: str = Field(..., min_length=1, max_length=200)
+    estrutura_h2_h3: list[H2Block] = Field(..., min_length=1)
+    topicos_obrigatorios: list[str] = Field(..., min_length=1)
+    information_gain: InformationGainBlock
+    faq_sugerida: list[FAQItem] = Field(default_factory=list)
+    cta_principal: str = Field(..., min_length=1, max_length=400)
+    cta_secundario: str | None = Field(default=None, max_length=400)
+    evidencias_externas_sugeridas: list[EvidenciaExterna] = Field(default_factory=list)
+    schema_org_recomendados: list[str] = Field(default_factory=list)
+    word_count_alvo: int = Field(..., ge=300, le=50_000)
+    tom_de_voz: str = Field(..., min_length=1, max_length=400)
+    alertas_para_humano: list[str] = Field(default_factory=list)
+
+    @field_validator("title_seo", "meta_description", "h1_sugerido", mode="before")
+    @classmethod
+    def strip_strings(cls, v: str) -> str:
+        if isinstance(v, str):
+            return v.strip()
+        return v
+
+
+class CompetitorContent(BaseModel):
+    """Entrada do summarizer (SERP + conteúdo raspado)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    url: str
+    titulo: str | None = None
+    posicao: int = Field(..., ge=1, le=50)
+    markdown: str
+    word_count: int = Field(..., ge=0)
+    headings_h2: list[str] = Field(default_factory=list)
+    headings_h3: list[str] = Field(default_factory=list)
+    tem_faq: bool = False
+    tem_tabela: bool = False
+    thin: bool = False
+    paywalled: bool = False
+
+
+class CompetitorSummary(BaseModel):
+    """Resumo extrativo enviado ao LLM."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    url: str
+    titulo: str | None = None
+    posicao: int
+    word_count: int
+    headings_h2: list[str] = Field(default_factory=list)
+    headings_h3: list[str] = Field(default_factory=list)
+    trecho_inicio: str = Field(..., max_length=520)
+    tem_faq: bool = False
+    tem_tabela: bool = False

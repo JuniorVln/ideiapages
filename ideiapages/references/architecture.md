@@ -6,19 +6,21 @@
 
 ## Stack
 
-| Camada | Tecnologia | Versão alvo |
-|--------|------------|-------------|
-| Frontend | Next.js (App Router) | 15.x |
-| Linguagem (web) | TypeScript | 5.x (strict) |
-| Estilo | Tailwind CSS | 4.x |
-| UI Primitives | shadcn/ui (Radix) | latest |
-| Backend (web) | Next.js Route Handlers | runtime: nodejs ou edge |
-| Banco | Supabase PostgreSQL | latest |
-| ORM | Supabase JS Client + tipos gerados | `@supabase/supabase-js` |
-| Hosting | Vercel | Free → Pro |
-| Tools de pesquisa | Python | 3.11+ |
-| Gerenciador Python | uv | latest |
-| LLMs | Claude, GPT, Gemini | mais recente disponível |
+
+| Camada             | Tecnologia                         | Versão alvo             |
+| ------------------ | ---------------------------------- | ----------------------- |
+| Frontend           | Next.js (App Router)               | 15.x                    |
+| Linguagem (web)    | TypeScript                         | 5.x (strict)            |
+| Estilo             | Tailwind CSS                       | 4.x                     |
+| UI Primitives      | shadcn/ui (Radix)                  | latest                  |
+| Backend (web)      | Next.js Route Handlers             | runtime: nodejs ou edge |
+| Banco              | Supabase PostgreSQL                | latest                  |
+| ORM                | Supabase JS Client + tipos gerados | `@supabase/supabase-js` |
+| Hosting            | Vercel                             | Free → Pro              |
+| Tools de pesquisa  | Python                             | 3.11+                   |
+| Gerenciador Python | uv                                 | latest                  |
+| LLMs               | Claude, GPT, Gemini                | mais recente disponível |
+
 
 ---
 
@@ -43,7 +45,7 @@ ideiapages/
 ### 1. Thin Client / Fat Server
 
 - **NUNCA** colocar API keys no client (Next.js).
-- Variáveis com prefixo `NEXT_PUBLIC_*` são públicas — usar APENAS para dados que podem vazar (URL Supabase, anon key, GA4 ID, número de WhatsApp).
+- Variáveis com prefixo `NEXT_PUBLIC_`* são públicas — usar APENAS para dados que podem vazar (URL Supabase, anon key, GA4 ID, número de WhatsApp).
 - Variáveis sensíveis (Anthropic, OpenAI, Google AI, Apify, Firecrawl, Supabase service_role) ficam APENAS em route handlers / scripts Python.
 - Toda chamada a LLM/Apify/Firecrawl acontece no server.
 
@@ -114,6 +116,8 @@ flowchart LR
   client -.x.-|"NUNCA"| apify
 ```
 
+
+
 ---
 
 ## Versionamento
@@ -126,10 +130,13 @@ flowchart LR
 
 ## Performance budgets (alvo)
 
-| Métrica | Alvo |
-|---------|------|
-| LCP (mobile) | < 2.5s |
-| CLS | < 0.1 |
-| INP | < 200ms |
-| Bundle JS por página | < 100kb gzip |
-| Imagens | sempre via `next/image`, formato AVIF/WebP |
+
+| Métrica              | Alvo                                       |
+| -------------------- | ------------------------------------------ |
+| LCP (mobile)         | < 2.5s                                     |
+| CLS                  | < 0.1                                      |
+| INP                  | < 200ms                                    |
+| Bundle JS por página | < 100kb gzip                               |
+| Imagens              | sempre via `next/image`, formato AVIF/WebP |
+
+

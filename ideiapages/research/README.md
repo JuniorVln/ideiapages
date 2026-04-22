@@ -2,6 +2,8 @@
 
 Scripts Python para coleta e análise de termos de busca.
 
+**Status macro do projeto** (sempre atualizado): [`../ROADMAP.md`](../ROADMAP.md).
+
 ## Setup
 
 ```bash
@@ -32,14 +34,27 @@ Copiar `.env.example` da raiz do `ideiapages/` para `.env` da raiz, com:
 # Listar comandos
 uv run ideiapages-research --help
 
+# Onde estou no funil? (contagens Supabase + próximos comandos)
+uv run ideiapages-research fase-0-status
+
 # Coletar autocomplete + PAA para um seed
 uv run ideiapages-research collect-autocomplete --seed "atendimento whatsapp"
 
-# Snapshot SERP top 10 para um termo
-uv run ideiapages-research collect-serp --termo-id <uuid>
+# Priorizar termos classificados (score ≥ 7, exclui tendência decrescente)
+uv run ideiapages-research prioritize-terms --limit 50
+uv run ideiapages-research prioritize-terms --dry-run
 
-# Raspar conteúdo dos top concorrentes
+# Snapshot SERP top 10 (Apify) — um termo ou lote priorizado
+uv run ideiapages-research collect-serp --termo-id <uuid>
+uv run ideiapages-research collect-serp --keyword "atendimento whatsapp"
+uv run ideiapages-research collect-serp --all-priorizados --limit 30 --top-n 10
+# Se ainda não marcou priorizado: incluir analisados com bom score
+uv run ideiapages-research collect-serp --all-priorizados --include-analisado --limit 30
+
+# Raspar concorrentes (Firecrawl) — grupo SERP mais recente do termo
 uv run ideiapages-research scrape-competitors --termo-id <uuid>
+uv run ideiapages-research scrape-competitors --snapshot-id <uuid-linha-serp>
+uv run ideiapages-research scrape-competitors --all-pending --limit 20
 
 # Buscar tendências Google Trends para uma keyword
 uv run ideiapages-research collect-trends --keyword "atendimento whatsapp"
@@ -50,8 +65,11 @@ uv run ideiapages-research classify-terms --batch-size 50
 # Análise de gaps de conteúdo
 uv run ideiapages-research analyze-gaps --termo-id <uuid>
 
-# Pipeline completo para um seed
-uv run ideiapages-research run-pipeline --seed-file ../seeds/ideia_chat.json
+# Fase 0 ponta a ponta (custo alto: confirme o estimador ou use --yes)
+uv run ideiapages-research run-pipeline --seed-file ../seeds/ideia_chat.json --yes
+
+# Só relatório (snapshot atual do Supabase → research/data/relatorios/)
+uv run ideiapages-research report
 ```
 
 ## Estrutura
@@ -83,7 +101,8 @@ research/
 │           ├── scrape_competitors/
 │           ├── collect_trends/
 │           ├── classify_terms/
-│           └── analyze_gaps/
+│           ├── analyze_gaps/
+│           └── pipeline/
 └── tests/
     └── behaviors/...
 ```

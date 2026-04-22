@@ -1,0 +1,11 @@
+# Dominios a ignorar nos snapshots organicos (um host por linha, sem protocolo).
+# Linhas vazias e comentarios (#) sao ignoradas.
+
+ideiamultichat.com.br
+www.ideiamultichat.com.br
+instagram.com
+www.instagram.com
+facebook.com
+www.facebook.com
+m.facebook.com
+web.facebook.com

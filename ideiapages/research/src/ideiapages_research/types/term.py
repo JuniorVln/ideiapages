@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TermSource(StrEnum):
@@ -48,12 +48,42 @@ class TermInput(BaseModel):
 class TermClassification(BaseModel):
     """Output da classificação por LLM."""
 
+    model_config = ConfigDict(extra="forbid")
+
     keyword: str
     intencao: TermIntent
     score_conversao: int = Field(..., ge=1, le=10)
     tipo_pagina_recomendado: PageType
-    cluster: str
-    justificativa: str
+    cluster: str = Field(..., max_length=200)
+    justificativa: str = Field(..., max_length=500)
+
+
+class ClassifyLLMResponse(BaseModel):
+    """JSON raiz retornado pelo modelo."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    classifications: list[TermClassification]
+
+
+class ClassifyBatchInput(BaseModel):
+    """Entrada explícita de um lote (testes / chamadas programáticas)."""
+
+    termos: list[UUID]
+    keywords: list[str]
+
+
+class ClassifyBatchResult(BaseModel):
+    """Agregado após processar um lote via API."""
+
+    batch_index: int
+    processed: int
+    succeeded: int
+    failed: int
+    cost_brl: float
+    score_histogram: dict[int, int] = Field(default_factory=dict)
+    cluster_top: dict[str, int] = Field(default_factory=dict)
+    errors: list[str] = Field(default_factory=list)
 
 
 class TermRecord(BaseModel):
