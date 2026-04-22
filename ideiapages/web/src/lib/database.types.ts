@@ -1,5 +1,3 @@
-// Tipos alinhados ao schema remoto (Supabase). Regenerar via MCP ou `pnpm db:types` com projeto linkado.
-
 export type Json =
   | string
   | number
@@ -9,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
@@ -114,6 +114,72 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          criado_em: string
+          email: string
+          id: string
+          ip_hash: string | null
+          nome: string
+          pagina_id: string | null
+          telefone: string
+          user_agent_hash: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          variacao_id: string | null
+        }
+        Insert: {
+          criado_em?: string
+          email: string
+          id?: string
+          ip_hash?: string | null
+          nome: string
+          pagina_id?: string | null
+          telefone: string
+          user_agent_hash?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          variacao_id?: string | null
+        }
+        Update: {
+          criado_em?: string
+          email?: string
+          id?: string
+          ip_hash?: string | null
+          nome?: string
+          pagina_id?: string | null
+          telefone?: string
+          user_agent_hash?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          variacao_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_pagina_id_fkey"
+            columns: ["pagina_id"]
+            isOneToOne: false
+            referencedRelation: "paginas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_variacao_id_fkey"
+            columns: ["variacao_id"]
+            isOneToOne: false
+            referencedRelation: "variacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       llm_calls_log: {
         Row: {
           behavior: string
@@ -202,6 +268,115 @@ export type Database = {
           terminou_em?: string | null
         }
         Relationships: []
+      }
+      metricas_diarias: {
+        Row: {
+          cliques_whatsapp: number
+          criado_em: string
+          ctr_whatsapp: number | null
+          data: string
+          id: string
+          leads: number
+          pageviews: number
+          pagina_id: string
+          sessoes: number
+          taxa_conversao: number | null
+        }
+        Insert: {
+          cliques_whatsapp?: number
+          criado_em?: string
+          ctr_whatsapp?: number | null
+          data: string
+          id?: string
+          leads?: number
+          pageviews?: number
+          pagina_id: string
+          sessoes?: number
+          taxa_conversao?: number | null
+        }
+        Update: {
+          cliques_whatsapp?: number
+          criado_em?: string
+          ctr_whatsapp?: number | null
+          data?: string
+          id?: string
+          leads?: number
+          pageviews?: number
+          pagina_id?: string
+          sessoes?: number
+          taxa_conversao?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metricas_diarias_pagina_id_fkey"
+            columns: ["pagina_id"]
+            isOneToOne: false
+            referencedRelation: "paginas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paginas: {
+        Row: {
+          atualizado_em: string
+          corpo_mdx: string
+          criado_em: string
+          cta_whatsapp_texto: string
+          faq_jsonb: Json | null
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          og_image_url: string | null
+          publicado_em: string | null
+          slug: string
+          status: string
+          subtitulo: string | null
+          termo_id: string | null
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          corpo_mdx?: string
+          criado_em?: string
+          cta_whatsapp_texto?: string
+          faq_jsonb?: Json | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image_url?: string | null
+          publicado_em?: string | null
+          slug: string
+          status?: string
+          subtitulo?: string | null
+          termo_id?: string | null
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          corpo_mdx?: string
+          criado_em?: string
+          cta_whatsapp_texto?: string
+          faq_jsonb?: Json | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image_url?: string | null
+          publicado_em?: string | null
+          slug?: string
+          status?: string
+          subtitulo?: string | null
+          termo_id?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paginas_termo_id_fkey"
+            columns: ["termo_id"]
+            isOneToOne: false
+            referencedRelation: "termos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       serp_snapshots: {
         Row: {
@@ -297,6 +472,41 @@ export type Database = {
           volume_estimado?: number | null
         }
         Relationships: []
+      }
+      variacoes: {
+        Row: {
+          ativa: boolean
+          corpo_mdx: string | null
+          criado_em: string
+          id: string
+          nome: string
+          pagina_id: string
+        }
+        Insert: {
+          ativa?: boolean
+          corpo_mdx?: string | null
+          criado_em?: string
+          id?: string
+          nome?: string
+          pagina_id: string
+        }
+        Update: {
+          ativa?: boolean
+          corpo_mdx?: string | null
+          criado_em?: string
+          id?: string
+          nome?: string
+          pagina_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variacoes_pagina_id_fkey"
+            columns: ["pagina_id"]
+            isOneToOne: false
+            referencedRelation: "paginas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

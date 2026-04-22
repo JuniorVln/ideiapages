@@ -1,8 +1,48 @@
 @import "tailwindcss";
 
+/* ── Design Tokens ── */
 :root {
-  --background: 255 255 255;
-  --foreground: 17 24 39;
+  /* Brand */
+  --color-brand-primary: #1e40af;       /* azul Ideia */
+  --color-brand-primary-dark: #1e3a8a;
+  --color-brand-cta: #25D366;           /* WhatsApp green */
+  --color-brand-cta-dark: #128C7E;
+  --color-brand-cta-text: #ffffff;
+
+  /* Surface */
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8fafc;
+  --color-surface-card: #f1f5f9;
+
+  /* Text */
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-text-subtle: #94a3b8;
+
+  /* Border */
+  --color-border: #e2e8f0;
+  --color-border-focus: #1e40af;
+
+  /* Status */
+  --color-success: #16a34a;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
+
+  /* Spacing */
+  --section-y: 4rem;
+  --container-max: 75rem;
+  --content-max: 65ch;
+
+  /* Shadow */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -16,9 +56,79 @@
 html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: rgb(var(--background));
-  color: rgb(var(--foreground));
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* ── Prose (artigos de blog) ── */
+.prose-blog {
+  max-width: var(--content-max);
+  line-height: 1.75;
+}
+
+.prose-blog h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+.prose-blog h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.prose-blog p {
+  margin-bottom: 1.25rem;
+  color: var(--color-text-muted);
+}
+
+.prose-blog ul,
+.prose-blog ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+  color: var(--color-text-muted);
+}
+
+.prose-blog li {
+  margin-bottom: 0.375rem;
+}
+
+.prose-blog strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.prose-blog a {
+  color: var(--color-brand-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.prose-blog table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.prose-blog th,
+.prose-blog td {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.prose-blog th {
+  background: var(--color-surface-card);
+  font-weight: 600;
 }
