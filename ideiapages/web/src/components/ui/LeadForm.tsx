@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "./Button";
 import { FormField } from "./FormField";
 import { captureUtmsFromUrl, getStoredUtms, type UtmParams } from "@/lib/utm";
@@ -38,6 +38,7 @@ export function LeadForm({
   ctaLabel = "Falar com especialista no WhatsApp",
   onSuccess,
 }: LeadFormProps) {
+  void whatsappNumber;
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -45,16 +46,26 @@ export function LeadForm({
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [utms, setUtms] = useState<UtmParams | null>(null);
-  const [started, setStarted] = useState(false);
+  const startedRef = useRef(false);
+  const submittedRef = useRef(false);
 
   useEffect(() => {
     const captured = captureUtmsFromUrl();
     setUtms(captured ?? getStoredUtms());
   }, []);
 
+  useEffect(
+    () => () => {
+      if (startedRef.current && !submittedRef.current) {
+        trackEvent("form_abandon", { pagina_id: paginaId });
+      }
+    },
+    [paginaId]
+  );
+
   function handleFirstInteraction() {
-    if (!started) {
-      setStarted(true);
+    if (!startedRef.current) {
+      startedRef.current = true;
       trackEvent("form_start", { pagina_id: paginaId });
     }
   }
@@ -91,10 +102,11 @@ export function LeadForm({
         return;
       }
 
+      submittedRef.current = true;
       trackEvent("lead_submit", { pagina_id: paginaId, variacao_id: variacaoId });
 
       if (data.redirect_url) {
-        trackEvent("whatsapp_open", { pagina_id: paginaId, keyword });
+        trackEvent("whatsapp_redirect", { pagina_id: paginaId, keyword });
         window.open(data.redirect_url, "_blank", "noopener,noreferrer");
       }
 

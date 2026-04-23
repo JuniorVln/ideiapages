@@ -26,7 +26,7 @@ const IS_PROD = process.env.NEXT_PUBLIC_ENV === "production";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={inter.variable}>
-      <body className="min-h-screen bg-surface text-text antialiased">
+      <body className="min-h-screen bg-surface text-text antialiased font-sans">
         {children}
         {IS_PROD && GA4_ID && <GoogleAnalytics gaId={GA4_ID} />}
       </body>

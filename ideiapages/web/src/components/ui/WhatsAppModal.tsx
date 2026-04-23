@@ -12,6 +12,14 @@ interface WhatsAppModalProps {
   whatsappNumber: string;
 }
 
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  const sel =
+    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  return Array.from(container.querySelectorAll<HTMLElement>(sel)).filter(
+    (el) => !el.closest("[hidden]") && el.getAttribute("aria-hidden") !== "true"
+  );
+}
+
 export function WhatsAppModal({
   isOpen,
   onClose,
@@ -21,6 +29,7 @@ export function WhatsAppModal({
   whatsappNumber,
 }: WhatsAppModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -41,6 +50,31 @@ export function WhatsAppModal({
     dialog.addEventListener("close", handleClose);
     return () => dialog.removeEventListener("close", handleClose);
   }, [onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function onKeyDown(e: KeyboardEvent) {
+      const panel = panelRef.current;
+      if (!panel || e.key !== "Tab") return;
+      const list = getFocusableElements(panel);
+      if (list.length === 0) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
 
   function handleBackdropClick(e: React.MouseEvent<HTMLDialogElement>) {
     const rect = dialogRef.current?.getBoundingClientRect();
@@ -67,7 +101,7 @@ export function WhatsAppModal({
         open:animate-in open:fade-in open:slide-in-from-bottom-4
       "
     >
-      <div className="p-6">
+      <div ref={panelRef} className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 id="modal-title" className="text-xl font-bold text-text">

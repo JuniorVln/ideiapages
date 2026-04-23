@@ -1,6 +1,8 @@
 "use client";
 
 import { type InputHTMLAttributes, forwardRef, useId } from "react";
+import { Input } from "./Input";
+import { Label } from "./Label";
 
 interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -15,23 +17,16 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
 
     return (
       <div className="flex flex-col gap-1">
-        <label htmlFor={id} className="text-sm font-medium text-text">
+        <Label htmlFor={id} requiredIndicator={Boolean(props.required)}>
           {label}
-          {props.required && <span className="text-red-500 ml-0.5" aria-hidden>*</span>}
-        </label>
-        <input
+        </Label>
+        <Input
           ref={ref}
           id={id}
           aria-describedby={error ? errorId : undefined}
           aria-invalid={error ? "true" : undefined}
-          className={`
-            w-full rounded-lg border px-3 py-2.5 text-sm text-text placeholder:text-text-subtle
-            transition-colors duration-150 outline-none
-            border-border focus:border-border-focus focus:ring-2 focus:ring-brand-primary/20
-            disabled:opacity-50 disabled:cursor-not-allowed
-            ${error ? "border-red-500 focus:border-red-500 focus:ring-red-200" : ""}
-            ${className}
-          `}
+          invalid={Boolean(error)}
+          className={className}
           {...props}
         />
         {error && (

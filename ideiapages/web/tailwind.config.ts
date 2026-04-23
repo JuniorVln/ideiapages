@@ -8,11 +8,24 @@ const config: Config = {
         brand: {
           primary: "#1e40af",
           "primary-dark": "#1e3a8a",
+          /** Texto / superfícies escuras da marca (não confundir com verde WhatsApp) */
+          dark: "#0f172a",
           cta: "#25D366",
           "cta-dark": "#128C7E",
           DEFAULT: "#1e40af",
-          dark: "#128C7E",
           accent: "#075E54",
+        },
+        neutral: {
+          50: "#f8fafc",
+          100: "#f1f5f9",
+          200: "#e2e8f0",
+          300: "#cbd5e1",
+          400: "#94a3b8",
+          500: "#64748b",
+          600: "#475569",
+          700: "#334155",
+          800: "#1e293b",
+          900: "#0f172a",
         },
         surface: {
           DEFAULT: "#ffffff",
@@ -32,6 +45,9 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
         display: ["var(--font-inter)", "system-ui", "sans-serif"],
+      },
+      letterSpacing: {
+        display: "-0.02em",
       },
       maxWidth: {
         content: "65ch",

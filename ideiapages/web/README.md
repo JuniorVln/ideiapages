@@ -44,7 +44,7 @@ web/
 │   │   ├── sitemap.ts
 │   │   └── robots.ts
 │   ├── components/
-│   │   └── ui/              # shadcn-style (Button, Input, etc)
+│   │   └── ui/              # Design system Fase 1: Button, Input, Label, FormField, LeadForm, WhatsAppModal, PageCTA, FloatingCTA, StickyHeader, SchemaOrg
 │   ├── behaviors/           # implementação por behavior (cobertor curto)
 │   │   └── <dominio>/<behavior>/
 │   │       ├── components/

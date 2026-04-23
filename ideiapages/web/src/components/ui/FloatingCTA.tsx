@@ -22,7 +22,7 @@ export function FloatingCTA({
   const [open, setOpen] = useState(false);
 
   function handleOpen() {
-    trackEvent("whatsapp_cta_click", { source: "floating", pagina_id: paginaId });
+    trackEvent("whatsapp_open", { source: "floating_cta", pagina_id: paginaId });
     setOpen(true);
   }
 

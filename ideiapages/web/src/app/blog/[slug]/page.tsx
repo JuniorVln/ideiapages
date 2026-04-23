@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { SchemaOrg } from "@/components/ui/SchemaOrg";
 import { PageCTA } from "@/components/ui/PageCTA";
 import { FloatingCTA } from "@/components/ui/FloatingCTA";
+import { StickyHeader } from "@/components/ui/StickyHeader";
 import type { Tables } from "@/lib/database.types";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ideiamultichat.com.br";
@@ -110,9 +112,9 @@ export default async function BlogPage({ params }: Props) {
         <div className="max-w-container mx-auto">
           <nav aria-label="Breadcrumb" className="mb-6">
             <ol className="flex items-center gap-2 text-sm text-blue-200">
-              <li><a href="/" className="hover:text-white transition-colors">Início</a></li>
+              <li><Link href="/" className="hover:text-white transition-colors">Início</Link></li>
               <li aria-hidden className="text-blue-300">/</li>
-              <li><a href="/blog" className="hover:text-white transition-colors">Blog</a></li>
+              <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
               <li aria-hidden className="text-blue-300">/</li>
               <li className="text-white font-medium truncate max-w-[200px]" aria-current="page">{pagina.titulo}</li>
             </ol>
@@ -134,8 +136,20 @@ export default async function BlogPage({ params }: Props) {
             label={pagina.cta_whatsapp_texto}
             size="lg"
           />
+          {/* Sentinel para StickyHeader (IntersectionObserver) */}
+          <div id="hero-scroll-sentinel" aria-hidden className="h-px w-full shrink-0" />
         </div>
       </section>
+
+      <StickyHeader
+        sentinelId="hero-scroll-sentinel"
+        paginaId={pagina.id}
+        variacaoId={variacaoControle?.id}
+        keyword={pagina.titulo}
+        whatsappNumber={WA_NUMBER}
+        ctaLabel={pagina.cta_whatsapp_texto}
+        headline={pagina.titulo}
+      />
 
       {/* Conteúdo */}
       <div className="max-w-container mx-auto px-4 py-12 flex flex-col lg:flex-row gap-12">

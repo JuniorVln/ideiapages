@@ -27,7 +27,7 @@ export function PageCTA({
   const [open, setOpen] = useState(false);
 
   function handleClick() {
-    trackEvent("whatsapp_cta_click", { source: "page", pagina_id: paginaId });
+    trackEvent("whatsapp_open", { source: "page_cta", pagina_id: paginaId });
     setOpen(true);
   }
 
