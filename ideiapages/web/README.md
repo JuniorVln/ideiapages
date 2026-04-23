@@ -22,6 +22,8 @@ pnpm typecheck    # tsc --noEmit
 pnpm db:types     # regenera src/lib/database.types.ts a partir do Supabase
 pnpm compose-page -- --list-pronto
 pnpm compose-page -- --termo-id <uuid> [--publish] [--dry-run]
+pnpm generate-page -- --termo-id <uuid> [--providers claude,gpt,gemini] [--activate] [--replace-llm] [--dry-run]
+pnpm declare-winner -- [--apply] [--min-per-arm 30]
 ```
 
 ## Deploy na Vercel (Fase 1 — piloto)
@@ -55,8 +57,26 @@ Migrations do domínio web ficam em `ideiapages/supabase/migrations/`:
 
 - `0007_paginas` … `0010_metricas_diarias` — tabelas `paginas`, `variacoes`, `leads`, `metricas_diarias`
 - `0011_fase1_web_hardening` — remove índice inválido em `leads`, garante trigger de dedup (5 min) e restringe leitura pública de `variacoes` / `metricas_diarias` a páginas com `status = 'publicado'`
+- **`0012_fase2_experiments`** — colunas `provider` / custo / tokens em `variacoes`; `status_experimento` e `variacao_vencedora_id` em `paginas`; tabela `experimentos`; `metricas_diarias.variacao_id` + índices únicos parciais (rollup vs braço)
 
 Após `supabase db push` (ou aplicar SQL no projeto), rode `pnpm db:types` nesta pasta.
+
+## Fase 2 — Multi-IA + A/B (app)
+
+1. **Env**: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_AI_API_KEY` (ou `GEMINI_API_KEY`). Opcional: `CLAUDE_MODEL`, `OPENAI_MODEL`, `GEMINI_MODEL`.
+2. **Fluxo**: criar página com `compose-page` → gerar braços com `pnpm generate-page -- --termo-id …` → opcional `--activate` para `status_experimento=ativo` e linha em `experimentos`.
+3. **Runtime**: `middleware.ts` grava `ideia_vid` e `ideia_ab_<paginaId>`; `/blog/[slug]` renderiza `corpo_mdx` do braço; `ExposureTracker` chama `POST /api/metrics/exposure` (service role no servidor).
+4. **Vencedor**: `pnpm declare-winner --` (relatório) ou `--apply` se χ² indicar diferença significativa e `--min-per-arm` atingido.
+
+Prompts versionados: `ideiapages/references/prompts/generate-page.*.md`.
+
+## Fase 3 — Dashboard interno (`/admin`)
+
+1. **Env**: `ADMIN_ALLOWED_EMAILS` (lista separada por vírgula, minúsculas recomendadas).
+2. **Supabase Auth**: habilitar **Magic Link** (email) no projeto; URL de redirect permitida deve incluir `https://<seu-dominio>/auth/callback`.
+3. **Rotas**: `/admin/login` → link mágico → `/auth/callback` → `/admin/dashboard`; também `/admin/pages`, `/admin/recommendations`, `/admin/costs`.
+
+O middleware exige sessão + e-mail na allowlist para tudo sob `/admin` exceto `/admin/login`.
 
 ## Google Search Console (pós-deploy)
 

@@ -7,11 +7,12 @@
 
 ## Status atual
 
-- **Marco em andamento**: **Fase 1 — Páginas Piloto** (Fase 0 **encerrada** em 22/04/2026).
+- **Marco em andamento**: **construção Fase 2 + 3 no app** antes do teste live ampliado; deploy piloto (**`f1-piloto-deploy`**) quando o Júnior validar na Vercel.
 - **Aprovação Fase 0**: **assinada** em `[FASE-0-APROVACAO.md](./FASE-0-APROVACAO.md)` — 19 briefings prontos (meta 20 flexibilizada pelo Júnior).
-- **Próxima ação concreta**: Fase 1 — **`f1-piloto-deploy`** (Vercel + proxy `ideiamultichat.com.br/blog`) e publicar 5–10 páginas; depois **`f1-validacao`** (2 semanas de dados).
+- **Próxima ação concreta**: aplicar migration **`0012_fase2_experiments`** no Supabase; configurar **`ADMIN_ALLOWED_EMAILS`** + Auth (magic link); rodar **`pnpm generate-page`** / **`pnpm declare-winner`** conforme doc em `web/README.md`.
+- **`f1-validacao` (2 semanas)**: **adiada** de propósito — primeiro finalizar construção e deploy de verificação.
 - **Bloqueios**: nenhum.
-- **Última atualização**: 2026-04-23 (`f1-impl-rendering` / `conversion` / `tracking` fechados no app; ver `web/README.md` GSC).
+- **Última atualização**: 2026-04-23 — Fase 2 (generators, quality-gate, experimentos, middleware A/B, métricas por braço) e Fase 3 MVP (`/admin/*`, auth allowlist) implementados no `web/`.
 
 ---
 
@@ -22,14 +23,14 @@
 | -------------------------- | ------ | ---------- | ------------ | --------- |
 | Bootstrap SDD              | 1      | 1          | 0            | 0         |
 | Fase 0 — Research Pipeline | 14     | 14         | 0            | 0         |
-| Fase 1 — Páginas Piloto    | 11     | 8          | 0            | 3         |
-| Fase 2 — Multi-IA + A/B    | 9      | 1          | 0            | 8         |
-| Fase 3 — Dashboard         | 6      | 1          | 0            | 5         |
+| Fase 1 — Páginas Piloto    | 11     | 8          | 1            | 2         |
+| Fase 2 — Multi-IA + A/B    | 9      | 5          | 0            | 4         |
+| Fase 3 — Dashboard         | 6      | 3          | 0            | 3         |
 | Fase 4 — Autocura + Escala | 7      | 1          | 0            | 6         |
-| **TOTAL**                  | **48** | **26**     | **0**        | **22**    |
+| **TOTAL**                  | **48** | **32**     | **1**        | **15**    |
 
 
-Progresso geral: **54%** (26 de 48) — *Fase 1: app web com blog índice, leads corrigidos, UTMs `__utm`, GA4+GSC doc; próximo: deploy piloto + validação.*
+Progresso geral: **67%** (32 de 48, +1 em andamento) — *Fase 2/3: código no repo; falta escala operacional (`f2-expansao`), aprovações formais e autocura Fase 4.*
 
 ---
 
@@ -72,13 +73,13 @@ Progresso geral: **54%** (26 de 48) — *Fase 1: app web com blog índice, leads
 - **f1-spec** — Spec da fase: `specs/fase-1-paginas-piloto.md` **(concluída 2026-04-22)**
 - **f1-contracts** ✅ Contratos por domínio: [`behaviors/web/data-model/contract.md`](./behaviors/web/data-model/contract.md), [`design`](./behaviors/web/design/contract.md), [`rendering`](./behaviors/web/rendering/contract.md), [`conversion`](./behaviors/web/conversion/contract.md), [`monitoring`](./behaviors/web/monitoring/contract.md), [`generation`](./behaviors/web/generation/contract.md)
 - **f1-break** ✅ **Arquivo consolidado** `[specs/fase-1-paginas-piloto.break.md](./specs/fase-1-paginas-piloto.break.md)`: DAG + **22 issues** detalhadas. *Opcional (paridade Fase 0):* espelhar em `behaviors/web/.../issues/*.md` — ainda **não** criado.
-- **f1-impl-tables** ✅ Migrations `0007_paginas` … `0010_metricas_diarias` + `0011_fase1_web_hardening` (dedup leads, RLS `variacoes`/`metricas_diarias` só com página `publicado`). Tipos: regenerar com `pnpm db:types` após aplicar no Supabase.
+- **f1-impl-tables** ✅ Migrations `0007_paginas` … `0010_metricas_diarias` + `0011_fase1_web_hardening` (dedup leads, RLS `variacoes`/`metricas_diarias` só com página `publicado`). **+ `0012_fase2_experiments`** (provider/prompt em `variacoes`, `experimentos`, métricas por `variacao_id`, estado em `paginas`). Tipos: atualizar com `pnpm db:types` após aplicar no Supabase (ou manter `database.types.ts` alinhado manualmente).
 - **f1-impl-design** ✅ Tokens em `globals.css` + `tailwind.config.ts` (`brand.*`, `neutral.*`); componentes `Button`, `Input`, `Label`, `FormField`, `LeadForm`, `WhatsAppModal` (focus trap Tab), `FloatingCTA`, `StickyHeader`, `PageCTA`; eventos `whatsapp_open` (abrir modal) e `whatsapp_redirect` (abrir `wa.me`)
 - **f1-impl-rendering** ✅ `app/blog/[slug]/page.tsx` + `app/blog/page.tsx` (índice); `SchemaOrg` (Article, FAQ, Breadcrumb); `sitemap.ts` (home + `/blog` + posts `publicado`); `robots.ts` (só produção indexável)
 - **f1-impl-conversion** ✅ `POST /api/leads` (valida página `publicado`, URL WhatsApp sempre do env, dedup + erro 23505); `WhatsAppModal` + `LeadForm`; `utm.ts` cookie **`__utm`** (legado `__utmip`) + **`useUtmTracking`**
 - **f1-impl-tracking** ✅ `GoogleAnalytics` no `layout` (produção); `analytics.ts` + `GA_EVENTS`; README com checklist **Google Search Console**
-- **f1-piloto-deploy** — Deploy 5-10 páginas piloto em `ideiamultichat.com.br/blog` (proxy reverso Vercel)
-- **f1-validacao** — Coletar 2 semanas de dados (CTR, leads, ranking) e validar funil
+- **f1-piloto-deploy** 🔄 Deploy 5-10 páginas + proxy (repo pronto; aguardando verificação live pelo Júnior)
+- **f1-validacao** ⏸️ Adiada — coleta de 2 semanas só após construção/deploy de verificação acordados
 - **f1-aprovacao** — Aprovação do Júnior (taxa de conversão ≥ 1%) → libera Fase 2
 
 ---
@@ -92,10 +93,10 @@ Progresso geral: **54%** (26 de 48) — *Fase 1: app web com blog índice, leads
 - **f2-spec** — Spec da fase: `specs/fase-2-multi-ia-ab.md` **(concluída 2026-04-22)**
 - **f2-contracts** — Contratos: generation (claude-generator, gpt-generator, gemini-generator, quality-gate), experiments (assign-variation, track-metrics, declare-winner)
 - **f2-break** — `/break fase-2-multi-ia-ab`: issues + DAG
-- **f2-impl-prompts** — Prompt engineering: templates versionados em `references/prompts/` (generate-page por intent)
-- **f2-impl-generators** — Implementar 3 generators: claude-generator, gpt-generator, gemini-generator
-- **f2-impl-quality-gate** — Implementar quality-gate (valida SEO + factual + design system + product_facts)
-- **f2-impl-experiments** — Implementar A/B: assign-variation, track-metrics, declare-winner (significância estatística)
+- **f2-impl-prompts** ✅ `references/prompts/generate-page.{informacional,transacional,comparativa,navegacional}.md` (v1)
+- **f2-impl-generators** ✅ `web/src/lib/generation/providers.ts` + CLI `pnpm generate-page`
+- **f2-impl-quality-gate** ✅ `web/src/lib/generation/quality-gate.ts` (estrutura, keyword, anti-padrões, checagem de preço vs `product_facts`)
+- **f2-impl-experiments** ✅ Middleware cookies (`ideia_vid`, `ideia_ab_*`), blog render por braço, `POST /api/metrics/exposure`, `pnpm declare-winner` (χ² homogeneidade, `--apply`)
 - **f2-expansao** — Gerar e publicar 20-50 páginas com A/B ativo entre as 3 IAs
 - **f2-aprovacao** — Aprovação do Júnior (winner statistically significant + ROI positivo) → libera Fase 3
 
@@ -110,8 +111,8 @@ Progresso geral: **54%** (26 de 48) — *Fase 1: app web com blog índice, leads
 - **f3-spec** — Spec da fase: `specs/fase-3-dashboard.md` **(concluída 2026-04-22)**
 - **f3-contracts** — Contratos: dashboard (performance-view, recommendations-engine)
 - **f3-break** — `/break fase-3-dashboard`: issues + DAG
-- **f3-impl-dashboard** — Dashboard interno: performance por página, por IA, por cluster, custo vs ROI
-- **f3-impl-recommendations** — Engine de recomendações (próximas páginas a criar, candidatos a A/B refresh)
+- **f3-impl-dashboard** ✅ `/admin/dashboard` (KPIs, leads por provider), `/admin/pages`, `/admin/pages/[slug]`; auth Supabase + allowlist `ADMIN_ALLOWED_EMAILS` + `/auth/callback`
+- **f3-impl-recommendations** ✅ `/admin/recommendations` (briefings sem página + experimentos ativos); **falta**: SERP delta, materialized views, export CSV
 - **f3-aprovacao** — Aprovação do Júnior → libera Fase 4
 
 ---

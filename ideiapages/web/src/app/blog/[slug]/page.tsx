@@ -1,12 +1,21 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { SchemaOrg } from "@/components/ui/SchemaOrg";
 import { PageCTA } from "@/components/ui/PageCTA";
 import { FloatingCTA } from "@/components/ui/FloatingCTA";
 import { StickyHeader } from "@/components/ui/StickyHeader";
+import { ExposureTracker } from "@/components/ExposureTracker";
 import type { Tables } from "@/lib/database.types";
+import {
+  resolveVariacaoId,
+  variacaoCookieName,
+  VISITOR_COOKIE,
+  type PaginaExperimentContext,
+  type VariacaoArm,
+} from "@/lib/experiments/pick-variation";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ideiamultichat.com.br";
 const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5511999999999";
@@ -15,14 +24,17 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-type Variacao = Pick<Tables<"variacoes">, "id" | "nome" | "ativa">;
+type Variacao = Pick<
+  Tables<"variacoes">,
+  "id" | "nome" | "ativa" | "provider" | "peso_trafego" | "corpo_mdx"
+>;
 type PaginaComVariacoes = Tables<"paginas"> & { variacoes: Variacao[] };
 
 async function getPagina(slug: string): Promise<PaginaComVariacoes | null> {
   const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase
     .from("paginas")
-    .select("*, variacoes(id, nome, ativa)")
+    .select("*, variacoes(id, nome, ativa, provider, peso_trafego, corpo_mdx)")
     .eq("slug", slug)
     .eq("status", "publicado")
     .single();
@@ -89,14 +101,36 @@ export default async function BlogPage({ params }: Props) {
   if (!pagina) notFound();
 
   const faqs = parseFaq(pagina.faq_jsonb);
-  const variacaoControle = Array.isArray(pagina.variacoes)
-    ? (pagina.variacoes as Array<{ id: string; nome: string; ativa: boolean }>).find(
-        (v) => v.nome === "controle" && v.ativa
-      )
-    : undefined;
+  const arms: VariacaoArm[] = Array.isArray(pagina.variacoes)
+    ? (pagina.variacoes as Variacao[]).map((v) => ({
+        id: v.id,
+        nome: v.nome,
+        ativa: v.ativa,
+        provider: v.provider ?? "controle",
+        peso_trafego: v.peso_trafego ?? 1,
+        corpo_mdx: v.corpo_mdx,
+      }))
+    : [];
+
+  const cookieStore = await cookies();
+  const visitorId = cookieStore.get(VISITOR_COOKIE)?.value ?? "anon";
+  const ctx: PaginaExperimentContext = {
+    id: pagina.id,
+    status_experimento: pagina.status_experimento ?? "inativo",
+    variacao_vencedora_id: pagina.variacao_vencedora_id ?? null,
+    variacoes: arms,
+  };
+  const cookieVid = cookieStore.get(variacaoCookieName(pagina.id))?.value;
+  const variacaoAtivaId = resolveVariacaoId(visitorId, ctx, cookieVid);
+  const variacaoAtiva = arms.find((v) => v.id === variacaoAtivaId);
+  const corpoMdx =
+    variacaoAtiva?.corpo_mdx && variacaoAtiva.corpo_mdx.trim().length > 0
+      ? variacaoAtiva.corpo_mdx
+      : pagina.corpo_mdx;
 
   return (
     <>
+      <ExposureTracker paginaId={pagina.id} variacaoId={variacaoAtivaId} />
       <SchemaOrg
         titulo={pagina.titulo}
         subtitulo={pagina.subtitulo}
@@ -130,7 +164,7 @@ export default async function BlogPage({ params }: Props) {
 
           <PageCTA
             paginaId={pagina.id}
-            variacaoId={variacaoControle?.id}
+            variacaoId={variacaoAtivaId}
             keyword={pagina.titulo}
             whatsappNumber={WA_NUMBER}
             label={pagina.cta_whatsapp_texto}
@@ -144,7 +178,7 @@ export default async function BlogPage({ params }: Props) {
       <StickyHeader
         sentinelId="hero-scroll-sentinel"
         paginaId={pagina.id}
-        variacaoId={variacaoControle?.id}
+        variacaoId={variacaoAtivaId}
         keyword={pagina.titulo}
         whatsappNumber={WA_NUMBER}
         ctaLabel={pagina.cta_whatsapp_texto}
@@ -156,7 +190,7 @@ export default async function BlogPage({ params }: Props) {
         <article className="flex-1 min-w-0">
           <div
             className="prose-blog"
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(pagina.corpo_mdx) }}
+            dangerouslySetInnerHTML={{ __html: renderMarkdown(corpoMdx) }}
           />
 
           {/* CTA intermediário (a cada ~600 palavras é feito inline, mas aqui colocamos um fixo no meio) */}
@@ -169,7 +203,7 @@ export default async function BlogPage({ params }: Props) {
             </p>
             <PageCTA
               paginaId={pagina.id}
-              variacaoId={variacaoControle?.id}
+              variacaoId={variacaoAtivaId}
               keyword={pagina.titulo}
               whatsappNumber={WA_NUMBER}
               label="Quero ver uma demo grátis"
@@ -213,7 +247,7 @@ export default async function BlogPage({ params }: Props) {
             </p>
             <PageCTA
               paginaId={pagina.id}
-              variacaoId={variacaoControle?.id}
+              variacaoId={variacaoAtivaId}
               keyword={pagina.titulo}
               whatsappNumber={WA_NUMBER}
               label={pagina.cta_whatsapp_texto}
@@ -232,7 +266,7 @@ export default async function BlogPage({ params }: Props) {
             </p>
             <PageCTA
               paginaId={pagina.id}
-              variacaoId={variacaoControle?.id}
+              variacaoId={variacaoAtivaId}
               keyword={pagina.titulo}
               whatsappNumber={WA_NUMBER}
               label="Conversar agora"
@@ -246,7 +280,7 @@ export default async function BlogPage({ params }: Props) {
       {/* CTA flutuante mobile */}
       <FloatingCTA
         paginaId={pagina.id}
-        variacaoId={variacaoControle?.id}
+        variacaoId={variacaoAtivaId}
         keyword={pagina.titulo}
         whatsappNumber={WA_NUMBER}
       />

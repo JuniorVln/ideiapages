@@ -114,6 +114,63 @@ export type Database = {
           },
         ]
       }
+      experimentos: {
+        Row: {
+          amostra_total: number | null
+          criado_em: string
+          encerrado_em: string | null
+          id: string
+          iniciado_em: string
+          lift: number | null
+          notas: string | null
+          p_value: number | null
+          pagina_id: string
+          status: string
+          vencedor_variacao_id: string | null
+        }
+        Insert: {
+          amostra_total?: number | null
+          criado_em?: string
+          encerrado_em?: string | null
+          id?: string
+          iniciado_em?: string
+          lift?: number | null
+          notas?: string | null
+          p_value?: number | null
+          pagina_id: string
+          status?: string
+          vencedor_variacao_id?: string | null
+        }
+        Update: {
+          amostra_total?: number | null
+          criado_em?: string
+          encerrado_em?: string | null
+          id?: string
+          iniciado_em?: string
+          lift?: number | null
+          notas?: string | null
+          p_value?: number | null
+          pagina_id?: string
+          status?: string
+          vencedor_variacao_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experimentos_pagina_id_fkey"
+            columns: ["pagina_id"]
+            isOneToOne: false
+            referencedRelation: "paginas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "experimentos_vencedor_variacao_id_fkey"
+            columns: ["vencedor_variacao_id"]
+            isOneToOne: false
+            referencedRelation: "variacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           criado_em: string
@@ -281,6 +338,7 @@ export type Database = {
           pagina_id: string
           sessoes: number
           taxa_conversao: number | null
+          variacao_id: string | null
         }
         Insert: {
           cliques_whatsapp?: number
@@ -293,6 +351,7 @@ export type Database = {
           pagina_id: string
           sessoes?: number
           taxa_conversao?: number | null
+          variacao_id?: string | null
         }
         Update: {
           cliques_whatsapp?: number
@@ -305,6 +364,7 @@ export type Database = {
           pagina_id?: string
           sessoes?: number
           taxa_conversao?: number | null
+          variacao_id?: string | null
         }
         Relationships: [
           {
@@ -312,6 +372,13 @@ export type Database = {
             columns: ["pagina_id"]
             isOneToOne: false
             referencedRelation: "paginas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metricas_diarias_variacao_id_fkey"
+            columns: ["variacao_id"]
+            isOneToOne: false
+            referencedRelation: "variacoes"
             referencedColumns: ["id"]
           },
         ]
@@ -330,9 +397,11 @@ export type Database = {
           publicado_em: string | null
           slug: string
           status: string
+          status_experimento: string
           subtitulo: string | null
           termo_id: string | null
           titulo: string
+          variacao_vencedora_id: string | null
         }
         Insert: {
           atualizado_em?: string
@@ -347,9 +416,11 @@ export type Database = {
           publicado_em?: string | null
           slug: string
           status?: string
+          status_experimento?: string
           subtitulo?: string | null
           termo_id?: string | null
           titulo: string
+          variacao_vencedora_id?: string | null
         }
         Update: {
           atualizado_em?: string
@@ -364,9 +435,11 @@ export type Database = {
           publicado_em?: string | null
           slug?: string
           status?: string
+          status_experimento?: string
           subtitulo?: string | null
           termo_id?: string | null
           titulo?: string
+          variacao_vencedora_id?: string | null
         }
         Relationships: [
           {
@@ -374,6 +447,13 @@ export type Database = {
             columns: ["termo_id"]
             isOneToOne: false
             referencedRelation: "termos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paginas_variacao_vencedora_id_fkey"
+            columns: ["variacao_vencedora_id"]
+            isOneToOne: false
+            referencedRelation: "variacoes"
             referencedColumns: ["id"]
           },
         ]
@@ -478,25 +558,46 @@ export type Database = {
           ativa: boolean
           corpo_mdx: string | null
           criado_em: string
+          custo_estimado_usd: number | null
           id: string
+          model_version: string | null
           nome: string
           pagina_id: string
+          peso_trafego: number
+          prompt_version: string
+          provider: string
+          tokens_input: number | null
+          tokens_output: number | null
         }
         Insert: {
           ativa?: boolean
           corpo_mdx?: string | null
           criado_em?: string
+          custo_estimado_usd?: number | null
           id?: string
-          nome?: string
+          model_version?: string | null
+          nome: string
           pagina_id: string
+          peso_trafego?: number
+          prompt_version?: string
+          provider?: string
+          tokens_input?: number | null
+          tokens_output?: number | null
         }
         Update: {
           ativa?: boolean
           corpo_mdx?: string | null
           criado_em?: string
+          custo_estimado_usd?: number | null
           id?: string
+          model_version?: string | null
           nome?: string
           pagina_id?: string
+          peso_trafego?: number
+          prompt_version?: string
+          provider?: string
+          tokens_input?: number | null
+          tokens_output?: number | null
         }
         Relationships: [
           {

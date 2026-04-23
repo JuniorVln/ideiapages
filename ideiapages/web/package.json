@@ -9,15 +9,21 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:types": "supabase gen types typescript --linked > src/lib/database.types.ts",
-    "compose-page": "tsx scripts/compose-page.ts"
+    "compose-page": "tsx scripts/compose-page.ts",
+    "generate-page": "tsx scripts/generate-page.ts",
+    "declare-winner": "tsx scripts/declare-winner.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
+    "@google/generative-ai": "^0.24.1",
     "@next/third-parties": "^16.2.4",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.0",
     "next": "^15.0.0",
+    "openai": "^6.34.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "recharts": "^3.8.1",
     "schema-dts": "^1.1.2",
     "zod": "^3.23.0"
   },
