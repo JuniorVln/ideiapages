@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getAdminAllowlist } from "@/lib/admin/allowlist";
 import {
   pickVariation,
   variacaoCookieName,
@@ -17,14 +18,6 @@ function parseBlogSlug(pathname: string): string | null {
   const rest = pathname.slice("/blog/".length);
   if (!rest || rest.includes("/")) return null;
   return decodeURIComponent(rest);
-}
-
-function adminAllowlist(): string[] {
-  const raw = process.env.ADMIN_ALLOWED_EMAILS ?? "";
-  return raw
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
 }
 
 async function fetchPaginaExperimentContext(
@@ -112,7 +105,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    const allow = adminAllowlist();
+    const allow = getAdminAllowlist();
     const email = user?.email?.toLowerCase() ?? "";
     if (!user || !allow.includes(email)) {
       const url = request.nextUrl.clone();
@@ -123,7 +116,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/admin/login")) {
-    const allow = adminAllowlist();
+    const allow = getAdminAllowlist();
     const email = user?.email?.toLowerCase() ?? "";
     if (user && allow.includes(email)) {
       const url = request.nextUrl.clone();

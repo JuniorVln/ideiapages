@@ -112,7 +112,8 @@ Progresso geral: **67%** (32 de 48, +1 em andamento) — *Fase 2/3: código no r
 - **f3-contracts** — Contratos: dashboard (performance-view, recommendations-engine)
 - **f3-break** — `/break fase-3-dashboard`: issues + DAG
 - **f3-impl-dashboard** ✅ `/admin/dashboard` (KPIs, leads por provider), `/admin/pages`, `/admin/pages/[slug]`; auth Supabase + allowlist `ADMIN_ALLOWED_EMAILS` + `/auth/callback`
-- **f3-impl-recommendations** ✅ `/admin/recommendations` (briefings sem página + experimentos ativos); **falta**: SERP delta, materialized views, export CSV
+- **f3-impl-recommendations** ✅ `/admin/recommendations` (briefings sem página + experimentos ativos); **falta**: SERP delta, materialized views
+- **f3-impl-export** ✅ `/admin/export` + `GET /api/admin/export` (paginas, variacoes, metricas, leads pseudonimizados)
 - **f3-aprovacao** — Aprovação do Júnior → libera Fase 4
 
 ---

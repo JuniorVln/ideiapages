@@ -74,9 +74,10 @@ Prompts versionados: `ideiapages/references/prompts/generate-page.*.md`.
 
 1. **Env**: `ADMIN_ALLOWED_EMAILS` (lista separada por vírgula, minúsculas recomendadas).
 2. **Supabase Auth**: habilitar **Magic Link** (email) no projeto; URL de redirect permitida deve incluir `https://<seu-dominio>/auth/callback`.
-3. **Rotas**: `/admin/login` → link mágico → `/auth/callback` → `/admin/dashboard`; também `/admin/pages`, `/admin/recommendations`, `/admin/costs`.
+3. **Rotas**: `/admin/login` → link mágico → `/auth/callback` → `/admin/dashboard`; também `/admin/pages`, `/admin/recommendations`, `/admin/costs`, `/admin/export`.
+4. **Export CSV** (logado): `/admin/export` ou `GET /api/admin/export?type=paginas|variacoes|metricas|leads_privacy` — `leads_privacy` não inclui e-mail/telefone em claro (hash SHA-256 do e-mail + últimos 4 dígitos do telefone).
 
-O middleware exige sessão + e-mail na allowlist para tudo sob `/admin` exceto `/admin/login`.
+O middleware exige sessão + e-mail na allowlist para tudo sob `/admin` exceto `/admin/login`. A barra de navegação do admin não aparece na tela de login (route group `(panel)`).
 
 ## Google Search Console (pós-deploy)
 

@@ -36,7 +36,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-16 p-6 rounded-2xl border border-slate-800 bg-slate-900">
+    <div className="max-w-md mx-auto mt-16 mb-16 px-4 p-6 rounded-2xl border border-slate-800 bg-slate-900">
       <h1 className="text-xl font-semibold text-white mb-2">Acesso operador</h1>
       <p className="text-sm text-slate-400 mb-6">
         Use o e-mail autorizado em <code className="text-slate-300">ADMIN_ALLOWED_EMAILS</code>.
@@ -68,7 +68,9 @@ function LoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <Suspense fallback={<div className="text-slate-400 text-sm p-6">Carregando…</div>}>
+    <Suspense
+      fallback={<div className="text-slate-400 text-sm p-6 text-center">Carregando…</div>}
+    >
       <LoginForm />
     </Suspense>
   );

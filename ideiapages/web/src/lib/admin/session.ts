@@ -1,11 +1,11 @@
 import { createServerClient, type CookieMethodsServer } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import type { Database } from "@/lib/database.types";
 import type { User } from "@supabase/supabase-js";
 import { getAdminAllowlist } from "./allowlist";
 
-export async function requireAdmin(): Promise<User> {
+/** Sessão admin ou null (para route handlers sem redirect). */
+export async function getAdminUser(): Promise<User | null> {
   const cookieStore = await cookies();
   const cookieMethods: CookieMethodsServer = {
     getAll: () => cookieStore.getAll(),
@@ -26,12 +26,8 @@ export async function requireAdmin(): Promise<User> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const allow = getAdminAllowlist();
   const email = user?.email?.toLowerCase() ?? "";
-
-  if (!user || !allow.includes(email)) {
-    redirect("/admin/login");
-  }
-
+  const allow = getAdminAllowlist();
+  if (!user || !allow.includes(email)) return null;
   return user;
 }
