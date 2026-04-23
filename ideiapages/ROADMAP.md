@@ -9,9 +9,9 @@
 
 - **Marco em andamento**: **Fase 1 — Páginas Piloto** (Fase 0 **encerrada** em 22/04/2026).
 - **Aprovação Fase 0**: **assinada** em `[FASE-0-APROVACAO.md](./FASE-0-APROVACAO.md)` — 19 briefings prontos (meta 20 flexibilizada pelo Júnior).
-- **Próxima ação concreta**: Fase 1 — escrever **`f1-contracts`** (`behaviors/web/**/contract.md`), depois **`f1-impl-tables`** (migrations `paginas`, `variacoes`, `leads`, `metricas_diarias`). O `/break` consolidado já está em `specs/fase-1-paginas-piloto.break.md`.
+- **Próxima ação concreta**: Fase 1 — **`f1-impl-tables`** (migrations `paginas`, `variacoes`, `leads`, `metricas_diarias` + tipos). Contratos web em `behaviors/web/*/contract.md` **criados**. O `/break` consolidado: `specs/fase-1-paginas-piloto.break.md`.
 - **Bloqueios**: nenhum.
-- **Última atualização**: 2026-04-23 (Canvas + ROADMAP: Fase 0 fechada no Canvas; status Fase 1 contracts/break).
+- **Última atualização**: 2026-04-23 (`f1-contracts`: 6× `behaviors/web/*/contract.md`).
 
 ---
 
@@ -22,14 +22,14 @@
 | -------------------------- | ------ | ---------- | ------------ | --------- |
 | Bootstrap SDD              | 1      | 1          | 0            | 0         |
 | Fase 0 — Research Pipeline | 14     | 14         | 0            | 0         |
-| Fase 1 — Páginas Piloto    | 11     | 2          | 0            | 9         |
+| Fase 1 — Páginas Piloto    | 11     | 3          | 0            | 8         |
 | Fase 2 — Multi-IA + A/B    | 9      | 1          | 0            | 8         |
 | Fase 3 — Dashboard         | 6      | 1          | 0            | 5         |
 | Fase 4 — Autocura + Escala | 7      | 1          | 0            | 6         |
-| **TOTAL**                  | **48** | **20**     | **0**        | **28**    |
+| **TOTAL**                  | **48** | **21**     | **0**        | **27**    |
 
 
-Progresso geral: **42%** (20 de 48) — *Fase 0 encerrada; Fase 1: spec + break consolidado OK; falta contratos `behaviors/web` e implementação.*
+Progresso geral: **44%** (21 de 48) — *Fase 1: spec, break e contratos `behaviors/web` OK; próximo: migrations + app.*
 
 ---
 
@@ -70,7 +70,7 @@ Progresso geral: **42%** (20 de 48) — *Fase 0 encerrada; Fase 1: spec + break 
 > **Spec**: `[specs/fase-1-paginas-piloto.md](./specs/fase-1-paginas-piloto.md)`
 
 - **f1-spec** — Spec da fase: `specs/fase-1-paginas-piloto.md` **(concluída 2026-04-22)**
-- **f1-contracts** — **Pendente.** Ainda não existem `behaviors/web/**/contract.md` (só há contratos da Fase 0 em `behaviors/research/*`). Próximo passo: criar contratos por domínio (data-model, design, rendering, conversion, monitoring, generation) conforme a spec.
+- **f1-contracts** ✅ Contratos por domínio: [`behaviors/web/data-model/contract.md`](./behaviors/web/data-model/contract.md), [`design`](./behaviors/web/design/contract.md), [`rendering`](./behaviors/web/rendering/contract.md), [`conversion`](./behaviors/web/conversion/contract.md), [`monitoring`](./behaviors/web/monitoring/contract.md), [`generation`](./behaviors/web/generation/contract.md)
 - **f1-break** ✅ **Arquivo consolidado** `[specs/fase-1-paginas-piloto.break.md](./specs/fase-1-paginas-piloto.break.md)`: DAG + **22 issues** detalhadas. *Opcional (paridade Fase 0):* espelhar em `behaviors/web/.../issues/*.md` — ainda **não** criado.
 - **f1-impl-tables** — Migrations: tabelas paginas, variacoes, leads, metricas_diarias
 - **f1-impl-design** — Design system base (Tailwind tokens + componentes UI base: Button, Form, Modal)
