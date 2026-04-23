@@ -30,8 +30,16 @@ CREATE UNIQUE INDEX idx_metricas_pagina_data ON metricas_diarias (pagina_id, dat
 -- RLS
 ALTER TABLE metricas_diarias ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY metricas_select_public ON metricas_diarias
-  FOR SELECT USING (true);
+-- Leitura anon: apenas métricas de páginas publicadas
+CREATE POLICY metricas_select_publicadas ON metricas_diarias
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM paginas p
+      WHERE p.id = metricas_diarias.pagina_id
+        AND p.status = 'publicado'
+    )
+  );
 
 CREATE POLICY metricas_service_role_all ON metricas_diarias
   FOR ALL

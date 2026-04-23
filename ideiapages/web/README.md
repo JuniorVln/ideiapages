@@ -22,6 +22,15 @@ pnpm typecheck    # tsc --noEmit
 pnpm db:types     # regenera src/lib/database.types.ts a partir do Supabase
 ```
 
+## Supabase (Fase 1)
+
+Migrations do domínio web ficam em `ideiapages/supabase/migrations/`:
+
+- `0007_paginas` … `0010_metricas_diarias` — tabelas `paginas`, `variacoes`, `leads`, `metricas_diarias`
+- `0011_fase1_web_hardening` — remove índice inválido em `leads`, garante trigger de dedup (5 min) e restringe leitura pública de `variacoes` / `metricas_diarias` a páginas com `status = 'publicado'`
+
+Após `supabase db push` (ou aplicar SQL no projeto), rode `pnpm db:types` nesta pasta.
+
 ## Estrutura
 
 ```

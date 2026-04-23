@@ -9,9 +9,9 @@
 
 - **Marco em andamento**: **Fase 1 — Páginas Piloto** (Fase 0 **encerrada** em 22/04/2026).
 - **Aprovação Fase 0**: **assinada** em `[FASE-0-APROVACAO.md](./FASE-0-APROVACAO.md)` — 19 briefings prontos (meta 20 flexibilizada pelo Júnior).
-- **Próxima ação concreta**: Fase 1 — **`f1-impl-tables`** (migrations `paginas`, `variacoes`, `leads`, `metricas_diarias` + tipos). Contratos web em `behaviors/web/*/contract.md` **criados**. O `/break` consolidado: `specs/fase-1-paginas-piloto.break.md`.
+- **Próxima ação concreta**: Fase 1 — **`f1-impl-design`** (tokens Tailwind + `Button`, `LeadForm`, `WhatsAppModal`, CTAs). Migrations web: `supabase/migrations/0007_*`–`0011_*` + rodar `pnpm db:types` em `web/` após `db push`.
 - **Bloqueios**: nenhum.
-- **Última atualização**: 2026-04-23 (`f1-contracts`: 6× `behaviors/web/*/contract.md`).
+- **Última atualização**: 2026-04-23 (`f1-impl-tables`: migrations + hardening `0011`).
 
 ---
 
@@ -22,14 +22,14 @@
 | -------------------------- | ------ | ---------- | ------------ | --------- |
 | Bootstrap SDD              | 1      | 1          | 0            | 0         |
 | Fase 0 — Research Pipeline | 14     | 14         | 0            | 0         |
-| Fase 1 — Páginas Piloto    | 11     | 3          | 0            | 8         |
+| Fase 1 — Páginas Piloto    | 11     | 4          | 0            | 7         |
 | Fase 2 — Multi-IA + A/B    | 9      | 1          | 0            | 8         |
 | Fase 3 — Dashboard         | 6      | 1          | 0            | 5         |
 | Fase 4 — Autocura + Escala | 7      | 1          | 0            | 6         |
-| **TOTAL**                  | **48** | **21**     | **0**        | **27**    |
+| **TOTAL**                  | **48** | **22**     | **0**        | **26**    |
 
 
-Progresso geral: **44%** (21 de 48) — *Fase 1: spec, break e contratos `behaviors/web` OK; próximo: migrations + app.*
+Progresso geral: **46%** (22 de 48) — *Fase 1: migrations web revisadas (`0011` hardening); próximo: design system + rotas.*
 
 ---
 
@@ -72,7 +72,7 @@ Progresso geral: **44%** (21 de 48) — *Fase 1: spec, break e contratos `behavi
 - **f1-spec** — Spec da fase: `specs/fase-1-paginas-piloto.md` **(concluída 2026-04-22)**
 - **f1-contracts** ✅ Contratos por domínio: [`behaviors/web/data-model/contract.md`](./behaviors/web/data-model/contract.md), [`design`](./behaviors/web/design/contract.md), [`rendering`](./behaviors/web/rendering/contract.md), [`conversion`](./behaviors/web/conversion/contract.md), [`monitoring`](./behaviors/web/monitoring/contract.md), [`generation`](./behaviors/web/generation/contract.md)
 - **f1-break** ✅ **Arquivo consolidado** `[specs/fase-1-paginas-piloto.break.md](./specs/fase-1-paginas-piloto.break.md)`: DAG + **22 issues** detalhadas. *Opcional (paridade Fase 0):* espelhar em `behaviors/web/.../issues/*.md` — ainda **não** criado.
-- **f1-impl-tables** — Migrations: tabelas paginas, variacoes, leads, metricas_diarias
+- **f1-impl-tables** ✅ Migrations `0007_paginas` … `0010_metricas_diarias` + `0011_fase1_web_hardening` (dedup leads, RLS `variacoes`/`metricas_diarias` só com página `publicado`). Tipos: regenerar com `pnpm db:types` após aplicar no Supabase.
 - **f1-impl-design** — Design system base (Tailwind tokens + componentes UI base: Button, Form, Modal)
 - **f1-impl-rendering** — Behaviors de rendering: render-page (Next.js dinâmica), schema.org, sitemap, robots
 - **f1-impl-conversion** — Behaviors de conversion: lead-form-submit, whatsapp-modal, utm-tracking
@@ -185,3 +185,4 @@ Progresso geral: **44%** (21 de 48) — *Fase 1: spec, break e contratos `behavi
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-04-20 | Fase 0: implementados `analyze-gaps`, `run-pipeline`, `prioritize-terms`, `report`; ROADMAP alinhado ao fluxo SERP → scrape → gaps. |
 | 2026-04-22 | Criados specs das Fases 1–4: `fase-1-paginas-piloto.md`, `fase-2-multi-ia-ab.md`, `fase-3-dashboard.md`, `fase-4-autocura.md`.      |
+| 2026-04-23 | Fase 1 data-model: revisão RLS + trigger dedup `leads`; migration `0011_fase1_web_hardening` para upgrades.                          |

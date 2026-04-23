@@ -23,10 +23,34 @@ CREATE INDEX idx_leads_pagina   ON leads (pagina_id);
 CREATE INDEX idx_leads_email    ON leads (email);
 CREATE INDEX idx_leads_criado   ON leads (criado_em);
 
--- Deduplicação: evita lead duplicado de mesmo email+telefone+pagina em 5 minutos
-CREATE UNIQUE INDEX idx_leads_dedup
-  ON leads (email, telefone, pagina_id)
-  WHERE criado_em > now() - interval '5 minutes';
+-- Deduplicação em janela de 5 min (índice parcial com now() é inválido — usar trigger)
+CREATE OR REPLACE FUNCTION leads_block_duplicate_5min()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
+AS $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM leads
+    WHERE email = NEW.email
+      AND telefone = NEW.telefone
+      AND pagina_id IS NOT DISTINCT FROM NEW.pagina_id
+      AND criado_em > now() - interval '5 minutes'
+  ) THEN
+    RAISE EXCEPTION 'lead_duplicate_within_5min'
+      USING ERRCODE = '23505',
+            HINT = 'Mesmo email+telefone+pagina_id em menos de 5 minutos';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_leads_block_dup_5min
+  BEFORE INSERT ON leads
+  FOR EACH ROW
+  EXECUTE FUNCTION public.leads_block_duplicate_5min();
 
 -- RLS: nenhum acesso via client (anon ou authenticated)
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;

@@ -29,8 +29,16 @@ CREATE TRIGGER trg_paginas_criar_variacao_controle
 -- RLS
 ALTER TABLE variacoes ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY variacoes_select_public ON variacoes
-  FOR SELECT USING (true);
+-- Leitura anon: apenas variações cuja página pai está publicada
+CREATE POLICY variacoes_select_publicadas ON variacoes
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM paginas p
+      WHERE p.id = variacoes.pagina_id
+        AND p.status = 'publicado'
+    )
+  );
 
 CREATE POLICY variacoes_service_role_all ON variacoes
   FOR ALL
