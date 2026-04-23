@@ -37,12 +37,22 @@ function getClientIp(req: NextRequest): string {
   );
 }
 
-function buildWhatsappUrl(number: string, keyword?: string): string {
-  const base = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? number ?? "5511999999999";
+/** Sempre usa `NEXT_PUBLIC_WHATSAPP_NUMBER` (nunca o telefone do lead). */
+function buildWhatsappRedirectUrl(keyword?: string | null): string {
+  const raw = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5511999999999";
+  const digits = raw.replace(/\D/g, "");
   const msg = keyword
     ? `Olá! Vi sobre "${keyword}" e gostaria de saber mais sobre o Ideia Chat.`
     : "Olá! Gostaria de saber mais sobre o Ideia Chat.";
-  return `https://wa.me/${base.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
+}
+
+function isDuplicateLeadError(message: string, code?: string): boolean {
+  return (
+    code === "23505" ||
+    message.includes("lead_duplicate") ||
+    message.includes("lead_duplicate_within_5min")
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -59,7 +69,21 @@ export async function POST(req: NextRequest) {
 
     const supabase = getSupabaseAdmin();
 
-    // Deduplicação: mesmo email+telefone+pagina nos últimos 5 min
+    const { data: pagina, error: paginaError } = await supabase
+      .from("paginas")
+      .select("titulo, status")
+      .eq("id", pagina_id)
+      .single();
+
+    if (paginaError || !pagina || pagina.status !== "publicado") {
+      return NextResponse.json(
+        { success: false, error: "Página não encontrada ou indisponível." },
+        { status: 404 }
+      );
+    }
+
+    const keyword = pagina.titulo;
+
     const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     const { data: existing } = await supabase
       .from("leads")
@@ -71,17 +95,11 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (existing) {
-      // Lead já existe — retorna sucesso sem duplicar
-      const redirect_url = buildWhatsappUrl(telefone);
-      return NextResponse.json({ success: true, redirect_url });
+      return NextResponse.json({
+        success: true,
+        redirect_url: buildWhatsappRedirectUrl(keyword),
+      });
     }
-
-    // Busca keyword da página para personalizar mensagem WhatsApp
-    const { data: pagina } = await supabase
-      .from("paginas")
-      .select("titulo, termo_id")
-      .eq("id", pagina_id)
-      .single();
 
     const ip = getClientIp(req);
     const userAgent = req.headers.get("user-agent") ?? "";
@@ -104,6 +122,12 @@ export async function POST(req: NextRequest) {
     const { error: insertError } = await supabase.from("leads").insert(leadRow);
 
     if (insertError) {
+      if (isDuplicateLeadError(insertError.message, insertError.code)) {
+        return NextResponse.json({
+          success: true,
+          redirect_url: buildWhatsappRedirectUrl(keyword),
+        });
+      }
       console.error("[leads] insert error:", insertError.message);
       return NextResponse.json(
         { success: false, error: "Erro ao registrar lead. Tente novamente." },
@@ -111,10 +135,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const keyword = pagina?.titulo;
-    const redirect_url = buildWhatsappUrl(telefone, keyword);
-
-    return NextResponse.json({ success: true, redirect_url });
+    return NextResponse.json({
+      success: true,
+      redirect_url: buildWhatsappRedirectUrl(keyword),
+    });
   } catch (err) {
     console.error("[leads] unexpected error:", err);
     return NextResponse.json(

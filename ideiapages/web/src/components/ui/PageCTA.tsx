@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "./Button";
 import { WhatsAppModal } from "./WhatsAppModal";
-import { trackEvent } from "@/lib/analytics";
+import { GA_EVENTS, trackEvent } from "@/lib/analytics";
 
 interface PageCTAProps {
   paginaId: string;
@@ -27,7 +27,7 @@ export function PageCTA({
   const [open, setOpen] = useState(false);
 
   function handleClick() {
-    trackEvent("whatsapp_open", { source: "page_cta", pagina_id: paginaId });
+    trackEvent(GA_EVENTS.WHATSAPP_OPEN, { source: "page_cta", pagina_id: paginaId });
     setOpen(true);
   }
 

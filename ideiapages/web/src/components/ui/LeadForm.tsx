@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "./Button";
 import { FormField } from "./FormField";
-import { captureUtmsFromUrl, getStoredUtms, type UtmParams } from "@/lib/utm";
-import { trackEvent } from "@/lib/analytics";
+import { useUtmTracking } from "@/lib/utm";
+import { GA_EVENTS, trackEvent } from "@/lib/analytics";
 
 interface LeadFormProps {
   paginaId: string;
@@ -45,19 +45,14 @@ export function LeadForm({
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const [utms, setUtms] = useState<UtmParams | null>(null);
+  const utms = useUtmTracking();
   const startedRef = useRef(false);
   const submittedRef = useRef(false);
-
-  useEffect(() => {
-    const captured = captureUtmsFromUrl();
-    setUtms(captured ?? getStoredUtms());
-  }, []);
 
   useEffect(
     () => () => {
       if (startedRef.current && !submittedRef.current) {
-        trackEvent("form_abandon", { pagina_id: paginaId });
+        trackEvent(GA_EVENTS.FORM_ABANDON, { pagina_id: paginaId });
       }
     },
     [paginaId]
@@ -66,7 +61,7 @@ export function LeadForm({
   function handleFirstInteraction() {
     if (!startedRef.current) {
       startedRef.current = true;
-      trackEvent("form_start", { pagina_id: paginaId });
+      trackEvent(GA_EVENTS.FORM_START, { pagina_id: paginaId });
     }
   }
 
@@ -103,10 +98,10 @@ export function LeadForm({
       }
 
       submittedRef.current = true;
-      trackEvent("lead_submit", { pagina_id: paginaId, variacao_id: variacaoId });
+      trackEvent(GA_EVENTS.LEAD_SUBMIT, { pagina_id: paginaId, variacao_id: variacaoId });
 
       if (data.redirect_url) {
-        trackEvent("whatsapp_redirect", { pagina_id: paginaId, keyword });
+        trackEvent(GA_EVENTS.WHATSAPP_REDIRECT, { pagina_id: paginaId, keyword });
         window.open(data.redirect_url, "_blank", "noopener,noreferrer");
       }
 

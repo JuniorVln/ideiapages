@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 export interface UtmParams {
   utm_source?: string;
   utm_medium?: string;
@@ -8,7 +10,10 @@ export interface UtmParams {
   utm_term?: string;
 }
 
-const UTM_COOKIE = "__utmip";
+/** First-touch UTM (90d, SameSite=Lax) — alinhado ao contract Fase 1 */
+const UTM_COOKIE = "__utm";
+/** Nome legado (migração silenciosa) */
+const UTM_COOKIE_LEGACY = "__utmip";
 const UTM_TTL_DAYS = 90;
 
 function parseBrowserCookies(): Record<string, string> {
@@ -55,11 +60,24 @@ export function captureUtmsFromUrl(): UtmParams | null {
 
 export function getStoredUtms(): UtmParams | null {
   const cookies = parseBrowserCookies();
-  const raw = cookies[UTM_COOKIE];
+  const raw = cookies[UTM_COOKIE] ?? cookies[UTM_COOKIE_LEGACY];
   if (!raw) return null;
   try {
     return JSON.parse(raw) as UtmParams;
   } catch {
     return null;
   }
+}
+
+/**
+ * Hook para páginas client: captura UTMs da URL no mount e devolve cookie first-touch.
+ */
+export function useUtmTracking(): UtmParams | null {
+  const [utms, setUtms] = useState<UtmParams | null>(null);
+
+  useEffect(() => {
+    setUtms(captureUtmsFromUrl() ?? getStoredUtms());
+  }, []);
+
+  return utms;
 }

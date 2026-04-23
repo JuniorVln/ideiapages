@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { trackEvent } from "@/lib/analytics";
+import { GA_EVENTS, trackEvent } from "@/lib/analytics";
 import { WhatsAppModal } from "./WhatsAppModal";
 
 interface FloatingCTAProps {
@@ -22,7 +22,7 @@ export function FloatingCTA({
   const [open, setOpen] = useState(false);
 
   function handleOpen() {
-    trackEvent("whatsapp_open", { source: "floating_cta", pagina_id: paginaId });
+    trackEvent(GA_EVENTS.WHATSAPP_OPEN, { source: "floating_cta", pagina_id: paginaId });
     setOpen(true);
   }
 

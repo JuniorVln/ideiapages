@@ -9,9 +9,9 @@
 
 - **Marco em andamento**: **Fase 1 — Páginas Piloto** (Fase 0 **encerrada** em 22/04/2026).
 - **Aprovação Fase 0**: **assinada** em `[FASE-0-APROVACAO.md](./FASE-0-APROVACAO.md)` — 19 briefings prontos (meta 20 flexibilizada pelo Júnior).
-- **Próxima ação concreta**: Fase 1 — **`f1-impl-rendering`** (refinos em `blog/[slug]`, sitemap/robots se necessário) ou **`f1-impl-conversion`** (`utm.ts`, `/api/leads` já existem — revisar vs contract).
+- **Próxima ação concreta**: Fase 1 — **`f1-piloto-deploy`** (Vercel + proxy `ideiamultichat.com.br/blog`) e publicar 5–10 páginas; depois **`f1-validacao`** (2 semanas de dados).
 - **Bloqueios**: nenhum.
-- **Última atualização**: 2026-04-23 (`f1-impl-design`: tokens, `Input`/`Label`, `StickyHeader`, modal focus trap, GA4 `form_abandon` / `whatsapp_redirect`).
+- **Última atualização**: 2026-04-23 (`f1-impl-rendering` / `conversion` / `tracking` fechados no app; ver `web/README.md` GSC).
 
 ---
 
@@ -22,14 +22,14 @@
 | -------------------------- | ------ | ---------- | ------------ | --------- |
 | Bootstrap SDD              | 1      | 1          | 0            | 0         |
 | Fase 0 — Research Pipeline | 14     | 14         | 0            | 0         |
-| Fase 1 — Páginas Piloto    | 11     | 5          | 0            | 6         |
+| Fase 1 — Páginas Piloto    | 11     | 8          | 0            | 3         |
 | Fase 2 — Multi-IA + A/B    | 9      | 1          | 0            | 8         |
 | Fase 3 — Dashboard         | 6      | 1          | 0            | 5         |
 | Fase 4 — Autocura + Escala | 7      | 1          | 0            | 6         |
-| **TOTAL**                  | **48** | **23**     | **0**        | **25**    |
+| **TOTAL**                  | **48** | **26**     | **0**        | **22**    |
 
 
-Progresso geral: **48%** (23 de 48) — *Fase 1: design system base em `web/src/components/ui` + tokens; próximo: fechar rendering/conversion/tracking.*
+Progresso geral: **54%** (26 de 48) — *Fase 1: app web com blog índice, leads corrigidos, UTMs `__utm`, GA4+GSC doc; próximo: deploy piloto + validação.*
 
 ---
 
@@ -74,9 +74,9 @@ Progresso geral: **48%** (23 de 48) — *Fase 1: design system base em `web/src/
 - **f1-break** ✅ **Arquivo consolidado** `[specs/fase-1-paginas-piloto.break.md](./specs/fase-1-paginas-piloto.break.md)`: DAG + **22 issues** detalhadas. *Opcional (paridade Fase 0):* espelhar em `behaviors/web/.../issues/*.md` — ainda **não** criado.
 - **f1-impl-tables** ✅ Migrations `0007_paginas` … `0010_metricas_diarias` + `0011_fase1_web_hardening` (dedup leads, RLS `variacoes`/`metricas_diarias` só com página `publicado`). Tipos: regenerar com `pnpm db:types` após aplicar no Supabase.
 - **f1-impl-design** ✅ Tokens em `globals.css` + `tailwind.config.ts` (`brand.*`, `neutral.*`); componentes `Button`, `Input`, `Label`, `FormField`, `LeadForm`, `WhatsAppModal` (focus trap Tab), `FloatingCTA`, `StickyHeader`, `PageCTA`; eventos `whatsapp_open` (abrir modal) e `whatsapp_redirect` (abrir `wa.me`)
-- **f1-impl-rendering** — Behaviors de rendering: render-page (Next.js dinâmica), schema.org, sitemap, robots
-- **f1-impl-conversion** — Behaviors de conversion: lead-form-submit, whatsapp-modal, utm-tracking
-- **f1-impl-tracking** — Behaviors de tracking: GA4 events, GSC integration, conversion tracking
+- **f1-impl-rendering** ✅ `app/blog/[slug]/page.tsx` + `app/blog/page.tsx` (índice); `SchemaOrg` (Article, FAQ, Breadcrumb); `sitemap.ts` (home + `/blog` + posts `publicado`); `robots.ts` (só produção indexável)
+- **f1-impl-conversion** ✅ `POST /api/leads` (valida página `publicado`, URL WhatsApp sempre do env, dedup + erro 23505); `WhatsAppModal` + `LeadForm`; `utm.ts` cookie **`__utm`** (legado `__utmip`) + **`useUtmTracking`**
+- **f1-impl-tracking** ✅ `GoogleAnalytics` no `layout` (produção); `analytics.ts` + `GA_EVENTS`; README com checklist **Google Search Console**
 - **f1-piloto-deploy** — Deploy 5-10 páginas piloto em `ideiamultichat.com.br/blog` (proxy reverso Vercel)
 - **f1-validacao** — Coletar 2 semanas de dados (CTR, leads, ranking) e validar funil
 - **f1-aprovacao** — Aprovação do Júnior (taxa de conversão ≥ 1%) → libera Fase 2
@@ -187,3 +187,4 @@ Progresso geral: **48%** (23 de 48) — *Fase 1: design system base em `web/src/
 | 2026-04-22 | Criados specs das Fases 1–4: `fase-1-paginas-piloto.md`, `fase-2-multi-ia-ab.md`, `fase-3-dashboard.md`, `fase-4-autocura.md`.      |
 | 2026-04-23 | Fase 1 data-model: revisão RLS + trigger dedup `leads`; migration `0011_fase1_web_hardening` para upgrades.                          |
 | 2026-04-23 | Fase 1 design: `Input`/`Label`, `StickyHeader`, tokens neutros, `form_abandon`, breadcrumbs com `next/link`.                         |
+| 2026-04-23 | Fase 1 rendering/conversion/tracking: `/blog` índice, fix `wa.me` no dedup leads, UTMs `__utm`, `GA_EVENTS`, doc GSC.              |

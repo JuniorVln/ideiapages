@@ -31,6 +31,16 @@ Migrations do domínio web ficam em `ideiapages/supabase/migrations/`:
 
 Após `supabase db push` (ou aplicar SQL no projeto), rode `pnpm db:types` nesta pasta.
 
+## Google Search Console (pós-deploy)
+
+1. Em [Google Search Console](https://search.google.com/search-console), adicione a propriedade de URL prefix (`https://ideiamultichat.com.br` ou o domínio que apontar para este app).
+2. Verifique a propriedade (DNS, arquivo HTML ou tag meta, conforme a opção escolhida).
+3. Em **Sitemaps**, envie `https://<seu-dominio>/sitemap.xml`.
+4. Após indexação inicial: **Rich Results Test** em pelo menos uma URL `/blog/<slug>` com FAQ.
+5. **PageSpeed / Web Vitals** (mobile) para LCP e CLS conforme spec Fase 1.
+
+Eventos GA4 usados no cliente (ver `src/lib/analytics.ts`): `form_start`, `form_abandon`, `lead_submit`, `whatsapp_open`, `whatsapp_redirect`.
+
 ## Estrutura
 
 ```
