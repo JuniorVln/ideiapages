@@ -20,7 +20,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID;
+const GA4_ID =
+  process.env.NEXT_PUBLIC_GA4_ID ?? process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
 const IS_PROD = process.env.NEXT_PUBLIC_ENV === "production";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

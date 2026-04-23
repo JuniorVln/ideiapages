@@ -20,7 +20,34 @@ pnpm start        # rodar build
 pnpm lint         # ESLint
 pnpm typecheck    # tsc --noEmit
 pnpm db:types     # regenera src/lib/database.types.ts a partir do Supabase
+pnpm compose-page -- --list-pronto
+pnpm compose-page -- --termo-id <uuid> [--publish] [--dry-run]
 ```
+
+## Deploy na Vercel (Fase 1 — piloto)
+
+1. **Repositório**: conecte o GitHub ao Vercel e defina **Root Directory** = `ideiapages/web` (se o repo for a pasta `ideiapages`; se o mono for `Rede Ideia`, use `ideiapages/web`).
+2. **Framework**: Next.js (auto). O arquivo `vercel.json` fixa `pnpm install` + `pnpm run build`.
+3. **Variáveis de ambiente** (Production + Preview), espelhando `ideiapages/.env.example`:
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` (somente servidor — necessário para `POST /api/leads`)
+   - `NEXT_PUBLIC_SITE_URL` — URL pública final (ex.: `https://ideiamultichat.com.br` ou o domínio `.vercel.app` até o proxy)
+   - `NEXT_PUBLIC_WHATSAPP_NUMBER` — só dígitos, ex. `5511999999999`
+   - `NEXT_PUBLIC_GA4_ID` ou `NEXT_PUBLIC_GA4_MEASUREMENT_ID`
+   - **`NEXT_PUBLIC_ENV=production`** em **Production** (ativa GA4 e `robots` liberando crawl). Em Preview use outro valor para manter `robots` bloqueado.
+4. **Domínio em `/blog` no site principal**: faça o proxy reverso do host principal para este projeto **preservando o path** `/blog` e `/blog/*` (ex.: Nginx `location /blog/` → upstream Vercel com URI intacta; ou Cloudflare Workers / rewrite equivalente). O app já expõe rotas em `/blog` e `/blog/[slug]`.
+5. **Pós-deploy**: enviar `https://<domínio>/sitemap.xml` no GSC (ver seção GSC acima); testar um lead real e o evento `lead_submit` no GA4 DebugView.
+
+### Publicar páginas piloto (Supabase)
+
+A partir da pasta `ideiapages/web` (com `.env` em `ideiapages/.env` contendo `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`):
+
+```bash
+pnpm compose-page -- --list-pronto
+pnpm compose-page -- --termo-id <uuid> --publish
+```
+
+Repita para 5–10 termos com `briefing_pronto`. Evite slug duplicado (o script avisa se já existir).
 
 ## Supabase (Fase 1)
 
