@@ -78,6 +78,18 @@ Cada behavior é isolado em sua pasta. Mudar X não quebra Y. Veja [`ideiapages/
 
 ---
 
+## Deploy na Vercel (app Next.js)
+
+Este repo inclui várias pastas (`SEO-Apresentacao`, `_docs`, etc.). O **site / sistema IDeiaPages** está em **`ideiapages/web`** ([JuniorVln/ideiapages](https://github.com/JuniorVln/ideiapages)).
+
+No projeto Vercel ligado a esse repositório:
+
+1. **Settings → Build & Deployment → Root Directory:** `ideiapages/web` (obrigatório — senão o build tenta Vite na raiz e falha).
+2. **Framework:** Next.js (detetado depois de definires o diretório raiz).
+3. **Environment Variables:** seguir `ideiapages/.env.example`. Para o middleware reconhecer bypass do admin em produção, incluir `ADMIN_LOCAL_BYPASS=true` nas envs do projeto (ou usar apenas Magic Link + `ADMIN_ALLOWED_EMAILS`).
+
+---
+
 ## Status atual
 
 - ✅ **Fase -1**: Bootstrap SDD (estrutura, knowledge base, agentes, comandos)
