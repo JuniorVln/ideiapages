@@ -7,13 +7,16 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 /** Mesmo ficheiro `ideiapages/.env` quer `pnpm dev` corra a partir de `web/` ou da raiz. */
 const fromHere = (p: string) => path.join(__dirname, p);
-const monorepoRoot = fromHere("..");
-if (existsSync(path.join(monorepoRoot, ".env")) || existsSync(path.join(monorepoRoot, ".env.local"))) {
-  loadEnvConfig(monorepoRoot);
+/** Pasta `ideiapages/` (pai de `web/`). */
+const ideiapagesRoot = fromHere("..");
+/** Raiz do repositório Git (`Rede Ideia/` — mesmo repo que a Vercel clona). */
+const workspaceRoot = path.join(ideiapagesRoot, "..");
+if (existsSync(path.join(ideiapagesRoot, ".env")) || existsSync(path.join(ideiapagesRoot, ".env.local"))) {
+  loadEnvConfig(ideiapagesRoot);
 } else if (existsSync(fromHere(".env")) || existsSync(fromHere(".env.local"))) {
   loadEnvConfig(__dirname);
 } else {
-  loadEnvConfig(monorepoRoot);
+  loadEnvConfig(ideiapagesRoot);
 }
 
 const BASE_SECURITY_HEADERS = [
@@ -32,8 +35,8 @@ const HSTS_HEADER = {
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  /** Monorepo: pasta pai `ideiapages` (evita avisos de tracing ao fazer build a partir de `web/`). */
-  outputFileTracingRoot: path.join(__dirname, ".."),
+  /** Incluir o repo inteiro no tracing — na Vercel o cwd é `…/ideiapages/web` dentro do clone; sem isto pode falhar o bundle (`noop.js` / next-server). */
+  outputFileTracingRoot: workspaceRoot,
   typedRoutes: true,
   images: {
     formats: ["image/avif", "image/webp"],
