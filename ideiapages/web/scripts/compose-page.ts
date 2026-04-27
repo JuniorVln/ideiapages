@@ -17,7 +17,14 @@
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "fs";
 import { resolve } from "path";
+import { buildImagenContextFromBriefing } from "../src/lib/blog/briefing-imagens";
 import type { Database } from "../src/lib/database.types";
+import { pexelsDiversifyIndex, searchPexelsPhoto } from "../src/lib/pexels";
+import {
+  briefingJsonToMdx,
+  faqJsonbFromBriefing,
+  pageMetaFromBriefing,
+} from "../src/lib/research/briefing-to-mdx";
 
 // ── Env ───────────────────────────────────────────────────────────────────────
 const ENV_PATH = resolve(__dirname, "../../.env");
@@ -56,51 +63,6 @@ function slugify(text: string): string {
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
-}
-
-interface BriefingJson {
-  titulo?: string;
-  subtitulo?: string;
-  meta_title?: string;
-  meta_description?: string;
-  introducao?: string;
-  topicos?: Array<{ titulo: string; conteudo: string }>;
-  faq?: Array<{ pergunta: string; resposta: string }>;
-  conclusao?: string;
-  cta?: string;
-}
-
-function briefingToMdx(briefing: BriefingJson, keyword: string): string {
-  const parts: string[] = [];
-
-  if (briefing.introducao) {
-    parts.push(briefing.introducao);
-    parts.push("");
-  }
-
-  if (briefing.topicos && briefing.topicos.length > 0) {
-    for (const topico of briefing.topicos) {
-      parts.push(`## ${topico.titulo}`);
-      parts.push("");
-      parts.push(topico.conteudo);
-      parts.push("");
-    }
-  }
-
-  if (briefing.conclusao) {
-    parts.push("## Conclusão");
-    parts.push("");
-    parts.push(briefing.conclusao);
-    parts.push("");
-  }
-
-  if (parts.length === 0) {
-    parts.push(`# ${keyword}`);
-    parts.push("");
-    parts.push("*Conteúdo a ser preenchido com base no briefing.*");
-  }
-
-  return parts.join("\n");
 }
 
 // ── Ações ─────────────────────────────────────────────────────────────────────
@@ -165,19 +127,27 @@ async function composePage(termoId: string, publish: boolean, dryRun: boolean) {
     process.exit(1);
   }
 
-  const briefing = briefingRow.briefing_jsonb as BriefingJson;
-
-  // Deriva campos
-  const slug = slugify(briefing.titulo ?? termo.keyword);
-  const titulo = briefing.titulo ?? termo.keyword;
-  const subtitulo = briefing.subtitulo ?? null;
-  const meta_title = briefing.meta_title ?? titulo;
-  const meta_description = briefing.meta_description ?? subtitulo ?? null;
-  const corpo_mdx = briefingToMdx(briefing, termo.keyword);
-  const faq_jsonb = briefing.faq && briefing.faq.length > 0 ? briefing.faq : null;
-  const cta_whatsapp_texto = briefing.cta ?? "Falar com especialista";
+  const bj = briefingRow.briefing_jsonb as Record<string, unknown>;
+  const meta = pageMetaFromBriefing(bj, termo.keyword);
+  const slug = slugify(meta.titulo);
+  const titulo = meta.titulo;
+  const subtitulo = meta.subtitulo;
+  const meta_title = meta.meta_title;
+  const meta_description = meta.meta_description;
+  const corpo_mdx = briefingJsonToMdx(bj, termo.keyword);
+  const faq_jsonb = faqJsonbFromBriefing(bj);
+  const cta_whatsapp_texto = meta.cta;
   const status = publish ? "publicado" : "rascunho";
   const publicado_em = publish ? new Date().toISOString() : null;
+
+  const imagensContexto = buildImagenContextFromBriefing(briefingRow.briefing_jsonb, termo.keyword, titulo);
+  let og_image_url: string | null = null;
+  const heroPhoto = await searchPexelsPhoto({
+    query: imagensContexto.hero_query,
+    orientation: "landscape",
+    resultIndex: pexelsDiversifyIndex(`${slug}:${termo.keyword}:hero`, 12),
+  });
+  if (heroPhoto?.src) og_image_url = heroPhoto.src;
 
   const pagina: Database["public"]["Tables"]["paginas"]["Insert"] = {
     termo_id: termoId,
@@ -189,6 +159,8 @@ async function composePage(termoId: string, publish: boolean, dryRun: boolean) {
     meta_description,
     faq_jsonb: faq_jsonb as unknown as Database["public"]["Tables"]["paginas"]["Insert"]["faq_jsonb"],
     cta_whatsapp_texto,
+    og_image_url,
+    imagens_contexto_jsonb: imagensContexto as unknown as Database["public"]["Tables"]["paginas"]["Insert"]["imagens_contexto_jsonb"],
     status,
     publicado_em: publicado_em ?? undefined,
   };

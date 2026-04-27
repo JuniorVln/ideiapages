@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/lib/database.types";
+import { getSupabasePublicReadClient } from "@/lib/supabase/public";
+import { PUBLIC_CONTENT_BASE_PATH } from "@/lib/public-pages";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ideiamultichat.com.br";
+const SITE_URL = getSiteUrl();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base: MetadataRoute.Sitemap = [
@@ -16,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${SITE_URL}/blog`,
+      url: `${SITE_URL}${PUBLIC_CONTENT_BASE_PATH}`,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9,
@@ -24,10 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    const supabase = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabase = getSupabasePublicReadClient();
 
     const { data: paginas } = await supabase
       .from("paginas")
@@ -37,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     if (paginas) {
       const blogEntries: MetadataRoute.Sitemap = paginas.map((p) => ({
-        url: `${SITE_URL}/blog/${p.slug}`,
+        url: `${SITE_URL}${PUBLIC_CONTENT_BASE_PATH}/${p.slug}`,
         lastModified: new Date(p.atualizado_em ?? p.publicado_em ?? new Date()),
         changeFrequency: "weekly" as const,
         priority: 0.8,

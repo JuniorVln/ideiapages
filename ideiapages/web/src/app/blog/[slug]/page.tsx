@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { SchemaOrg } from "@/components/ui/SchemaOrg";
-import { PageCTA } from "@/components/ui/PageCTA";
 import { FloatingCTA } from "@/components/ui/FloatingCTA";
 import { StickyHeader } from "@/components/ui/StickyHeader";
 import { ExposureTracker } from "@/components/ExposureTracker";
-import type { Tables } from "@/lib/database.types";
+import { BlogTrustStrip } from "@/components/blog/BlogTrustStrip";
+import { BlogLegalFooter } from "@/components/blog/BlogLegalFooter";
+import { SalesPageHero } from "@/components/blog/BlogArticleHero";
+import { PageContentSections } from "@/components/blog/PageContentSections";
 import {
   resolveVariacaoId,
   variacaoCookieName,
@@ -16,39 +16,27 @@ import {
   type PaginaExperimentContext,
   type VariacaoArm,
 } from "@/lib/experiments/pick-variation";
+import { loadBlogPost } from "@/lib/blog/load-post";
+import { parseMarkdownToSections } from "@/lib/blog/parse-sections";
+import type { VariacaoPagina } from "@/lib/blog/get-pagina";
+import { PUBLIC_CONTENT_BASE_PATH } from "@/lib/public-pages";
+import { getSiteUrl } from "@/lib/site-url";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ideiamultichat.com.br";
+const SITE_URL = getSiteUrl();
 const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5511999999999";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-type Variacao = Pick<
-  Tables<"variacoes">,
-  "id" | "nome" | "ativa" | "provider" | "peso_trafego" | "corpo_mdx"
->;
-type PaginaComVariacoes = Tables<"paginas"> & { variacoes: Variacao[] };
-
-async function getPagina(slug: string): Promise<PaginaComVariacoes | null> {
-  const supabase = await getSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("paginas")
-    .select("*, variacoes(id, nome, ativa, provider, peso_trafego, corpo_mdx)")
-    .eq("slug", slug)
-    .eq("status", "publicado")
-    .single();
-
-  if (error || !data) return null;
-  return data as unknown as PaginaComVariacoes;
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const pagina = await getPagina(slug);
-  if (!pagina) return { title: "Página não encontrada" };
+  const { slug: rawSlug } = await params;
+  const data = await loadBlogPost(rawSlug);
+  if (!data) return { title: "Página não encontrada" };
 
-  const canonical = `${SITE_URL}/blog/${slug}`;
+  const { pagina, visuals } = data;
+  const canonical = `${SITE_URL}${PUBLIC_CONTENT_BASE_PATH}/${pagina.slug}`;
+  const ogImage = visuals.heroSrc ?? pagina.og_image_url ?? undefined;
 
   return {
     title: pagina.meta_title ?? pagina.titulo,
@@ -58,8 +46,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: pagina.meta_title ?? pagina.titulo,
       description: pagina.meta_description ?? pagina.subtitulo ?? undefined,
       url: canonical,
-      type: "article",
-      images: pagina.og_image_url ? [{ url: pagina.og_image_url }] : [],
+      type: "website",
+      locale: "pt_BR",
+      images: ogImage ? [{ url: ogImage }] : [],
     },
   };
 }
@@ -76,33 +65,21 @@ function parseFaq(raw: unknown): FaqItem[] {
       typeof item === "object" &&
       item !== null &&
       "pergunta" in item &&
-      "resposta" in item
+      "resposta" in item,
   );
 }
 
-function renderMarkdown(text: string): string {
-  return text
-    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/\n\n/g, "</p><p>")
-    .replace(/^(?!<[h|p|u|o|l])/, "<p>")
-    .replace(/$(?!<\/[h|p|u|o|l])/, "</p>")
-    .replace(/^- (.+)$/gm, "<li>$1</li>")
-    .replace(/(<li>[\s\S]+?<\/li>)/g, "<ul>$1</ul>");
-}
+export default async function PublicSalesPage({ params }: Props) {
+  const { slug: rawSlug } = await params;
+  const data = await loadBlogPost(rawSlug);
+  if (!data) notFound();
 
-export default async function BlogPage({ params }: Props) {
-  const { slug } = await params;
-  const pagina = await getPagina(slug);
-
-  if (!pagina) notFound();
+  const { pagina, focusKeyword, visuals } = data;
+  const publicSlug = pagina.slug;
 
   const faqs = parseFaq(pagina.faq_jsonb);
   const arms: VariacaoArm[] = Array.isArray(pagina.variacoes)
-    ? (pagina.variacoes as Variacao[]).map((v) => ({
+    ? (pagina.variacoes as VariacaoPagina[]).map((v) => ({
         id: v.id,
         nome: v.nome,
         ativa: v.ativa,
@@ -128,156 +105,75 @@ export default async function BlogPage({ params }: Props) {
       ? variacaoAtiva.corpo_mdx
       : pagina.corpo_mdx;
 
+  const ogForSchema = visuals.heroSrc ?? pagina.og_image_url;
+
+  // Parsear markdown em seções estruturadas
+  const sections = parseMarkdownToSections(corpoMdx ?? "");
+
   return (
     <>
-      <ExposureTracker paginaId={pagina.id} variacaoId={variacaoAtivaId} />
+      {variacaoAtivaId ? (
+        <ExposureTracker paginaId={pagina.id} variacaoId={variacaoAtivaId} />
+      ) : null}
+
       <SchemaOrg
         titulo={pagina.titulo}
         subtitulo={pagina.subtitulo}
-        slug={slug}
+        slug={publicSlug}
         siteUrl={SITE_URL}
         publicadoEm={pagina.publicado_em}
         atualizadoEm={pagina.atualizado_em}
         faqs={faqs}
+        imageUrl={ogForSchema}
+        articleSection={focusKeyword}
       />
 
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-primary to-brand-primary-dark text-white py-16 px-4">
-        <div className="max-w-container mx-auto">
-          <nav aria-label="Breadcrumb" className="mb-6">
-            <ol className="flex items-center gap-2 text-sm text-blue-200">
-              <li><Link href="/" className="hover:text-white transition-colors">Início</Link></li>
-              <li aria-hidden className="text-blue-300">/</li>
-              <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
-              <li aria-hidden className="text-blue-300">/</li>
-              <li className="text-white font-medium truncate max-w-[200px]" aria-current="page">{pagina.titulo}</li>
-            </ol>
-          </nav>
-
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4">
-            {pagina.titulo}
-          </h1>
-
-          {pagina.subtitulo && (
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl">{pagina.subtitulo}</p>
-          )}
-
-          <PageCTA
-            paginaId={pagina.id}
-            variacaoId={variacaoAtivaId}
-            keyword={pagina.titulo}
-            whatsappNumber={WA_NUMBER}
-            label={pagina.cta_whatsapp_texto}
-            size="lg"
-          />
-          {/* Sentinel para StickyHeader (IntersectionObserver) */}
-          <div id="hero-scroll-sentinel" aria-hidden className="h-px w-full shrink-0" />
-        </div>
-      </section>
-
-      <StickyHeader
-        sentinelId="hero-scroll-sentinel"
-        paginaId={pagina.id}
-        variacaoId={variacaoAtivaId}
-        keyword={pagina.titulo}
-        whatsappNumber={WA_NUMBER}
-        ctaLabel={pagina.cta_whatsapp_texto}
-        headline={pagina.titulo}
+      {/* ── Hero (inalterado) ─────────────────────────── */}
+      <SalesPageHero
+        titulo={pagina.titulo}
+        subtitulo={pagina.subtitulo}
+        focusKeyword={focusKeyword}
+        heroImageSrc={visuals.heroSrc}
+        heroImageAlt={visuals.heroAlt}
+        heroCredit={pagina.og_image_url ? null : visuals.heroCredit}
+        publicadoEm={pagina.publicado_em}
       />
 
-      {/* Conteúdo */}
-      <div className="max-w-container mx-auto px-4 py-12 flex flex-col lg:flex-row gap-12">
-        <article className="flex-1 min-w-0">
-          <div
-            className="prose-blog"
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(corpoMdx) }}
-          />
+      {/* ── Marquee (inalterado) ─────────────────────── */}
+      <BlogTrustStrip />
 
-          {/* CTA intermediário (a cada ~600 palavras é feito inline, mas aqui colocamos um fixo no meio) */}
-          <div className="my-10 p-6 bg-surface-alt rounded-2xl border border-border text-center">
-            <p className="text-lg font-semibold text-text mb-2">
-              Pronto para transformar o atendimento da sua empresa?
-            </p>
-            <p className="text-text-muted mb-4">
-              Fale agora com um especialista e receba uma demonstração gratuita do Ideia Chat.
-            </p>
-            <PageCTA
-              paginaId={pagina.id}
-              variacaoId={variacaoAtivaId}
-              keyword={pagina.titulo}
-              whatsappNumber={WA_NUMBER}
-              label="Quero ver uma demo grátis"
-            />
-          </div>
+      {/* ── Header sticky ───────────────────────────── */}
+      <StickyHeader sentinelId="hero-scroll-sentinel" headline={pagina.titulo} />
 
-          {/* FAQ */}
-          {faqs.length > 0 && (
-            <section aria-labelledby="faq-heading" className="mt-12">
-              <h2 id="faq-heading" className="text-2xl font-bold text-text mb-6">
-                Perguntas frequentes
-              </h2>
-              <dl className="flex flex-col gap-4">
-                {faqs.map((faq, i) => (
-                  <details key={i} className="group rounded-xl border border-border p-4">
-                    <summary className="font-semibold text-text cursor-pointer list-none flex justify-between items-center">
-                      {faq.pergunta}
-                      <svg
-                        className="size-4 text-text-muted transition-transform group-open:rotate-180"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        aria-hidden
-                      >
-                        <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </summary>
-                    <p className="mt-3 text-text-muted leading-relaxed">{faq.resposta}</p>
-                  </details>
-                ))}
-              </dl>
-            </section>
-          )}
+      {/* ── Conteúdo dinâmico ────────────────────────── */}
+      <main aria-label="Conteúdo comercial da página">
+        {focusKeyword ? (
+          <p className="sr-only">
+            Foco desta oferta: {focusKeyword}. Conteúdo em português para empresas no Brasil.
+          </p>
+        ) : null}
 
-          {/* CTA final */}
-          <div className="mt-12 p-8 bg-brand-primary rounded-2xl text-white text-center">
-            <h2 className="text-2xl font-bold mb-2">Comece agora com o Ideia Chat</h2>
-            <p className="text-blue-100 mb-6">
-              Mais de 400 empresas já usam. Setup em menos de 24h.
-            </p>
-            <PageCTA
-              paginaId={pagina.id}
-              variacaoId={variacaoAtivaId}
-              keyword={pagina.titulo}
-              whatsappNumber={WA_NUMBER}
-              label={pagina.cta_whatsapp_texto}
-              size="lg"
-              className="bg-white !text-brand-primary hover:bg-blue-50"
-            />
-          </div>
-        </article>
+        <PageContentSections
+          sections={sections}
+          faqs={faqs}
+          pageTitulo={pagina.titulo}
+          focusKeyword={focusKeyword}
+          excludeImageSrcs={
+            [visuals.heroSrc, visuals.inlineSrc].filter((u): u is string => Boolean(u)) as string[]
+          }
+          inlineFigure={{
+            src: visuals.inlineSrc,
+            alt: visuals.inlineAlt,
+            credit: visuals.inlineCredit,
+          }}
+          paginaId={pagina.id}
+          variacaoId={variacaoAtivaId}
+          whatsappNumber={WA_NUMBER}
+        />
+      </main>
 
-        {/* Sidebar (desktop) */}
-        <aside className="hidden lg:block w-72 flex-shrink-0">
-          <div className="sticky top-8 p-6 bg-surface-alt rounded-2xl border border-border">
-            <p className="font-semibold text-text mb-1">Fale com um especialista</p>
-            <p className="text-sm text-text-muted mb-4">
-              Tire suas dúvidas e veja como o Ideia Chat se encaixa no seu negócio.
-            </p>
-            <PageCTA
-              paginaId={pagina.id}
-              variacaoId={variacaoAtivaId}
-              keyword={pagina.titulo}
-              whatsappNumber={WA_NUMBER}
-              label="Conversar agora"
-              size="md"
-              className="w-full"
-            />
-          </div>
-        </aside>
-      </div>
+      <BlogLegalFooter />
 
-      {/* CTA flutuante mobile */}
       <FloatingCTA
         paginaId={pagina.id}
         variacaoId={variacaoAtivaId}

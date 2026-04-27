@@ -41,10 +41,23 @@ const config: Config = {
           DEFAULT: "#e2e8f0",
           focus: "#1e40af",
         },
+        /** Ideia Chat — primary = azul geral; chat = #2282C7 (UI marca: eyebrow, círculos de passo) */
+        ideia: {
+          primary: "#1e40af",
+          "primary-dark": "#1e3a8a",
+          /** Tom Ideia Chat (eyebrow, números em círculos em fundos escuros) */
+          chat: "#2282C7",
+          "chat-dark": "#1B6A9E",
+          secondary: "#60a5fa",
+          accent: "#93c5fd",
+          link: "#2563eb",
+          bg: "#0f172a",
+        },
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
         display: ["var(--font-inter)", "system-ui", "sans-serif"],
+        ideia: ["var(--font-maven)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       letterSpacing: {
         display: "-0.02em",

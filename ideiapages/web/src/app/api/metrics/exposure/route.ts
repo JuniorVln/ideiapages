@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 
 const BodySchema = z.object({
   pagina_id: z.string().uuid(),
@@ -24,7 +24,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "invalid" }, { status: 422 });
     }
     const { pagina_id, variacao_id } = parsed.data;
-    const supabase = getSupabaseAdmin();
+    const supabase = getSupabaseAdminOptional();
+    if (!supabase) {
+      return NextResponse.json({ ok: false, error: "supabase_unconfigured" }, { status: 503 });
+    }
 
     const { data: pagina, error: pErr } = await supabase
       .from("paginas")

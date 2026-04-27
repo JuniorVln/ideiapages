@@ -1,24 +1,27 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabasePublicReadClient } from "@/lib/supabase/public";
 import type { Tables } from "@/lib/database.types";
+import { CONTENT_HUB_NAME, PUBLIC_CONTENT_BASE_PATH } from "@/lib/public-pages";
+import { getSiteUrl } from "@/lib/site-url";
+import { formatDatePtBrLong } from "@/lib/format-date-br";
 
 type PaginaListItem = Pick<
   Tables<"paginas">,
   "slug" | "titulo" | "subtitulo" | "publicado_em"
 >;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ideiamultichat.com.br";
+const SITE_URL = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: `${CONTENT_HUB_NAME} | Ideia Chat`,
   description:
-    "Artigos e guias sobre atendimento WhatsApp, Ideia Chat e conversão para empresas.",
-  alternates: { canonical: `${SITE_URL}/blog` },
+    "Páginas e conteúdos para decidir com confiança: atendimento WhatsApp com IA, API oficial e escala comercial.",
+  alternates: { canonical: `${SITE_URL}${PUBLIC_CONTENT_BASE_PATH}` },
 };
 
-export default async function BlogIndexPage() {
-  const supabase = await getSupabaseServerClient();
+export default async function ContentHubIndexPage() {
+  const supabase = getSupabasePublicReadClient();
   const { data: paginasRaw } = await supabase
     .from("paginas")
     .select("slug, titulo, subtitulo, publicado_em")
@@ -38,17 +41,18 @@ export default async function BlogIndexPage() {
           </li>
           <li aria-hidden>/</li>
           <li className="text-text font-medium" aria-current="page">
-            Blog
+            {CONTENT_HUB_NAME}
           </li>
         </ol>
       </nav>
 
       <header className="mb-12">
         <h1 className="text-3xl md:text-4xl font-bold font-display text-text tracking-display">
-          Blog
+          Soluções para vender e atender melhor no WhatsApp
         </h1>
         <p className="mt-3 text-text-muted max-w-2xl">
-          Conteúdo para quem quer escalar atendimento e vendas no WhatsApp com processo profissional.
+          Conteúdos pensados para apresentar o Ideia Chat, tirar dúvidas e levar você a falar com um
+          especialista — com foco em resultado comercial e conversão.
         </p>
       </header>
 
@@ -58,7 +62,7 @@ export default async function BlogIndexPage() {
             <li key={p.slug}>
               <article className="rounded-xl border border-border bg-surface p-5 shadow-card hover:border-border-focus/40 transition-colors">
                 <Link
-                  href={`/blog/${p.slug}`}
+                  href={`${PUBLIC_CONTENT_BASE_PATH}/${p.slug}`}
                   className="block group"
                 >
                   <h2 className="text-lg font-semibold text-text group-hover:text-brand-primary transition-colors">
@@ -72,11 +76,7 @@ export default async function BlogIndexPage() {
                       dateTime={p.publicado_em}
                       className="mt-2 block text-xs text-text-subtle"
                     >
-                      {new Date(p.publicado_em).toLocaleDateString("pt-BR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                      {formatDatePtBrLong(p.publicado_em) || "—"}
                     </time>
                   )}
                 </Link>
@@ -86,9 +86,9 @@ export default async function BlogIndexPage() {
         </ul>
       ) : (
         <p className="text-text-muted">
-          Nenhum artigo publicado ainda. Publique páginas com{" "}
-          <code className="text-sm bg-surface-card px-1 rounded">status = publicado</code> no
-          Supabase.
+          Nenhuma página pública ainda. Publique com{" "}
+          <code className="text-sm bg-surface-card px-1 rounded">status = publicado</code> no painel
+          ou Supabase.
         </p>
       )}
     </main>

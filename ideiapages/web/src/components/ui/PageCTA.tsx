@@ -13,6 +13,8 @@ interface PageCTAProps {
   label?: string;
   size?: "sm" | "md" | "lg";
   className?: string;
+  /** Visual: azul marca Ideia ou verde WhatsApp padrão. */
+  buttonVariant?: "ideia" | "whatsapp";
 }
 
 export function PageCTA({
@@ -23,6 +25,7 @@ export function PageCTA({
   label = "Falar com especialista",
   size = "lg",
   className = "",
+  buttonVariant = "ideia",
 }: PageCTAProps) {
   const [open, setOpen] = useState(false);
 
@@ -34,7 +37,7 @@ export function PageCTA({
   return (
     <>
       <Button
-        variant="whatsapp"
+        variant={buttonVariant === "ideia" ? "ideia" : "whatsapp"}
         size={size}
         onClick={handleClick}
         className={className}

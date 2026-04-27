@@ -1,6 +1,6 @@
 import { type ButtonHTMLAttributes, forwardRef } from "react";
 
-type Variant = "primary" | "ghost" | "whatsapp" | "outline";
+type Variant = "primary" | "ghost" | "whatsapp" | "outline" | "ideia";
 type Size = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -15,9 +15,12 @@ const variantClasses: Record<Variant, string> = {
   ghost:
     "bg-transparent text-brand-primary hover:bg-blue-50 focus-visible:ring-brand-primary",
   whatsapp:
-    "bg-brand-cta text-white hover:bg-brand-cta-dark focus-visible:ring-brand-cta font-semibold shadow-md",
+    "bg-[var(--color-brand-cta)] text-[var(--color-brand-cta-text)] hover:bg-[var(--color-brand-cta-dark)] focus-visible:ring-[var(--color-brand-cta)] font-semibold shadow-md",
   outline:
     "border border-border-focus text-brand-primary hover:bg-blue-50 focus-visible:ring-brand-primary",
+  /** CTA Ideia Chat (azul marca); PageCTA usa com className que pode sobrescrever p/ gradiente. */
+  ideia:
+    "bg-brand-primary text-white hover:bg-brand-primary-dark focus-visible:ring-brand-primary font-semibold shadow-md",
 };
 
 const sizeClasses: Record<Size, string> = {

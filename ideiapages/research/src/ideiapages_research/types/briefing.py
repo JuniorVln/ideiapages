@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 EvidenceTipo = Literal["estatistica", "case", "cita"]
 
@@ -40,7 +40,7 @@ class InformationGainBlock(BaseModel):
 
 
 class BriefingSEO(BaseModel):
-    """JSON raiz exigido do modelo (v1)."""
+    """JSON raiz exigido do modelo (v1). Campos LSI/PAA/gancho: enriquecimento v2 do prompt."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -59,13 +59,67 @@ class BriefingSEO(BaseModel):
     word_count_alvo: int = Field(..., ge=300, le=50_000)
     tom_de_voz: str = Field(..., min_length=1, max_length=400)
     alertas_para_humano: list[str] = Field(default_factory=list)
+    # —— SEO/GEO: termos semânticos, PAA, gancho comercial (não texto genérico de enciclopédia)
+    keywords_semanticas_lsi: list[str] = Field(
+        default_factory=list,
+        description="8–25 termos/n-grams do nicho; incluir jargão que aparece nos concorrentes.",
+    )
+    perguntas_tipo_paa: list[str] = Field(
+        default_factory=list,
+        description="Perguntas estilo PAA/People Also Ask a cobrir (mesmo que inventadas, "
+        "devem soar como dúvidas reais de compra).",
+    )
+    gancho_vendas: str = Field(
+        ...,
+        min_length=40,
+        max_length=700,
+        description="1º parágrafo: intenção de busca + por que Ideia Chat (fatos de product_facts).",
+    )
+    gaps_conteudo_top3: str = Field(
+        ...,
+        min_length=20,
+        max_length=1500,
+        description="O que os 3 primeiros resultados não explicam bem ou deixam superficial.",
+    )
 
     @field_validator("title_seo", "meta_description", "h1_sugerido", mode="before")
     @classmethod
-    def strip_strings(cls, v: str) -> str:
-        if isinstance(v, str):
-            return v.strip()
-        return v
+    def strip_and_cap_titles_meta_h1(cls, v: str, info: ValidationInfo) -> str:
+        """O LLM por vezes excede 60/155/200 chars; truncar em vez de falhar a pipeline."""
+        if not isinstance(v, str):
+            return v
+        s = v.strip()
+        limits = {"title_seo": 60, "meta_description": 155, "h1_sugerido": 200}
+        n = limits.get(str(info.field_name), 9_999)
+        if len(s) > n:
+            s = s[:n]
+        return s
+
+    @field_validator("gancho_vendas", mode="before")
+    @classmethod
+    def cap_gancho_vendas(cls, v: str) -> str:
+        if not isinstance(v, str):
+            return v
+        s = v.strip()
+        if len(s) > 700:
+            s = s[:700]
+        return s
+
+    @field_validator("keywords_semanticas_lsi", mode="after")
+    @classmethod
+    def min_lsi_count(cls, v: list[str]) -> list[str]:
+        out = [x.strip() for x in v if isinstance(x, str) and x.strip()]
+        if len(out) < 8:
+            raise ValueError("keywords_semanticas_lsi: forneça ao menos 8 termos semânticos.")
+        return out[:40]
+
+    @field_validator("perguntas_tipo_paa", mode="after")
+    @classmethod
+    def min_paa_count(cls, v: list[str]) -> list[str]:
+        out = [x.strip() for x in v if isinstance(x, str) and x.strip()]
+        if len(out) < 4:
+            raise ValueError("perguntas_tipo_paa: forneça ao menos 4 perguntas.")
+        return out[:35]
 
 
 class CompetitorContent(BaseModel):

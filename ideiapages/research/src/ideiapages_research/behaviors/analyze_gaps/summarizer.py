@@ -48,18 +48,46 @@ def estimate_summary_tokens(summaries: list[CompetitorSummary]) -> int:
     return max(1, len(raw) // 4)
 
 
+def _serp_stub_summary(row: dict[str, Any]) -> CompetitorSummary:
+    """Quando não há raspagem útil: título + meta do snapshot SERP (sem inventar H2/H3)."""
+    url = str(row["url"])
+    titulo = str(row["titulo"]).strip() if row.get("titulo") else None
+    meta = str(row.get("meta_description") or "").strip()
+    pos = int(row.get("posicao") or 1)
+    base = meta if meta else (titulo or url)
+    note = "[SERP apenas — sem corpo raspado ou página thin/paywall] "
+    trecho = (note + base)[:520]
+    return CompetitorSummary(
+        url=url,
+        titulo=titulo,
+        posicao=max(1, min(50, pos)),
+        word_count=0,
+        headings_h2=[],
+        headings_h3=[],
+        trecho_inicio=trecho,
+        tem_faq=False,
+        tem_tabela=False,
+    )
+
+
 def summarize_competitors_for_term(
     sb: Client,
     termo_id: UUID,
     *,
     top_n: int = 10,
 ) -> list[CompetitorSummary]:
-    """SERP mais recente + ``conteudo_concorrente``; ignora thin/paywall."""
+    """SERP mais recente + ``conteudo_concorrente``; ignora thin/paywall no texto completo.
+
+    Sempre que possível, completa com **stubs SERP** (título + meta) para o modelo não ficar
+    sem contexto — evita falha de pré-condição quando o scrape não preencheu a tabela.
+    """
     serp_rows = load_serp_group_latest_termo(sb, termo_id)
     if not serp_rows:
         return []
 
     out: list[CompetitorSummary] = []
+    seen_urls: set[str] = set()
+
     for row in serp_rows:
         if len(out) >= top_n:
             break
@@ -97,4 +125,16 @@ def summarize_competitors_for_term(
             paywalled=paywalled,
         )
         out.append(summarize_competitor(content))
+        seen_urls.add(url)
+
+    # Fallback: incluir resultados orgânicos que não entraram (sem scrape, thin, etc.)
+    for row in serp_rows:
+        if len(out) >= top_n:
+            break
+        url = str(row["url"])
+        if url in seen_urls:
+            continue
+        out.append(_serp_stub_summary(row))
+        seen_urls.add(url)
+
     return out

@@ -3,9 +3,12 @@ import { cookies } from "next/headers";
 import type { Database } from "@/lib/database.types";
 import type { User } from "@supabase/supabase-js";
 import { getAdminAllowlist } from "./allowlist";
+import { getLocalBypassAdminUser, isAdminLocalBypass } from "./local-bypass";
 
 /** Sessão admin ou null (para route handlers sem redirect). */
 export async function getAdminUser(): Promise<User | null> {
+  if (isAdminLocalBypass()) return getLocalBypassAdminUser();
+
   const cookieStore = await cookies();
   const cookieMethods: CookieMethodsServer = {
     getAll: () => cookieStore.getAll(),

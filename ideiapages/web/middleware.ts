@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getAdminAllowlist } from "@/lib/admin/allowlist";
+import { isAdminLocalBypass } from "@/lib/admin/local-bypass";
 import {
   pickVariation,
   variacaoCookieName,
@@ -8,14 +9,16 @@ import {
   type PaginaExperimentContext,
   type VariacaoArm,
 } from "@/lib/experiments/pick-variation";
+import { PUBLIC_CONTENT_BASE_PATH } from "@/lib/public-pages";
 
 function newVisitorId(): string {
   return crypto.randomUUID();
 }
 
-function parseBlogSlug(pathname: string): string | null {
-  if (!pathname.startsWith("/blog/")) return null;
-  const rest = pathname.slice("/blog/".length);
+function parsePublicContentSlug(pathname: string): string | null {
+  const prefix = `${PUBLIC_CONTENT_BASE_PATH}/`;
+  if (!pathname.startsWith(prefix)) return null;
+  const rest = pathname.slice(prefix.length);
   if (!rest || rest.includes("/")) return null;
   return decodeURIComponent(rest);
 }
@@ -40,13 +43,19 @@ async function fetchPaginaExperimentContext(
     select: select,
   });
 
-  const res = await fetch(`${url}/rest/v1/paginas?${qs.toString()}`, {
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-    },
-    cache: "no-store",
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${url}/rest/v1/paginas?${qs.toString()}`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+      },
+      cache: "no-store",
+      signal: AbortSignal.timeout(12_000),
+    });
+  } catch {
+    return null;
+  }
 
   if (!res.ok) return null;
   const rows = (await res.json()) as Record<string, unknown>[];
@@ -73,12 +82,29 @@ async function fetchPaginaExperimentContext(
 }
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Em dev, com bypass local, não chama auth.getUser() (rede) — evita trava se Supabase
+  // estiver inacessível; o painel usa requireAdmin() + bypass no Server Component.
+  if (isAdminLocalBypass() && pathname.startsWith("/admin")) {
+    if (pathname.startsWith("/admin/login")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/hub";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  /** Sem credenciais no Edge, `createServerClient(undefined, …)` quebra o middleware inteiro → site em branco. */
+  let user: { email?: string | null } | null = null;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+
+  if (supabaseUrl && supabaseAnonKey) {
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -95,38 +121,45 @@ export async function middleware(request: NextRequest) {
           );
         },
       },
-    },
-  );
+    });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
+    const {
+      data: { user: u },
+    } = await supabase.auth.getUser();
+    user = u;
+  }
 
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    const allow = getAdminAllowlist();
-    const email = user?.email?.toLowerCase() ?? "";
-    if (!user || !allow.includes(email)) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/admin/login";
-      url.searchParams.set("next", pathname);
-      return NextResponse.redirect(url);
+    if (!isAdminLocalBypass()) {
+      const allow = getAdminAllowlist();
+      const email = user?.email?.toLowerCase() ?? "";
+      if (!user || !allow.includes(email)) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/admin/login";
+        url.searchParams.set("next", pathname);
+        return NextResponse.redirect(url);
+      }
     }
   }
 
   if (pathname.startsWith("/admin/login")) {
+    if (isAdminLocalBypass()) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/hub";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
     const allow = getAdminAllowlist();
     const email = user?.email?.toLowerCase() ?? "";
     if (user && allow.includes(email)) {
       const url = request.nextUrl.clone();
-      url.pathname = "/admin/dashboard";
+      url.pathname = "/admin/hub";
       url.search = "";
       return NextResponse.redirect(url);
     }
   }
 
-  const slug = parseBlogSlug(pathname);
+  const slug = parsePublicContentSlug(pathname);
   if (slug) {
     let visitorId = request.cookies.get(VISITOR_COOKIE)?.value;
     if (!visitorId) {
@@ -162,8 +195,12 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
+/**
+ * Não executar middleware em assets do Next (`/_next/*`), API routes, favicon nem ficheiros estáticos.
+ * Se o middleware correr em pedidos de CSS/JS (consoante versão/host), o painel pode renderizar sem estilos.
+ */
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/|api/|favicon\\.ico|robots\\.txt|sitemap\\.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

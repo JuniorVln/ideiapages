@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
+import { getSiteUrl } from "@/lib/site-url";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ideiamultichat.com.br";
+const SITE_URL = getSiteUrl();
 const IS_PROD = process.env.NEXT_PUBLIC_ENV === "production";
 
 export default function robots(): MetadataRoute.Robots {

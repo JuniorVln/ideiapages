@@ -29,13 +29,46 @@ from ideiapages_research.behaviors.classify_terms.classifier import (
     load_product_facts,
     load_prompt_bundle,
 )
+from ideiapages_research.behaviors.scrape_competitors.scraper import (
+    load_serp_group_latest_termo,
+)
 from ideiapages_research.llm.claude import get_claude
 from ideiapages_research.settings import PROJECT_ROOT, Settings, get_settings
 from ideiapages_research.types.briefing import BriefingSEO, CompetitorSummary
 
+
+def _summaries_when_no_serp_data(keyword: str) -> list[CompetitorSummary]:
+    """Último recurso: sem linhas em serp_snapshots — ainda assim gera briefing com Claude."""
+    k = keyword.strip()[:240] or "keyword"
+    return [
+        CompetitorSummary(
+            url="https://invalid.invalid/no-serp-data",
+            titulo="Sem snapshot SERP no banco",
+            posicao=1,
+            word_count=0,
+            headings_h2=[],
+            headings_h3=[],
+            trecho_inicio=(
+                "Não há serp_snapshots para este termo (rode collect-serp quando possível). "
+                f"Keyword: {k}. Produza briefing completo usando product_facts, term_data e schema."
+            )[:520],
+            tem_faq=False,
+            tem_tabela=False,
+        )
+    ]
+
 BEHAVIOR = "research/analyze-gaps"
 PROMPT_REL = Path("references") / "prompts" / "analyze-gaps.md"
+CONTENT_QUALITY_REL = Path("references") / "prompts" / "content-quality-and-briefing.md"
 BRIEFINGS_DIR = PROJECT_ROOT / "research" / "data" / "briefings"
+
+
+def _load_content_quality_append() -> str:
+    """Regras partilhadas com generate-page (factualidade, MDX, briefing)."""
+    p = PROJECT_ROOT / CONTENT_QUALITY_REL
+    if not p.is_file():
+        return ""
+    return "\n\n---\n\n" + p.read_text(encoding="utf-8")
 
 
 @dataclass
@@ -50,6 +83,36 @@ class AnalyzeGapsReport:
     suspicious_price_alerts: list[str]
 
 
+def load_serp_extras_json_for_prompt(sb: Client, termo_id: UUID) -> str:
+    """PAA, buscas relacionadas e featured snippet do último snapshot SERP (Apify)."""
+    rows = load_serp_group_latest_termo(sb, termo_id)
+    if not rows:
+        return json.dumps(
+            {
+                "people_also_ask": [],
+                "related_searches": [],
+                "featured_snippet": None,
+                "nota": "Sem serp_snapshots — rode collect-serp antes.",
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    r0 = cast(dict[str, Any], rows[0])
+    raw = r0.get("raw_jsonb")
+    ex: dict[str, Any] = {}
+    if isinstance(raw, dict):
+        ex = cast(dict[str, Any], raw.get("extras_head") or {})
+    out = {
+        "people_also_ask": ex.get("people_also_ask") or [],
+        "related_searches": ex.get("related_searches") or [],
+        "featured_snippet": ex.get("featured_snippet"),
+    }
+    s = json.dumps(out, ensure_ascii=False, indent=2)
+    if len(s) > 16_000:
+        return s[:16_000] + "\n…(truncado)"
+    return s
+
+
 def load_seo_rules(path: Path | None = None) -> str:
     p = path or (PROJECT_ROOT / "references" / "seo_rules.md")
     if not p.is_file():
@@ -58,17 +121,25 @@ def load_seo_rules(path: Path | None = None) -> str:
 
 
 def _extract_json_object(text: str) -> str:
+    """Extrai o primeiro objeto JSON de uma resposta (markdown ou texto puro)."""
     t = text.strip()
-    if t.startswith("```"):
-        t = re.sub(r"^```(?:json)?\s*", "", t, flags=re.IGNORECASE)
-        t = re.sub(r"\s*```$", "", t)
-    t = t.strip()
+    
+    # 1. Tenta extrair de blocos de código markdown
+    fence_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", t, re.IGNORECASE)
+    if fence_match:
+        t = fence_match.group(1).strip()
+    
+    # 2. Se ainda não for um JSON puro, procura pelo primeiro '{' e último '}'
     if not t.startswith("{"):
         i = t.find("{")
         j = t.rfind("}")
         if i != -1 and j != -1 and j > i:
             t = t[i : j + 1]
-    return t
+            
+    # 3. Remove comentários simples e de bloco (comuns em alucinações de IA)
+    t = re.sub(r"/\*[\s\S]*?\*/|(?<!:)//.*", "", t)
+    
+    return t.strip()
 
 
 def _estimate_cost_brl_sonnet(
@@ -114,6 +185,10 @@ def _scan_price_hallucinations(briefing: BriefingSEO, facts: str) -> list[str]:
         blobs.append(t)
     for t in briefing.information_gain.topicos_unicos_que_concorrentes_nao_tem:
         blobs.append(t)
+    blobs.append(briefing.gancho_vendas)
+    blobs.append(briefing.gaps_conteudo_top3)
+    for kw in briefing.keywords_semanticas_lsi:
+        blobs.append(kw)
     for f in briefing.faq_sugerida:
         blobs.append(f.pergunta)
         blobs.append(f.resposta_curta)
@@ -310,6 +385,22 @@ def briefing_to_markdown(b: BriefingSEO, *, keyword: str) -> str:
         lines.append("")
     lines.extend(
         [
+            "## Gancho de vendas (1º parágrafo)",
+            "",
+            b.gancho_vendas,
+            "",
+            "## Gaps vs top 3 da SERP",
+            "",
+            b.gaps_conteudo_top3,
+            "",
+            "## Keywords semânticas (LSI)",
+            "",
+            *([f"- {t}" for t in b.keywords_semanticas_lsi] or ["- (nenhuma)"]),
+            "",
+            "## Perguntas tipo PAA",
+            "",
+            *([f"- {t}" for t in b.perguntas_tipo_paa] or ["- (nenhuma)"]),
+            "",
             "## Tópicos obrigatórios",
             "",
             *[f"- {t}" for t in b.topicos_obrigatorios],
@@ -400,24 +491,8 @@ def analyze_gaps_for_term(
         )
 
     summaries = summarize_competitors_for_term(sb, termo_id, top_n=top_n)
-    if len(summaries) < settings.analyze_gaps_min_competitors:
-        msg = (
-            f"Pré-condição: ao menos {settings.analyze_gaps_min_competitors} concorrentes "
-            f"raspados (não thin, não paywall); obtidos {len(summaries)}."
-        )
-        if sb and not dry_run:
-            _mark_falha_briefing(sb, termo_id, msg)
-            _log_metricas_parse_error(sb, termo_id, msg)
-        return AnalyzeGapsReport(
-            termo_id=termo_id,
-            ok=False,
-            skipped_cache=False,
-            briefing=None,
-            cost_brl=0.0,
-            error=msg,
-            json_retries=0,
-            suspicious_price_alerts=[],
-        )
+    if not summaries:
+        summaries = _summaries_when_no_serp_data(keyword)
 
     tok_est = estimate_summary_tokens(summaries)
     if tok_est > 30_000:
@@ -436,11 +511,13 @@ def analyze_gaps_for_term(
         ensure_ascii=False,
         indent=2,
     )
+    serp_extras_json = load_serp_extras_json_for_prompt(sb, termo_id)
     user = (
         bundle.user_template.replace("{{product_facts}}", product_facts)
         .replace("{{seo_rules}}", seo_rules[:12_000])
         .replace("{{term_data}}", json.dumps(term_payload, ensure_ascii=False, indent=2))
         .replace("{{competitor_summaries}}", summaries_json)
+        .replace("{{serp_extras}}", serp_extras_json)
     )
 
     client = get_claude()
@@ -466,7 +543,7 @@ def analyze_gaps_for_term(
             raw_text, tin, tout, latency_ms = _call_claude(
                 client,
                 model=model,
-                system=bundle.system,
+                system=bundle.system + _load_content_quality_append(),
                 user=user + extra,
                 max_tokens=max_tokens,
                 temperature=temperature,

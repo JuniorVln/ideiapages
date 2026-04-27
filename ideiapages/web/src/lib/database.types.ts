@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_google_oauth: {
+        Row: {
+          actualizado_em: string
+          criado_em: string
+          refresh_token: string
+          user_id: string
+        }
+        Insert: {
+          actualizado_em?: string
+          criado_em?: string
+          refresh_token: string
+          user_id: string
+        }
+        Update: {
+          actualizado_em?: string
+          criado_em?: string
+          refresh_token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       briefings_seo: {
         Row: {
           briefing_jsonb: Json
@@ -391,6 +412,7 @@ export type Database = {
           cta_whatsapp_texto: string
           faq_jsonb: Json | null
           id: string
+          imagens_contexto_jsonb: Json | null
           meta_description: string | null
           meta_title: string | null
           og_image_url: string | null
@@ -410,6 +432,7 @@ export type Database = {
           cta_whatsapp_texto?: string
           faq_jsonb?: Json | null
           id?: string
+          imagens_contexto_jsonb?: Json | null
           meta_description?: string | null
           meta_title?: string | null
           og_image_url?: string | null
@@ -429,6 +452,7 @@ export type Database = {
           cta_whatsapp_texto?: string
           faq_jsonb?: Json | null
           id?: string
+          imagens_contexto_jsonb?: Json | null
           meta_description?: string | null
           meta_title?: string | null
           og_image_url?: string | null
@@ -560,12 +584,15 @@ export type Database = {
           criado_em: string
           custo_estimado_usd: number | null
           id: string
+          meta_description_alt: string | null
           model_version: string | null
           nome: string
           pagina_id: string
           peso_trafego: number
           prompt_version: string
-          provider: string
+          provider: string | null
+          quality_gate_errors: string[] | null
+          titulo_alt: string | null
           tokens_input: number | null
           tokens_output: number | null
         }
@@ -575,12 +602,15 @@ export type Database = {
           criado_em?: string
           custo_estimado_usd?: number | null
           id?: string
+          meta_description_alt?: string | null
           model_version?: string | null
           nome: string
           pagina_id: string
           peso_trafego?: number
           prompt_version?: string
-          provider?: string
+          provider?: string | null
+          quality_gate_errors?: string[] | null
+          titulo_alt?: string | null
           tokens_input?: number | null
           tokens_output?: number | null
         }
@@ -590,12 +620,15 @@ export type Database = {
           criado_em?: string
           custo_estimado_usd?: number | null
           id?: string
+          meta_description_alt?: string | null
           model_version?: string | null
           nome?: string
           pagina_id?: string
           peso_trafego?: number
           prompt_version?: string
-          provider?: string
+          provider?: string | null
+          quality_gate_errors?: string[] | null
+          titulo_alt?: string | null
           tokens_input?: number | null
           tokens_output?: number | null
         }

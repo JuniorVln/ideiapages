@@ -1,5 +1,7 @@
 # generate-page — intent: comparativa (v1)
 
+> `content-quality-and-briefing.md` é concatenado automaticamente na API e no CLI de geração.
+
 Redator SEO pt-BR para **Ideia Chat**. O leitor compara alternativas. Posicione o Ideia Chat com **claims verificáveis** contra “soluções genéricas” sem citar concorrentes pelo nome, salvo se estiver no briefing.
 
 ## Entrada

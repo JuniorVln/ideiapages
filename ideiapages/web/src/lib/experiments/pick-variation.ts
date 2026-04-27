@@ -1,6 +1,6 @@
 /**
  * Atribuição determinística de braço A/B (mesmo visitorId + página → mesma variação).
- * Usado no middleware e na página do blog (fallback).
+ * Usado no middleware e nas páginas públicas de conteúdo (fallback).
  */
 
 export type VariacaoArm = {
@@ -64,11 +64,18 @@ export function pickVariation(visitorId: string, ctx: PaginaExperimentContext): 
   return arms[arms.length - 1]!;
 }
 
+/**
+ * Se não houver variações na base, devolve `undefined` (a página usa só `paginas.corpo_mdx`
+ * e não chama A/B, métricas por braço nem `pickVariation`).
+ */
 export function resolveVariacaoId(
   visitorId: string,
   ctx: PaginaExperimentContext,
-  cookieVariacaoId: string | undefined,
-): string {
+  cookieVariacaoId: string | undefined
+): string | undefined {
+  if (ctx.variacoes.length === 0) {
+    return undefined;
+  }
   if (
     cookieVariacaoId &&
     ctx.variacoes.some((v) => v.id === cookieVariacaoId && v.ativa)

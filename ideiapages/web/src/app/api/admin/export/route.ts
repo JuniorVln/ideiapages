@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/admin/session";
 import { toCsv } from "@/lib/admin/csv";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 
 function sha256Hex(s: string): string {
   return createHash("sha256").update(s).digest("hex");
@@ -15,7 +15,13 @@ export async function GET(req: NextRequest) {
   }
 
   const type = req.nextUrl.searchParams.get("type") ?? "paginas";
-  const db = getSupabaseAdmin();
+  const db = getSupabaseAdminOptional();
+  if (!db) {
+    return NextResponse.json(
+      { error: "Supabase não configurado (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY)." },
+      { status: 503 },
+    );
+  }
 
   if (type === "paginas") {
     const { data, error } = await db

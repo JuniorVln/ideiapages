@@ -1,29 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PageCTA } from "./PageCTA";
+import { ScrollToSectionButton } from "./ScrollToSectionButton";
 
 interface StickyHeaderProps {
   /** Elemento observado: quando sair da viewport, o header aparece. */
   sentinelId: string;
-  paginaId: string;
-  variacaoId?: string;
-  keyword?: string;
-  whatsappNumber: string;
-  ctaLabel?: string;
   /** Título curto ao lado do CTA (opcional). */
   headline?: string;
 }
 
-export function StickyHeader({
-  sentinelId,
-  paginaId,
-  variacaoId,
-  keyword,
-  whatsappNumber,
-  ctaLabel = "Falar com especialista",
-  headline,
-}: StickyHeaderProps) {
+export function StickyHeader({ sentinelId, headline }: StickyHeaderProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -61,14 +48,13 @@ export function StickyHeader({
           <span className="hidden sm:block text-sm font-medium text-text-muted">Ideia Chat</span>
         )}
         <div className="flex-shrink-0 ml-auto">
-          <PageCTA
-            paginaId={paginaId}
-            variacaoId={variacaoId}
-            keyword={keyword}
-            whatsappNumber={whatsappNumber}
-            label={ctaLabel}
+          <ScrollToSectionButton
+            targetId="demonstracao-gratuita"
             size="sm"
-          />
+            aria-label="Rolar até valores e demonstração"
+          >
+            Valores e demonstração
+          </ScrollToSectionButton>
         </div>
       </div>
     </header>

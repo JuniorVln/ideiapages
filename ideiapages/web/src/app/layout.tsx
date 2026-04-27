@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const inter = Inter({
@@ -10,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://ideiamultichat.com.br"),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: "Ideia Chat — Atendimento WhatsApp Profissional",
     template: "%s | Ideia Chat",
@@ -26,7 +27,7 @@ const IS_PROD = process.env.NEXT_PUBLIC_ENV === "production";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={inter.variable}>
+    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-surface text-text antialiased font-sans">
         {children}
         {IS_PROD && GA4_ID && <GoogleAnalytics gaId={GA4_ID} />}

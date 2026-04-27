@@ -73,7 +73,14 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
-console = Console()
+import sys as _sys
+console = Console(
+    # Force UTF-8 on Windows (cmd.exe usa CP-1252 por padrão e quebra com →, →, etc.)
+    file=open(_sys.stdout.fileno(), mode="w", encoding="utf-8", buffering=1, closefd=False)
+    if _sys.platform == "win32" and hasattr(_sys.stdout, "fileno")
+    else None,
+    highlight=False,
+)
 
 
 class SeedFileSchema(BaseModel):
@@ -1317,8 +1324,8 @@ def analyze_gaps_cmd(
     if top_alerts:
         console.print("[bold]Alertas (amostra)[/bold]")
         for a in top_alerts:
-            console.print(f"  - {a}")
-    console.print(f"Log JSONL: [cyan]{log_path}[/cyan]")
+            console.print(f"  - {a}", markup=False)
+    console.print(f"Log JSONL: {log_path}")
 
     if fail_n:
         raise typer.Exit(code=1)
@@ -1488,7 +1495,7 @@ def run_pipeline_cmd(
     if summary.errors:
         console.print(f"[yellow]{len(summary.errors)} avisos/erros (primeiros 8):[/yellow]")
         for e in summary.errors[:8]:
-            console.print(f"  - {e}")
+            console.print(f"  - {e}", markup=False)
 
     if summary.seeds_failed or summary.gaps_failed or summary.scrape_url_failures:
         raise typer.Exit(code=1)

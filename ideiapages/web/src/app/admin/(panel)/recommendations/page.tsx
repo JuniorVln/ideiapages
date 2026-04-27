@@ -1,9 +1,11 @@
+import { AdminNeedSupabaseEnv } from "@/components/AdminNeedSupabaseEnv";
 import { requireAdmin } from "@/lib/admin/require-admin";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 
 export default async function AdminRecommendationsPage() {
   await requireAdmin();
-  const db = getSupabaseAdmin();
+  const db = getSupabaseAdminOptional();
+  if (!db) return <AdminNeedSupabaseEnv />;
 
   const { data: termos } = await db
     .from("termos")
@@ -28,9 +30,12 @@ export default async function AdminRecommendationsPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-white">Recomendações</h1>
+      <div>
+        <h1 className="text-2xl font-bold text-white">Alertas</h1>
+        <p className="text-slate-500 text-sm mt-1">Próximas páginas a criar e fila sugerida.</p>
+      </div>
       <section className="rounded-xl border border-slate-800 bg-slate-900/40 p-6">
-        <h2 className="text-lg font-semibold text-white mb-3">Próximas páginas (briefing pronto, sem publicar)</h2>
+        <h2 className="text-lg font-semibold text-white mb-3">Próximas páginas (roteiro pronto, sem publicar)</h2>
         {candidatos.length === 0 ? (
           <p className="text-slate-500 text-sm">Nenhum termo candidato ou todos já têm página.</p>
         ) : (

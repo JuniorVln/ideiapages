@@ -94,7 +94,8 @@ class Settings(BaseSettings):
     #: Confirmar lote se N * estimativa > isso (salvo --yes / skip_cost_confirm).
     analyze_gaps_batch_confirm_brl: float = Field(default=20.0)
     analyze_gaps_cache_days: int = Field(default=60)
-    analyze_gaps_min_competitors: int = Field(default=5)
+    #: Referência apenas — analyze-gaps **não aborta** por contagem; usa fallback SERP e stub.
+    analyze_gaps_min_competitors: int = Field(default=1)
     analyze_gaps_pause_seconds: float = Field(default=3.0)
 
 

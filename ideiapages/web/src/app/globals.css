@@ -2,9 +2,14 @@
 
 /* ── Design Tokens ── */
 :root {
-  /* Brand */
-  --color-brand-primary: #1e40af;       /* azul Ideia */
+  /* Brand (Azul “corporativo” em textos/CTA gerais) */
+  --color-brand-primary: #1e40af;
   --color-brand-primary-dark: #1e3a8a;
+  /** Ideia Chat — azul de interface (eyebrow, print ~#2282C7) */
+  --color-ideia-chat: #2282c7;
+  --color-ideia-chat-dark: #1b6a9e;
+  /** Passos em fundo escuro: tom um pouco mais claro, mesmo “família” do eyebrow, para borda + número legíveis */
+  --color-ideia-chat-bright: #4eb0ee;
   --color-brand-dark: #0f172a;          /* texto forte / “ink” */
   --color-brand-cta: #25D366;           /* WhatsApp green */
   --color-brand-cta-dark: #128C7E;
@@ -162,3 +167,31 @@ body {
   background: var(--color-surface-card);
   font-weight: 600;
 }
+
+/* ── Blog Trust Marquee ── */
+.blog-trust-marquee-wrapper {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.blog-trust-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: blog-trust-scroll 40s linear infinite;
+}
+
+@keyframes blog-trust-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.3333%);
+  }
+}
+
+/* Pause animation on hover for better UX */
+.blog-trust-marquee-track:hover {
+  animation-play-state: paused;
+}
+

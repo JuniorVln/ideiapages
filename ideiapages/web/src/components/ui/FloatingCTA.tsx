@@ -33,10 +33,10 @@ export function FloatingCTA({
           onClick={handleOpen}
           aria-label="Abrir chat no WhatsApp"
           className="
-            flex items-center gap-2 px-4 py-3 rounded-full
-            bg-brand-cta text-white font-semibold text-sm
-            shadow-modal hover:bg-brand-cta-dark transition-colors
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cta focus-visible:ring-offset-2
+            flex items-center gap-2 px-4 py-3 rounded-2xl
+            bg-brand-primary text-white font-semibold text-sm
+            shadow-modal hover:bg-brand-primary-dark transition-colors
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2
           "
         >
           <svg viewBox="0 0 24 24" className="size-5 fill-current" aria-hidden>

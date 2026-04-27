@@ -46,6 +46,7 @@ const supabase = createClient<Database>(SUPABASE_URL, SERVICE_KEY, {
 
 const PRODUCT_FACTS_PATH = resolve(__dirname, "../../references/product_facts.md");
 const PROMPTS_DIR = resolve(__dirname, "../../references/prompts");
+const CONTENT_QUALITY_PATH = resolve(PROMPTS_DIR, "content-quality-and-briefing.md");
 
 function parseArgs() {
   const argv = process.argv.slice(2);
@@ -137,7 +138,19 @@ async function main() {
 
   const promptFile = promptFileForIntencao(termo.intencao);
   const template = readFileSync(resolve(PROMPTS_DIR, promptFile), "utf-8");
-  const prompt = buildPrompt(template, termo.keyword, productFacts, briefingRow.briefing_jsonb);
+  let templateWithShared = template;
+  try {
+    const shared = readFileSync(CONTENT_QUALITY_PATH, "utf-8");
+    templateWithShared = `${template}\n\n${shared}`;
+  } catch {
+    /* content-quality-and-briefing.md opcional */
+  }
+  const prompt = buildPrompt(
+    templateWithShared,
+    termo.keyword,
+    productFacts,
+    briefingRow.briefing_jsonb,
+  );
 
   if (replaceLlm && !dryRun) {
     const { error: delErr } = await supabase
@@ -164,6 +177,8 @@ async function main() {
         console.error(`❌  ${provider} reprovado no quality-gate:\n   ${gate.reasons.join("\n   ")}`);
         results.push({ provider, ok: false, msg: gate.reasons.join("; ") });
         continue;
+      } else if (gate.warnings && gate.warnings.length > 0) {
+        console.warn(`⚠️  ${provider} passou com ressalvas:\n   ${gate.warnings.join("\n   ")}`);
       }
 
       const custo = usdEstimateFor(provider, gen.tokensInput, gen.tokensOutput);

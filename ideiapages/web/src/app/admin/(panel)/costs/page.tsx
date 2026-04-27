@@ -1,9 +1,11 @@
+import { AdminNeedSupabaseEnv } from "@/components/AdminNeedSupabaseEnv";
 import { requireAdmin } from "@/lib/admin/require-admin";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 
 export default async function AdminCostsPage() {
   await requireAdmin();
-  const db = getSupabaseAdmin();
+  const db = getSupabaseAdminOptional();
+  if (!db) return <AdminNeedSupabaseEnv />;
 
   const { data: vars } = await db
     .from("variacoes")
@@ -15,7 +17,8 @@ export default async function AdminCostsPage() {
   for (const v of vars ?? []) {
     const c = v.custo_estimado_usd ?? 0;
     sumUsd += c;
-    byProvider[v.provider] = (byProvider[v.provider] ?? 0) + c;
+    const provKey = v.provider ?? "desconhecido";
+    byProvider[provKey] = (byProvider[provKey] ?? 0) + c;
   }
 
   const { data: llm } = await db.from("llm_calls_log").select("model, custo_brl");

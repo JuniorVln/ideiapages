@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { z } from "zod";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/database.types";
 
 const LeadSchema = z.object({
@@ -67,7 +67,13 @@ export async function POST(req: NextRequest) {
 
     const { nome, email, telefone, pagina_id, variacao_id, utms } = parsed.data;
 
-    const supabase = getSupabaseAdmin();
+    const supabase = getSupabaseAdminOptional();
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: "Serviço temporariamente indisponível." },
+        { status: 503 },
+      );
+    }
 
     const { data: pagina, error: paginaError } = await supabase
       .from("paginas")
