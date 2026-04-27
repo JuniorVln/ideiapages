@@ -1,15 +1,17 @@
 import type { User } from "@supabase/supabase-js";
 
 /**
- * Em desenvolvimento (`pnpm dev`, NODE_ENV !== production): admin abre sem login.
- * Em produção (Vercel etc.): sempre exige Magic Link + allowlist.
+ * Admin sem login (Server Components + middleware alinhados):
+ * - Dev (`NODE_ENV !== production`): por defeito bypass ativo.
+ * - Produção: só com `ADMIN_LOCAL_BYPASS=true` (ou `1` / `yes`) — desligar antes de ir a público real.
  *
- * Para testar login no dev: ADMIN_LOCAL_BYPASS=false no .env.local
+ * Para testar login real no dev: ADMIN_LOCAL_BYPASS=false no .env
  */
 export function isAdminLocalBypass(): boolean {
-  if (process.env.NODE_ENV === "production") return false;
   const v = process.env.ADMIN_LOCAL_BYPASS?.trim().toLowerCase();
+  if (v === "1" || v === "true" || v === "yes") return true;
   if (v === "0" || v === "false" || v === "no") return false;
+  if (process.env.NODE_ENV === "production") return false;
   return true;
 }
 

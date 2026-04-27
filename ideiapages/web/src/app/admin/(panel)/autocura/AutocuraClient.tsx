@@ -2,23 +2,7 @@
 
 import { useState } from "react";
 import { formatThrown, safeJsonStringify } from "@/lib/format-thrown";
-
-type QueueRow = {
-  id: string;
-  status: string;
-  razao: string;
-  prioridade: number;
-  criado_em: string;
-  paginas: { slug: string; titulo: string } | null;
-};
-
-type AutomationState = {
-  automations_paused: boolean;
-  pause_reason: string | null;
-  custo_dia_brl: number;
-  custo_max_dia_brl: number;
-  custo_dia_referencia: string | null;
-};
+import type { AutocuraQueueRowDto, AutocuraStateDto } from "./serialise-props";
 
 const card =
   "rounded-xl border border-white/10 bg-slate-900/50 p-5 shadow-lg backdrop-blur";
@@ -29,14 +13,16 @@ export function AutocuraClient({
   gscEnvOk,
   gscEnvMessage,
   cronHint,
+  loadError,
 }: {
-  initialState: AutomationState | null;
-  initialQueue: QueueRow[];
+  initialState: AutocuraStateDto | null;
+  initialQueue: AutocuraQueueRowDto[];
   gscEnvOk: boolean;
   gscEnvMessage: string;
   cronHint: string;
+  loadError: string | null;
 }) {
-  const [state, setState] = useState<AutomationState | null>(initialState);
+  const [state, setState] = useState<AutocuraStateDto | null>(initialState);
   const [message, setMessage] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
@@ -45,7 +31,7 @@ export function AutocuraClient({
   async function refreshState() {
     try {
       const res = await fetch("/api/admin/automation/state");
-      const j = (await res.json()) as { state?: AutomationState; error?: string };
+      const j = (await res.json()) as { state?: AutocuraStateDto; error?: string };
       if (res.ok && j.state) setState(j.state);
     } catch {
       /* melhor esforço após acções manuais */
@@ -65,7 +51,7 @@ export function AutocuraClient({
           pause_reason: paused ? pauseReason || "Pausa manual" : null,
         }),
       });
-      const j = (await res.json()) as { state?: AutomationState; error?: string };
+      const j = (await res.json()) as { state?: AutocuraStateDto; error?: string };
       if (res.ok && j.state) {
         setState(j.state);
         setMessage(paused ? "Automações pausadas." : "Automações reativadas.");
@@ -114,6 +100,21 @@ export function AutocuraClient({
           <code className="text-cyan-300/90">/api/cron/*</code>.
         </p>
       </div>
+
+      {loadError && (
+        <div
+          className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-100 text-sm whitespace-pre-wrap"
+          role="alert"
+        >
+          <strong className="text-red-200">Erro ao ler Supabase:</strong> {loadError}
+          <br />
+          <span className="text-red-200/90">
+            Confirma que a migração <code className="text-red-100/90">0016_fase4_autocura</code> foi
+            aplicada e que as tabelas <code className="text-red-100/90">automation_state</code> e{" "}
+            <code className="text-red-100/90">auto_rewrite_queue</code> existem.
+          </span>
+        </div>
+      )}
 
       {!gscEnvOk && gscEnvMessage && (
         <div

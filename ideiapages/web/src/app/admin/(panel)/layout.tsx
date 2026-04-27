@@ -5,11 +5,20 @@ import { AdminPanelSidebar } from "@/components/AdminPanelSidebar";
 
 export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen bg-slate-950 flex flex-col md:flex-row overflow-hidden text-slate-200">
-      {/* Background Mesh Gradient blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-brand-primary/20 blur-[120px] mix-blend-screen pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-blue-500/10 blur-[100px] mix-blend-screen pointer-events-none" />
-      <div className="absolute top-[30%] right-[10%] w-[20vw] h-[20vw] rounded-full bg-purple-500/10 blur-[90px] mix-blend-screen pointer-events-none" />
+    <div className="relative min-h-screen bg-slate-950 flex flex-col md:flex-row overflow-x-hidden text-slate-200">
+      {/* Decoração: sem mix-blend (evita ecrã branco / “lavagem” no Safari e compositing). */}
+      <div
+        className="pointer-events-none absolute top-[-10%] left-[-10%] z-0 rounded-full bg-brand-primary/20 blur-[120px]"
+        style={{ width: "min(40vw, 28rem)", height: "min(40vw, 28rem)" }}
+      />
+      <div
+        className="pointer-events-none absolute bottom-[-10%] right-[-10%] z-0 rounded-full bg-blue-500/10 blur-[100px]"
+        style={{ width: "min(30vw, 24rem)", height: "min(30vw, 24rem)" }}
+      />
+      <div
+        className="pointer-events-none absolute top-[30%] right-[10%] z-0 rounded-full bg-purple-500/10 blur-[90px]"
+        style={{ width: "min(20vw, 20rem)", height: "min(20vw, 20rem)" }}
+      />
 
       <AdminPanelSidebar />
       

@@ -14,8 +14,6 @@ import { ResearchAdvancedPanel } from "./ResearchAdvancedPanel";
 import { ResearchMainPanel } from "./ResearchMainPanel";
 import { StatusBadge } from "./research-status";
 
-ensureMonorepoEnv();
-
 const allowRemote =
   process.env.NODE_ENV === "development" ||
   process.env.ALLOW_ADMIN_RESEARCH_CLI === "1" ||
@@ -24,6 +22,7 @@ const allowRemote =
 export const dynamic = "force-dynamic";
 
 export default async function ResearchDashboardPage() {
+  ensureMonorepoEnv();
   await requireAdmin();
   const db = getSupabaseAdminOptional();
   if (!db) return <AdminNeedSupabaseEnv />;
