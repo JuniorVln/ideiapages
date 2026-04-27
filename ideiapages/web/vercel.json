@@ -14,7 +14,7 @@
     },
     {
       "path": "/api/cron/auto-rewrite",
-      "schedule": "0 * * * *"
+      "schedule": "15 7 * * *"
     }
   ]
 }
