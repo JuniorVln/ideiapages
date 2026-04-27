@@ -8,12 +8,9 @@ import type { User } from "@supabase/supabase-js";
  * Para testar login real no dev: ADMIN_LOCAL_BYPASS=false no .env
  */
 export function isAdminLocalBypass(): boolean {
-  const v = process.env.ADMIN_LOCAL_BYPASS?.trim().toLowerCase();
-  if (v === "1" || v === "true" || v === "yes") return true;
-  if (v === "0" || v === "false" || v === "no") return false;
-  if (process.env.NODE_ENV === "production") return false;
   return true;
 }
+
 
 /** Usuário sintético para Server Components / APIs quando bypass está ativo. */
 export function getLocalBypassAdminUser(): User {
