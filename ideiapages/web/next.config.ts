@@ -35,9 +35,8 @@ const HSTS_HEADER = {
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  experimental: {
-    typedRoutes: true,
-  },
+  typedRoutes: true,
+  experimental: {},
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

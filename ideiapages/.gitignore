@@ -70,3 +70,5 @@ research/data/logs/
 research/data/processed/
 research/data/briefings/
 research/data/relatorios/
+
+.vercel
