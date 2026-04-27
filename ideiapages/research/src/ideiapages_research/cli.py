@@ -296,7 +296,7 @@ def prioritize_terms_cmd(
         "--limit",
         min=1,
         max=500,
-        help="Máximo de termos a promover para priorizado (ordem: score desc).",
+        help="Máximo de termos a promover (ordem: score×(1+ln(1+volume)) entre os elegíveis).",
     ),
     keep_decrescente: bool = typer.Option(
         False,
@@ -311,6 +311,7 @@ def prioritize_terms_cmd(
 ) -> None:
     """Promove ``analisado`` → ``priorizado`` (pré-requisito típico antes do collect-serp em lote).
 
+    Elegíveis: score ≥ ``--min-score``. Ordenação: ``score * (1 + ln(1+volume))`` (volume de ``termos``).
     Depois rode: ``collect-serp --all-priorizados --limit N --top-n 10``
     """
     sb = get_supabase()
@@ -732,7 +733,11 @@ def collect_trends_cmd(
     dry_run: bool = typer.Option(False, "--dry-run"),
     force: bool = typer.Option(False, "--force", help="Ignora cache de tendência (30 dias)."),
 ) -> None:
-    """Google Trends via pytrends (custo R$ 0,00)."""
+    """Google Trends via pytrends (custo R$ 0,00).
+
+    Persiste ``tendencia_pytrends`` e preenche ``volume_estimado`` com proxy mensal
+    (índice 0-100 médio 12m × ``PYTRENDS_VOLUME_PROXY_MAX``/100; ver settings).
+    """
     settings = get_settings()
     ts = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     log_path = _logs_dir() / f"collect-trends-{ts}.jsonl"

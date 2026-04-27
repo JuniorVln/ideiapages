@@ -34,9 +34,11 @@ Este bloco é **concatenado automaticamente** aos prompts `generate-page.*.md` n
 ## 4. Para o briefing (`analyze-gaps`) — o que garantir no JSON
 
 - `gancho_vendas` e `gaps_conteudo_top3`: **ângulos próprios**, sem depender de nomes de concorrentes para fazer autoridade; use lacunas da SERP de forma **descritiva** (“muitos resultados listam X sem explicar Y”), não listas de marcas.
-- `topicos_obrigatorios`: cada item deve ser **defensável com product_facts** ou com análise genérica de mercado; não exija que a página cite terceiros pelo nome.
+- `topicos_obrigatorios`: cada item deve ser **defensível com product_facts** ou com análise genérica de mercado; não exija que a página cite terceiros pelo nome. **Não** exija secção de tabela de preços no corpo do artigo: preços e planos visíveis vêm do **template fixo** (secção 5.1) e de `product_facts`.
 - `alertas_para_humano`: inclua quando houver comparação sensível, necessidade de revisão legal/comercial ou quando o termo pressupõe dados que não estão em `product_facts`.
 - `information_gain.angulo_diferenciado`: foque em **metodologia e critérios de decisão**, não em “atacar” players nomeados.
+- `cta_principal` / `cta_secundario` (quando usados no site): alinhe a **demonstração** ou **especialista**; o fluxo conduz a `#demonstracao-gratuita` / `#secao-valores` (ver secção 5.1).
+- `title_seo` / `meta_description`: podem falar em planos/valores de forma **genérica**; não listar preços se não estiverem explícitos em `product_facts`.
 
 ---
 
@@ -47,6 +49,34 @@ Este bloco é **concatenado automaticamente** aos prompts `generate-page.*.md` n
 
 ---
 
+## 5.1 Template público corrigido (todas as gerações) — leitura obrigatória
+
+Esta é a **ordem real** no front (não depende do redator inventar secções extra de preço no MDX):
+
+1. **Hero + metadados** (CMS): título, subtítulo, CTA que rola para a âncora de valores/demo.
+2. **Corpo** = `body_mdx` mapeado em blocos (duo, passos, split, cards do 5.º `##`, etc.) — ver `generate-page.transacional.md`.
+3. **Faixa de estatísticas** (`StatsStrip`), quando aplicável.
+4. **FAQ** = `faq_sugerida` do briefing (não duplicar no MDX).
+5. **Valores e demonstração** = componente fixo **`PricingAndDemoCta`** (não é markdown):
+   - Fundo **claro** (`bg-slate-50`, borda suave); conteúdo **centralizado** (título, texto introdutório, toggle **Mensal / Anual**, grelha de cartões).
+   - Cartões **Essencial** e **Elite** com preços e bullets alinhados a **`product_facts`** (e nota de referência ao ficheiro de fatos); CTAs **WhatsApp** para demonstração.
+   - **Sem** coluna lateral de imagem nem bloco escuro “hero” ao lado dos preços — esse layout está descontinuado.
+6. **Âncoras estáveis** para CTAs do site: `#demonstracao-gratuita` (secção inteira) e `#secao-valores` (grelha de planos). O redator **não** precisa criar esses IDs no MDX; já vêm do React.
+
+**O que o briefing (`analyze-gaps`) e o `body_mdx` NÃO devem fazer**
+
+- Não exigir nem escrever **tabela de preços**, **lista de valores em reais** ou **secção `## Preços`** no artigo — isso duplicaria o componente e pode gerar conflito com `product_facts`.
+- Não descrever no JSON um “layout de pricing” (imagem à esquerda, coluna escura, etc.); o template acima é único.
+- Pode (e deve) falar de **intenção de compra**, **próximo passo** e **custo como “consulte a tabela / a demonstração”** sem inventar números.
+
+**O que o briefing DEVE antecipar para casar com o template**
+
+- `cta_principal` / `cta_secundario` alinhados a **demonstração** ou **falar com especialista** (os botões de WhatsApp e o hero apontam para a mesma jornada).
+- `meta_description` e `title_seo` podem mencionar “valores” ou “planos” de forma **genérica** (“veja tabela no site”, “condições comerciais na demo”), desde que **não listem preços** que não estejam em `product_facts`.
+- `topicos_obrigatorios` e `gancho_vendas` reforçam **argumento de venda e critérios de decisão**, não a reprodução de uma tabela no texto.
+
+---
+
 ## 6. Checklist rápido antes de considerar o texto “pronto”
 
 - [ ] Nenhum nome de concorrente sem base no briefing/fonte aprovada.
@@ -54,3 +84,4 @@ Este bloco é **concatenado automaticamente** aos prompts `generate-page.*.md` n
 - [ ] Parágrafos respirados; listas onde ajudam a leitura.
 - [ ] Sem frases de meta-instrução para a IA.
 - [ ] Alinhado ao `tom_de_voz` e aos tópicos obrigatórios do briefing.
+- [ ] Nenhuma tabela ou secção de preços no MDX — pricing vem do template + `product_facts`.

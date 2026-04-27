@@ -1,11 +1,11 @@
-import { generateForProvider } from "./providers";
+import Anthropic from "@anthropic-ai/sdk";
 
 export async function writeFullPageWithAI({
   briefingJson,
   keyword,
   productFacts,
 }: {
-  briefingJson: any;
+  briefingJson: Record<string, unknown>;
   keyword: string;
   productFacts: string;
 }): Promise<string> {
@@ -36,14 +36,19 @@ ${keyword}
 Escreva o corpo do artigo em Markdown seguindo a estrutura de H2/H3 do briefing. 
 Desenvolva cada parágrafo com profundidade, mas mantendo a clareza. 
 Incorpore as palavras-chave LSI de forma natural.
-O tom deve ser: ${briefingJson.tom_de_voz || 'profissional e direto'}.
+O tom deve ser: ${(typeof briefingJson.tom_de_voz === "string" ? briefingJson.tom_de_voz : null) || "profissional e direto"}.
 `;
 
-  const response = await generateForProvider("anthropic", {
+  const model = process.env.CLAUDE_MODEL ?? "claude-sonnet-4-20250514";
+  const client = new Anthropic();
+  const msg = await client.messages.create({
+    model,
+    max_tokens: 8192,
     system,
-    user,
-    temperature: 0.7,
+    messages: [{ role: "user", content: user }],
   });
-
-  return response.text.trim();
+  const text = msg.content
+    .map((b) => (b.type === "text" ? (b as { text: string }).text : ""))
+    .join("");
+  return text.trim();
 }

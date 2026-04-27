@@ -49,6 +49,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     title: "Inteligência",
     items: [
       { href: "/admin/dashboard", label: "Performance" },
+      { href: "/admin/autocura", label: "Autocura" },
       { href: "/admin/recommendations", label: "Alertas" },
       { href: "/admin/experiments", label: "Relatório A/B" },
     ],

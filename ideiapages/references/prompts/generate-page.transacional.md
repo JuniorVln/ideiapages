@@ -42,6 +42,7 @@ O site renderiza o `body_mdx` em blocos fixos (hero + faixa de confiança vêm d
    - \`- **Título curto do benefício** — Descrição de 1–2 frases ligada ao tema da keyword e ao Ideia Chat.\`
 7. **`##` adicionais** (6.º em diante): síntese, gaps, diferenciação — mantenha listas quando fizer sentido. **Evite** secções tipo “checklist interno”, “lista de LSI” ou “PAA bruta”; integre termos do briefing no texto corrido ou em bullets úteis ao leitor.
 8. **FAQ**: não duplicar no MDX — o FAQ da página vem do briefing (\`faq_sugerida\`) no banco. Foque o MDX na conversão.
+9. **Preços e planos (fora do MDX)**: **não** adicione `## Preços`, tabelas de valores ou listagem de reais no `body_mdx`. Depois do FAQ, o site renderiza a secção fixa de valores (fundo claro, conteúdo centralizado, cartões Essencial/Elite e toggle mensal/anual) a partir de `product_facts` — o mesmo padrão em **todas** as páginas. Pode remeter a “valores na demonstração” no texto, sem inventar números.
 
 **Imagens**: o sistema escolhe fotos Pexels a partir do keyword + LSI do briefing. Reforce o tema no texto (vocabulário do nicho) para o conjunto título/keyword/briefing continuar coerente com as imagens automáticas.
 

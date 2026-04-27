@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 from ideiapages_research.clients.supabase import get_supabase
 from ideiapages_research.settings import get_settings
-from ideiapages_research.types.trends import TrendsCollectResult
+from ideiapages_research.types.trends import TrendDataPoint, TrendsCollectResult
 
 
 def _parse_iso_dt(raw: str) -> datetime | None:
@@ -58,6 +58,20 @@ def _classify_slope(slope: float, *, up: float, down: float) -> str:
     return "estavel"
 
 
+def _interesse_medio_12m_e_volume_proxy(
+    serie: list[TrendDataPoint],
+) -> tuple[float | None, int | None]:
+    """Média do índice 0–100 (até 12 meses) e proxy mensal proporcional (ver settings)."""
+    if not serie:
+        return None, None
+    vals = [p.interesse for p in serie]
+    window = vals[-12:] if len(vals) >= 12 else vals
+    avg = float(mean(window))
+    s = get_settings()
+    vmax = int(round(float(s.pytrends_volume_proxy_max) * (avg / 100.0)))
+    return round(avg, 2), max(0, vmax)
+
+
 def _build_trend_payload(result: TrendsCollectResult | None) -> dict[str, Any]:
     """Monta o JSONB completo (versão 1)."""
     fetched_at = datetime.now(UTC).isoformat()
@@ -77,6 +91,8 @@ def _build_trend_payload(result: TrendsCollectResult | None) -> dict[str, Any]:
             "pico_mes": 1,
             "amplitude": 0.0,
             "serie": [],
+            "interesse_medio_12m": None,
+            "volume_proxy_metodo": "google_trends_indice_0_100",
             "rising_queries": [q.model_dump() for q in result.rising_queries],
             "top_queries": [q.model_dump() for q in result.top_queries],
         }
@@ -101,6 +117,7 @@ def _build_trend_payload(result: TrendsCollectResult | None) -> dict[str, Any]:
     avgs = {m: mean(v) for m, v in by_month.items() if v}
     pico_mes = int(max(avgs, key=avgs.get)) if avgs else 1
     amplitude = (max(vals) - min(vals)) / 100.0 if vals else 0.0
+    im12, _vol_proxy = _interesse_medio_12m_e_volume_proxy(serie)
 
     return {
         "version": 1,
@@ -112,6 +129,8 @@ def _build_trend_payload(result: TrendsCollectResult | None) -> dict[str, Any]:
         "pico_mes": pico_mes,
         "amplitude": round(amplitude, 4),
         "serie": [p.model_dump() for p in serie],
+        "interesse_medio_12m": im12,
+        "volume_proxy_metodo": "google_trends_indice_0_100",
         "rising_queries": [q.model_dump() for q in result.rising_queries],
         "top_queries": [q.model_dump() for q in result.top_queries],
     }
@@ -148,7 +167,13 @@ def analyze_and_persist(
         )
 
     sb = get_supabase()
-    sb.table("termos").update({"tendencia_pytrends": payload}).eq("id", str(termo_id)).execute()
+    update_row: dict[str, Any] = {"tendencia_pytrends": payload}
+    if result and result.serie:
+        _im, vol_proxy = _interesse_medio_12m_e_volume_proxy(result.serie)
+        if vol_proxy is not None:
+            update_row["volume_estimado"] = vol_proxy
+
+    sb.table("termos").update(update_row).eq("id", str(termo_id)).execute()
     return AnalysisReport(
         termo_id=termo_id,
         keyword=keyword,

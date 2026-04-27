@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     #: Limiares de slope (últimos N pontos mensais) para classificar tendência.
     trend_slope_up: float = Field(default=0.5)
     trend_slope_down: float = Field(default=-0.5)
+    #: Trends só entrega índice 0–100; este valor é o ``volume_estimado`` quando o índice médio = 100.
+    #: Ajuste para calibrar a ordem de grandeza do proxy mensal (não é volume absoluto do Keyword Planner).
+    pytrends_volume_proxy_max: int = Field(default=10_000)
 
     #: Modelo Claude para classify-terms (Haiku).
     classify_model: str = Field(default="claude-haiku-4-5-20251001")

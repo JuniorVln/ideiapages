@@ -2,5 +2,19 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm run build"
+  "buildCommand": "pnpm run build",
+  "crons": [
+    {
+      "path": "/api/cron/gsc-sync",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/detect-ranking-drop",
+      "schedule": "30 6 * * *"
+    },
+    {
+      "path": "/api/cron/auto-rewrite",
+      "schedule": "0 * * * *"
+    }
+  ]
 }

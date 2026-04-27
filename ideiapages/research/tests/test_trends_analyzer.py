@@ -36,12 +36,17 @@ def test_build_payload_crescente() -> None:
         top_queries=[],
     )
     with patch("ideiapages_research.behaviors.collect_trends.analyzer.get_settings") as gs:
-        gs.return_value = MagicMock(trend_slope_up=0.5, trend_slope_down=-0.5)
+        gs.return_value = MagicMock(
+            trend_slope_up=0.5,
+            trend_slope_down=-0.5,
+            pytrends_volume_proxy_max=10_000,
+        )
         payload = an._build_trend_payload(r)
     assert payload["version"] == 1
     assert payload["tendencia"] == "crescente"
     assert payload["pico_mes"] == 12
     assert len(payload["serie"]) == 12
+    assert payload["interesse_medio_12m"] == 19.5  # média de 3..36 (m=1..12)
 
 
 def test_build_payload_no_data_none() -> None:
@@ -61,7 +66,11 @@ def test_analyze_and_persist_dry_run() -> None:
     )
     tid = uuid4()
     with patch("ideiapages_research.behaviors.collect_trends.analyzer.get_settings") as gs:
-        gs.return_value = MagicMock(trend_slope_up=0.5, trend_slope_down=-0.5)
+        gs.return_value = MagicMock(
+            trend_slope_up=0.5,
+            trend_slope_down=-0.5,
+            pytrends_volume_proxy_max=10_000,
+        )
         rep = analyze_and_persist(tid, "k", r, dry_run=True)
     assert rep.persisted is False
     assert rep.tendencia == "estavel"
@@ -89,8 +98,15 @@ def test_analyze_and_persist_writes_supabase() -> None:
         patch(supa, return_value=sb),
         patch(sett) as gs,
     ):
-        gs.return_value = MagicMock(trend_slope_up=0.5, trend_slope_down=-0.5)
+        gs.return_value = MagicMock(
+            trend_slope_up=0.5,
+            trend_slope_down=-0.5,
+            pytrends_volume_proxy_max=10_000,
+        )
         rep = analyze_and_persist(tid, "k", r, dry_run=False)
     assert rep.persisted is True
     sb.table.assert_called_with("termos")
     mock_table.update.assert_called_once()
+    call_kw = mock_table.update.call_args[0][0]
+    assert call_kw["volume_estimado"] == 5_000
+    assert "tendencia_pytrends" in call_kw

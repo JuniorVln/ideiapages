@@ -14,13 +14,21 @@ import {
   sumInRange,
   type MetricaRow,
 } from "@/lib/admin/dashboard-aggregate";
+import {
+  countTermsOurDomainInLatestSerpTop10,
+  type SerpRow,
+  siteHostFromPublicUrl,
+} from "@/lib/admin/serp-seo-aggregate";
 import { requireAdmin } from "@/lib/admin/require-admin";
+import { getSiteUrl } from "@/lib/site-url";
 import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { ProviderLeadsChart } from "./ProviderLeadsChart";
 import { ProviderWinsDonut, type WinSlice } from "./ProviderWinsDonut";
 import { TrafficLeadsChart, type TrafficLeadsRow } from "./TrafficLeadsChart";
 import { WeeklyChannelChart, type WeeklyChannelRow } from "./WeeklyChannelChart";
+
+type AdminDb = NonNullable<Awaited<ReturnType<typeof getSupabaseAdminOptional>>>;
 
 export default async function AdminDashboardPage() {
   await requireAdmin();
@@ -227,21 +235,12 @@ export default async function AdminDashboardPage() {
   const termoIds = [
     ...new Set((paginasList.data ?? []).map((t) => t.termo_id).filter(Boolean) as string[]),
   ];
-  let top10Count = 0;
-  if (termoIds.length > 0) {
-    const { data: snaps } = await db
-      .from("serp_snapshots")
-      .select("termo_id, posicao, capturado_em")
-      .in("termo_id", termoIds)
-      .order("capturado_em", { ascending: false })
-      .limit(2000);
-    const seen = new Set<string>();
-    for (const s of snaps ?? []) {
-      if (seen.has(s.termo_id)) continue;
-      seen.add(s.termo_id);
-      if (s.posicao <= 10) top10Count++;
-    }
-  }
+  const siteHostNorm = siteHostFromPublicUrl(getSiteUrl());
+  const serpRowsForTop10 =
+    termoIds.length > 0 && siteHostNorm
+      ? await fetchSerpSnapshotsForTermoIds(db, termoIds)
+      : [];
+  const top10SeoCount = countTermsOurDomainInLatestSerpTop10(serpRowsForTop10, siteHostNorm);
 
   const variacaoIds = [
     ...new Set(
@@ -287,6 +286,11 @@ export default async function AdminDashboardPage() {
     provider,
     total,
   }));
+
+  const { geoMentionCount, geoCheckHint } = await aggregateGeoKpis(
+    db,
+    (paginasList.data ?? []).map((p) => ({ id: p.id, termo_id: p.termo_id })),
+  );
 
   const insights = buildInsights({
     candidatos,
@@ -346,10 +350,16 @@ export default async function AdminDashboardPage() {
           hint="últimos 30 dias"
         />
         <Kpi
-          title="Termos no top 10"
-          value={top10Count}
+          title="Top 10 Google (SEO)"
+          value={top10SeoCount}
           deltaPct={null}
-          hint="SERP mais recente por termo"
+          hint="Domínio do site no top 10 orgânico, último snapshot SERP por termo"
+        />
+        <Kpi
+          title="Mencionado em IAs (GEO)"
+          value={geoMentionCount}
+          deltaPct={null}
+          hint={geoCheckHint}
         />
         <Kpi title="Experimentos ativos" value={expAtivos ?? 0} deltaPct={null} hint="A/B em andamento" />
       </div>
@@ -438,7 +448,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       <p className="text-sm text-slate-500">
-        Fonte primária: Supabase (`metricas_diarias`, `leads`, `experimentos`, `serp_snapshots`). Veja também{" "}
+        Fonte primária: Supabase (`metricas_diarias`, `leads`, `experimentos`, `serp_snapshots`, `generative_visibility_checks`). Veja também{" "}
         <Link href="/admin/pages" className="text-blue-400 hover:underline">
           todas as páginas
         </Link>{" "}
@@ -451,8 +461,6 @@ export default async function AdminDashboardPage() {
     </div>
   );
 }
-
-type AdminDb = NonNullable<Awaited<ReturnType<typeof getSupabaseAdminOptional>>>;
 
 async function fetchMetricasRange(
   db: AdminDb,
@@ -518,6 +526,133 @@ async function fetchLeadsLight(
     if (data.length < pageSize) break;
   }
   return out;
+}
+
+const SERP_IN_CHUNK = 80;
+
+async function fetchSerpSnapshotsForTermoIds(
+  db: AdminDb,
+  termoIds: string[],
+): Promise<SerpRow[]> {
+  const out: SerpRow[] = [];
+  const pageSize = 1000;
+  for (let c = 0; c < termoIds.length; c += SERP_IN_CHUNK) {
+    const chunk = termoIds.slice(c, c + SERP_IN_CHUNK);
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await db
+        .from("serp_snapshots")
+        .select("termo_id, posicao, capturado_em, url")
+        .in("termo_id", chunk)
+        .order("capturado_em", { ascending: true })
+        .range(from, from + pageSize - 1);
+      if (error) {
+        console.error("[dashboard] serp_snapshots", error.message);
+        break;
+      }
+      if (!data?.length) break;
+      for (const r of data) {
+        out.push({
+          termo_id: r.termo_id,
+          posicao: r.posicao,
+          capturado_em: r.capturado_em,
+          url: r.url,
+        });
+      }
+      if (data.length < pageSize) break;
+    }
+  }
+  return out;
+}
+
+/** PostgREST quando a tabela ainda não existe no projeto (migração 0015 não aplicada). */
+function isGenerativeVisibilityTableMissing(message: string): boolean {
+  const m = message.toLowerCase();
+  return (
+    m.includes("generative_visibility_checks") &&
+    (m.includes("could not find the table") ||
+      m.includes("schema cache") ||
+      (m.includes("relation") && m.includes("does not exist")))
+  );
+}
+
+async function aggregateGeoKpis(
+  db: AdminDb,
+  publishedPages: { id: string; termo_id: string | null }[],
+): Promise<{ geoMentionCount: number; geoCheckHint: string }> {
+  const withTermo = publishedPages.filter((p) => p.termo_id);
+  if (withTermo.length === 0) {
+    return {
+      geoMentionCount: 0,
+      geoCheckHint: "Sem termo associado às páginas — nada a contar para GEO",
+    };
+  }
+  const paginaIds = withTermo.map((p) => p.id);
+  const pageSize = 1000;
+  const rows: {
+    pagina_id: string;
+    termo_id: string | null;
+    mentioned: boolean;
+    checked_at: string;
+  }[] = [];
+  for (let c = 0; c < paginaIds.length; c += SERP_IN_CHUNK) {
+    const chunk = paginaIds.slice(c, c + SERP_IN_CHUNK);
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await db
+        .from("generative_visibility_checks")
+        .select("pagina_id, termo_id, mentioned, checked_at")
+        .in("pagina_id", chunk)
+        .range(from, from + pageSize - 1);
+      if (error) {
+        if (isGenerativeVisibilityTableMissing(error.message)) {
+          return {
+            geoMentionCount: 0,
+            geoCheckHint:
+              "KPI GEO desativado até aplicar a migração 0015_generative_visibility_checks no Supabase.",
+          };
+        }
+        console.error("[dashboard] generative_visibility_checks", error.message);
+        return {
+          geoMentionCount: 0,
+          geoCheckHint: "Tabela GEO indisponível (tente mais tarde).",
+        };
+      }
+      if (!data?.length) break;
+      rows.push(...data);
+      if (data.length < pageSize) break;
+    }
+  }
+  if (rows.length === 0) {
+    return {
+      geoMentionCount: 0,
+      geoCheckHint:
+        "Ainda sem checks — registe com POST /api/admin/generative-visibility (ou script)",
+    };
+  }
+  const latestByPagina = new Map<
+    string,
+    { termo_id: string | null; mentioned: boolean; checked_at: string }
+  >();
+  for (const r of rows) {
+    const cur = latestByPagina.get(r.pagina_id);
+    if (!cur || r.checked_at > cur.checked_at) {
+      latestByPagina.set(r.pagina_id, {
+        termo_id: r.termo_id,
+        mentioned: r.mentioned,
+        checked_at: r.checked_at,
+      });
+    }
+  }
+  const termoSeen = new Set<string>();
+  for (const p of withTermo) {
+    const last = latestByPagina.get(p.id);
+    if (!last || !p.termo_id) continue;
+    if (!last.mentioned) continue;
+    termoSeen.add(p.termo_id);
+  }
+  return {
+    geoMentionCount: termoSeen.size,
+    geoCheckHint: "Termos com último check GEO = mencionado (por página publicada)",
+  };
 }
 
 function Kpi({

@@ -56,8 +56,8 @@ export function AtualizarTrendsButton({ keyword, forceDefault = false }: Props) 
         </button>
       </div>
       <p className="text-xs text-slate-500 max-w-lg">
-        Usa pytrends (BR). Em picos, o Google pode limitar; a CLI aguarda e retenta. Não dispara
-        custo de LLM/Apify.
+        Usa pytrends (BR): atualiza tendência, índice 0–100 e o volume estimado (proxy mensal) no termo.
+        Em picos, o Google pode limitar; a CLI aguarda e retenta. Não dispara custo de LLM/Apify.
       </p>
       {err && (
         <p className="text-xs text-red-300 whitespace-pre-wrap break-words">{err}</p>

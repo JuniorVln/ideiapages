@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -81,6 +82,22 @@ class PipelineRunSummary:
         return round(sum(self.cost_breakdown().values()), 4)
 
 
+def _potencial_busca_score_volume(row: dict[str, Any]) -> float:
+    """Alinha com o front: score × (1 + ln(1+volume)); volume ausente = 0."""
+    s = row.get("score_conversao")
+    try:
+        sf = float(s) if s is not None else 0.0
+    except (TypeError, ValueError):
+        sf = 0.0
+    v = row.get("volume_estimado")
+    try:
+        vf = float(v) if v is not None else 0.0
+    except (TypeError, ValueError):
+        vf = 0.0
+    vf = max(0.0, vf)
+    return sf * (1.0 + math.log1p(vf))
+
+
 def auto_prioritize_terms(
     sb: Client,
     *,
@@ -89,10 +106,10 @@ def auto_prioritize_terms(
     exclude_decrescente: bool = True,
     dry_run: bool = False,
 ) -> int:
-    """Marca ``analisado`` → ``priorizado`` por score (e tendência)."""
+    """Marca ``analisado`` → ``priorizado`` por score×volume (índice) e tendência."""
     r = (
         sb.table("termos")
-        .select("id,score_conversao,tendencia_pytrends")
+        .select("id,score_conversao,tendencia_pytrends,volume_estimado")
         .eq("status", "analisado")
         .gte("score_conversao", min_score)
         .order("score_conversao", desc=True)
@@ -100,15 +117,15 @@ def auto_prioritize_terms(
         .execute()
     )
     rows = [cast(dict[str, Any], x) for x in (r.data or [])]
-    picked: list[dict[str, Any]] = []
+    filtered: list[dict[str, Any]] = []
     for row in rows:
-        if len(picked) >= limit:
-            break
         if exclude_decrescente:
             tp = row.get("tendencia_pytrends")
             if isinstance(tp, dict) and tp.get("tendencia") == "decrescente":
                 continue
-        picked.append(row)
+        filtered.append(row)
+    filtered.sort(key=_potencial_busca_score_volume, reverse=True)
+    picked = filtered[:limit]
 
     if dry_run:
         return len(picked)

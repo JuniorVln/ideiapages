@@ -7,7 +7,9 @@ import {
   faqJsonbFromBriefing,
   pageMetaFromBriefing,
 } from "@/lib/research/briefing-to-mdx";
-import type { Json } from "@/lib/database.types";
+import type { Database, Json } from "@/lib/database.types";
+
+type PaginaInsert = Database["public"]["Tables"]["paginas"]["Insert"];
 import { NextRequest, NextResponse } from "next/server";
 
 function slugify(text: string): string {
@@ -102,7 +104,7 @@ export async function POST(req: NextRequest) {
   });
   if (heroPhoto?.src) og_image_url = heroPhoto.src;
 
-  const row: Record<string, unknown> = {
+  const row: PaginaInsert = {
     termo_id: termo.id,
     slug,
     titulo: meta.titulo,
@@ -115,7 +117,7 @@ export async function POST(req: NextRequest) {
     og_image_url,
     imagens_contexto_jsonb: imagensContexto as unknown as Json,
     status,
-    publicado_em: publish ? new Date().toISOString() : undefined,
+    publicado_em: publish ? new Date().toISOString() : null,
   };
 
   let { data: inserted, error } = await db
@@ -125,10 +127,11 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error?.message?.includes("imagens_contexto_jsonb")) {
-    delete row.imagens_contexto_jsonb;
+    const retry: PaginaInsert = { ...row };
+    delete (retry as { imagens_contexto_jsonb?: Json | null }).imagens_contexto_jsonb;
     ({ data: inserted, error } = await db
       .from("paginas")
-      .insert(row)
+      .insert(retry)
       .select("id, slug, status")
       .single());
   }

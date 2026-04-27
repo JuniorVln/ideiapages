@@ -1,6 +1,5 @@
 import { requireAdmin } from "@/lib/admin/require-admin";
 import { ADMIN_NAV_SECTIONS } from "@/lib/admin/admin-nav";
-import { isAdminLocalBypass } from "@/lib/admin/local-bypass";
 import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 import Link from "next/link";
 import type { Route } from "next";
@@ -15,15 +14,13 @@ import {
   BarChart3, 
   Sparkles,
   ArrowRight,
-  Clock,
-  History
+  History,
+  type LucideIcon,
 } from "lucide-react";
 
 export default async function AdminHubPage() {
   await requireAdmin();
-  const bypass = isAdminLocalBypass();
   const db = getSupabaseAdminOptional();
-  const dbReady = db != null;
 
   let paginas: {
     slug: string;
@@ -56,7 +53,7 @@ export default async function AdminHubPage() {
     }
   }
 
-  const sectionIcons: Record<string, any> = {
+  const sectionIcons: Record<string, LucideIcon> = {
     "Dashboard": LayoutDashboard,
     "Pesquisa": Search,
     "Conteúdo": FileText,

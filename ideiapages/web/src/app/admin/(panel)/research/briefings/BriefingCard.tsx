@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  FileText,
   Target,
   Zap,
   Clock,
@@ -94,7 +93,7 @@ export function BriefingCard({
         <h3 className="font-bold text-white leading-tight group-hover:text-blue-200 transition-colors">{titulo}</h3>
         {descricao && (
           <p className="text-sm text-slate-400 mt-2 leading-relaxed line-clamp-2 italic">
-            "{descricao}"
+            &ldquo;{descricao}&rdquo;
           </p>
         )}
       </div>

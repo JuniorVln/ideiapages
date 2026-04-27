@@ -1,7 +1,6 @@
 "use client";
 
 import { PUBLIC_CONTENT_BASE_PATH } from "@/lib/public-pages";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Sparkles, FileText, CheckCircle2, ChevronRight, Info, AlertCircle, Layout, Target } from "lucide-react";
@@ -12,9 +11,21 @@ interface BriefingOption {
   keyword: string;
 }
 
+/** Campos usados no preview (briefing SEO JSON). */
+type BriefingJsonPreview = {
+  title_seo?: string;
+  meta_description?: string;
+  gancho_vendas?: string;
+  estrutura_h2_h3?: { h2?: string; h3s?: string[] }[];
+  information_gain?: { topicos_unicos_que_concorrentes_nao_tem?: string[] };
+  gaps_conteudo_top3?: string;
+  word_count_alvo?: string | number;
+  tom_de_voz?: string;
+};
+
 interface BriefingData {
   id: string;
-  briefing_jsonb: any;
+  briefing_jsonb: Record<string, unknown>;
   termos: {
     keyword: string;
     intencao?: string;
@@ -94,7 +105,7 @@ export function NewPageForm({
     router.push(`/admin/pages/${data.slug}`);
   }
 
-  const bj = briefingData?.briefing_jsonb;
+  const bj = briefingData?.briefing_jsonb as BriefingJsonPreview | undefined;
   const kw = briefingData?.termos?.keyword;
 
   return (
@@ -258,7 +269,7 @@ export function NewPageForm({
                   {bj.title_seo || "Título SEO pendente"}
                 </h2>
                 <p className="text-sm text-slate-400 line-clamp-2 italic">
-                  "{bj.meta_description || "Sem descrição disponível..."}"
+                  &ldquo;{bj.meta_description || "Sem descrição disponível..."}&rdquo;
                 </p>
               </div>
 
@@ -282,7 +293,8 @@ export function NewPageForm({
                     Arquitetura de Headings
                   </h4>
                   <div className="space-y-4">
-                    {Array.isArray(bj.estrutura_h2_h3) && bj.estrutura_h2_h3.map((block: any, i: number) => (
+                    {Array.isArray(bj.estrutura_h2_h3) &&
+                      bj.estrutura_h2_h3.map((block, i: number) => (
                       <div key={i} className="group p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:bg-slate-800/50 transition-all">
                         <div className="flex items-start gap-3">
                           <span className="text-xs font-mono text-slate-600 mt-1">H2</span>

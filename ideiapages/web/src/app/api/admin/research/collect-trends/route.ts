@@ -3,7 +3,7 @@ import { isResearchCliAllowed, runIdeiaPagesResearchCli } from "@/lib/admin/rese
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Dispara `collect-trends --keyword` (pytrends → grava em termos.tendencia_pytrends).
+ * Dispara `collect-trends --keyword` (pytrends → `termos.tendencia_pytrends` + `volume_estimado` em proxy).
  * Pode levar minutos se o Google limitar (429); em ban, a CLI espera e retenta.
  */
 export async function POST(req: NextRequest) {

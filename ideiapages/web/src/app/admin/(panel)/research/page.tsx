@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/admin/require-admin";
 import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 import { Suspense } from "react";
 import Link from "next/link";
+import { oportunidadeResumo } from "@/lib/research/termo-oportunidade";
 import {
   trendBadgeClass,
   trendBadgeLayoutClass,
@@ -46,7 +47,9 @@ export default async function ResearchDashboardPage() {
 
   const { data: recentTermos } = await db
     .from("termos")
-    .select("id, keyword, status, score_conversao, cluster, intencao, created_at, tendencia_pytrends")
+    .select(
+      "id, keyword, status, score_conversao, volume_estimado, cluster, intencao, created_at, tendencia_pytrends",
+    )
     .order("created_at", { ascending: false })
     .limit(10);
 
@@ -150,39 +153,70 @@ export default async function ResearchDashboardPage() {
                 <th className="text-left px-4 py-2">Status</th>
                 <th className="text-left px-4 py-2 whitespace-nowrap">Tendência</th>
                 <th className="text-left px-4 py-2">Intenção</th>
-                <th className="text-left px-4 py-2">Score</th>
+                <th className="text-right px-4 py-2">Score</th>
+                <th className="text-right px-4 py-2">Volume</th>
+                <th className="text-left px-4 py-2 min-w-[9rem]">Oportunidade</th>
                 <th className="text-left px-4 py-2">Cluster</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 text-slate-200">
-              {(recentTermos ?? []).map((t) => (
-                <tr key={t.id} className="hover:bg-slate-900/40">
-                  <td className="px-4 py-2">
-                    <Link
-                      href={`/admin/research/terms/${t.id}`}
-                      className="text-blue-400 hover:underline"
-                    >
-                      {t.keyword}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2">
-                    <StatusBadge status={t.status} />
-                  </td>
-                  <td className="px-4 py-2 align-middle whitespace-nowrap">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full border ${trendBadgeLayoutClass} ${trendBadgeClass(t.tendencia_pytrends)}`}
-                      title="Google Trends (pytrends)"
-                    >
-                      {trendLabelFromPytrendsJson(t.tendencia_pytrends)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 text-slate-400">{t.intencao ?? "—"}</td>
-                  <td className="px-4 py-2 text-slate-300">{t.score_conversao ?? "—"}</td>
-                  <td className="px-4 py-2 text-slate-400 max-w-[120px] truncate">
-                    {t.cluster ?? "—"}
-                  </td>
-                </tr>
-              ))}
+              {(recentTermos ?? []).map((t) => {
+                const op = oportunidadeResumo(
+                  t.score_conversao,
+                  t.volume_estimado as number | null | undefined,
+                );
+                return (
+                  <tr key={t.id} className="hover:bg-slate-900/40">
+                    <td className="px-4 py-2">
+                      <Link
+                        href={`/admin/research/terms/${t.id}`}
+                        className="text-blue-400 hover:underline"
+                      >
+                        {t.keyword}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2">
+                      <StatusBadge status={t.status} />
+                    </td>
+                    <td className="px-4 py-2 align-middle whitespace-nowrap">
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full border ${trendBadgeLayoutClass} ${trendBadgeClass(t.tendencia_pytrends)}`}
+                        title="Google Trends (pytrends)"
+                      >
+                        {trendLabelFromPytrendsJson(t.tendencia_pytrends)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-slate-400">{t.intencao ?? "—"}</td>
+                    <td className="px-4 py-2 text-right text-slate-300 font-mono">
+                      {t.score_conversao ?? "—"}
+                    </td>
+                    <td className="px-4 py-2 text-right text-slate-400">
+                      {t.volume_estimado != null
+                        ? Number(t.volume_estimado).toLocaleString("pt-BR")
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="flex flex-col gap-0.5">
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full border w-fit uppercase font-bold tracking-wider ${op.badgeClass}`}
+                          title={op.descricao}
+                        >
+                          {op.label}
+                        </span>
+                        <span
+                          className="text-[10px] text-slate-500 font-mono"
+                          title="Índice: score×(1+ln(1+volume)) — mesma regra de ordenação de Priorizar termos"
+                        >
+                          idx {op.indiceTexto}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 text-slate-400 max-w-[120px] truncate">
+                      {t.cluster ?? "—"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

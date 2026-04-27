@@ -1,6 +1,6 @@
 ---
 name: analyze-gaps
-version: 4
+version: 5
 model_recomendado: claude-3-5-sonnet-20241022
 temperature: 0.5
 max_tokens_output: 8000
@@ -33,7 +33,8 @@ Produzir um **briefing SEO estratégico** (JSON) que sirva como base para uma p�
 - `gancho_vendas`: Deve parecer escrito por um humano experiente, não um bot de SEO. Mínimo 150 caracteres de puro valor.
 - `topicos_obrigatorios`: Cada item deve ser uma "mini-tese" de venda, **específica e exclusiva**. Fuja de descrições genéricas. Cada item DEVE ter o formato: `Título do Tópico — Descrição detalhada do que abordar`.
 - **Contexto Geográfico (GEO)**: Se a keyword ou o contexto sugerir uma localidade, identifique dores ou benefícios específicos daquela região para incluir no briefing.
-- **Alinhamento com a geração de páginas**: O pipeline concatena ao teu system o ficheiro `content-quality-and-briefing.md` (factualidade, formatação MDX, gaps sem citar marcas de terceiros). O JSON que produzes alimenta esse fluxo — em `gancho_vendas`, `gaps_conteudo_top3` e `topicos_obrigatorios`, evite exigir menções a concorrentes por nome; descreva lacunas da SERP e critérios de decisão.
+- **Alinhamento com a geração de páginas**: O pipeline concatena ao teu system o ficheiro `content-quality-and-briefing.md` (factualidade, formatação MDX, gaps sem citar marcas de terceiros, **e o template fixo da landing** — secção 5.1 desse ficheiro). O JSON que produzes alimenta esse fluxo — em `gancho_vendas`, `gaps_conteudo_top3` e `topicos_obrigatorios`, evite exigir menções a concorrentes por nome; descreva lacunas da SERP e critérios de decisão.
+- **Template de preços e demo (obrigatório)**: A página pública **não** recebe tabela de preços no `body_mdx`. Depois do FAQ, o site injeta uma secção fixa (fundo claro, conteúdo centralizado, toggle mensal/anual, cartões Essencial/Elite com dados de `product_facts`, CTAs WhatsApp, âncoras `#demonstracao-gratuita` e `#secao-valores`). **Não** peças no JSON: “incluir secção H2 de preços no artigo”, “tabela de valores no markdown” nem descrevas layout com imagem lateral ou coluna escura — isso está **descontinuado**. Foque o briefing em **argumento de venda** e em CTAs alinhados a **demo**; preços vêm de `product_facts` + template.
 
 ### Schema de Saída (JSON)
 

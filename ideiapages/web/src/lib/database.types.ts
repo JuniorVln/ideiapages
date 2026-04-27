@@ -35,6 +35,188 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_log: {
+        Row: {
+          behavior: string
+          criado_em: string
+          detalhe: Json | null
+          id: string
+          pagina_id: string | null
+          resultado: Json | null
+        }
+        Insert: {
+          behavior: string
+          criado_em?: string
+          detalhe?: Json | null
+          id?: string
+          pagina_id?: string | null
+          resultado?: Json | null
+        }
+        Update: {
+          behavior?: string
+          criado_em?: string
+          detalhe?: Json | null
+          id?: string
+          pagina_id?: string | null
+          resultado?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_log_pagina_id_fkey"
+            columns: ["pagina_id"]
+            isOneToOne: false
+            referencedRelation: "paginas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_state: {
+        Row: {
+          automations_paused: boolean
+          custo_dia_brl: number
+          custo_dia_referencia: string | null
+          custo_max_dia_brl: number
+          id: number
+          max_rewrites_por_pagina_30d: number
+          pause_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          automations_paused?: boolean
+          custo_dia_brl?: number
+          custo_dia_referencia?: string | null
+          custo_max_dia_brl?: number
+          id?: number
+          max_rewrites_por_pagina_30d?: number
+          pause_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          automations_paused?: boolean
+          custo_dia_brl?: number
+          custo_dia_referencia?: string | null
+          custo_max_dia_brl?: number
+          id?: number
+          max_rewrites_por_pagina_30d?: number
+          pause_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      auto_rewrite_queue: {
+        Row: {
+          concluido_em: string | null
+          criado_em: string
+          custo_brl: number | null
+          detalhe_jsonb: Json | null
+          erro_mensagem: string | null
+          id: string
+          iniciado_em: string | null
+          pagina_id: string
+          prioridade: number
+          razao: string
+          snapshot_serp_id: string | null
+          status: string
+          termo_id: string | null
+        }
+        Insert: {
+          concluido_em?: string | null
+          criado_em?: string
+          custo_brl?: number | null
+          detalhe_jsonb?: Json | null
+          erro_mensagem?: string | null
+          id?: string
+          iniciado_em?: string | null
+          pagina_id: string
+          prioridade?: number
+          razao: string
+          snapshot_serp_id?: string | null
+          status?: string
+          termo_id?: string | null
+        }
+        Update: {
+          concluido_em?: string | null
+          criado_em?: string
+          custo_brl?: number | null
+          detalhe_jsonb?: Json | null
+          erro_mensagem?: string | null
+          id?: string
+          iniciado_em?: string | null
+          pagina_id?: string
+          prioridade?: number
+          razao?: string
+          snapshot_serp_id?: string | null
+          status?: string
+          termo_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_rewrite_queue_pagina_id_fkey"
+            columns: ["pagina_id"]
+            isOneToOne: false
+            referencedRelation: "paginas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auto_rewrite_queue_snapshot_serp_id_fkey"
+            columns: ["snapshot_serp_id"]
+            isOneToOne: false
+            referencedRelation: "serp_snapshots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auto_rewrite_queue_termo_id_fkey"
+            columns: ["termo_id"]
+            isOneToOne: false
+            referencedRelation: "termos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gsc_metricas_diarias: {
+        Row: {
+          atualizado_em: string
+          cliques: number
+          criado_em: string
+          data: string
+          id: string
+          impressoes: number
+          pagina_id: string
+          posicao_media: number
+          query: string
+        }
+        Insert: {
+          atualizado_em?: string
+          cliques?: number
+          criado_em?: string
+          data: string
+          id?: string
+          impressoes?: number
+          pagina_id: string
+          posicao_media?: number
+          query: string
+        }
+        Update: {
+          atualizado_em?: string
+          cliques?: number
+          criado_em?: string
+          data?: string
+          id?: string
+          impressoes?: number
+          pagina_id?: string
+          posicao_media?: number
+          query?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gsc_metricas_diarias_pagina_id_fkey"
+            columns: ["pagina_id"]
+            isOneToOne: false
+            referencedRelation: "paginas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       briefings_seo: {
         Row: {
           briefing_jsonb: Json
@@ -188,6 +370,54 @@ export type Database = {
             columns: ["vencedor_variacao_id"]
             isOneToOne: false
             referencedRelation: "variacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generative_visibility_checks: {
+        Row: {
+          id: string
+          pagina_id: string
+          termo_id: string | null
+          engine: string
+          checked_at: string
+          mentioned: boolean
+          detail_jsonb: Json | null
+          criado_em: string
+        }
+        Insert: {
+          id?: string
+          pagina_id: string
+          termo_id?: string | null
+          engine: string
+          checked_at?: string
+          mentioned: boolean
+          detail_jsonb?: Json | null
+          criado_em?: string
+        }
+        Update: {
+          id?: string
+          pagina_id?: string
+          termo_id?: string | null
+          engine?: string
+          checked_at?: string
+          mentioned?: boolean
+          detail_jsonb?: Json | null
+          criado_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generative_visibility_checks_pagina_id_fkey"
+            columns: ["pagina_id"]
+            isOneToOne: false
+            referencedRelation: "paginas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generative_visibility_checks_termo_id_fkey"
+            columns: ["termo_id"]
+            isOneToOne: false
+            referencedRelation: "termos"
             referencedColumns: ["id"]
           },
         ]

@@ -139,7 +139,11 @@ export function ResearchAdvancedPanel({ allowRemote }: { allowRemote: boolean })
 
       <section className={card}>
         <h2 className="text-white font-semibold">2. Priorizar (analisado → priorizado)</h2>
-        <p className="text-xs text-slate-500">Score mínimo e limite; tendência decrescente excluída salvo exceção.</p>
+        <p className="text-xs text-slate-500">
+          Entre termos com score ≥ mínimo, ordena por índice{" "}
+          <code className="text-slate-400">score×(1+ln(1+volume))</code> (volume do Supabase). Tendência
+          decrescente fica de fora, salvo &quot;Manter decrescente&quot;.
+        </p>
         <div className="flex flex-wrap gap-2 items-end">
           <label className="text-xs text-slate-500">
             Score mín.

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { PageCTA } from "@/components/ui/PageCTA";
+import { PricingAndDemoCta } from "@/components/blog/PricingAndDemoCta";
 import type { ParsedSection, SectionBlock } from "@/lib/blog/parse-sections";
 import {
   buildPexelsQuery,
@@ -768,66 +768,6 @@ function StatsStrip() {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   Mid-page CTA
-───────────────────────────────────────────────────────────────── */
-function MidPageCta({ paginaId, variacaoId, whatsappNumber }: { paginaId: string; variacaoId?: string; whatsappNumber: string }) {
-  return (
-    <section
-      id="demonstracao-gratuita"
-      className="scroll-mt-24 py-16 bg-white border-y border-slate-200"
-      aria-labelledby="mid-cta-heading"
-    >
-      <div className="max-w-container mx-auto px-4 flex flex-col gap-10">
-        <p className="text-xs font-bold uppercase tracking-widest text-ideia-primary">Demonstração gratuita</p>
-        <h2 id="mid-cta-heading" className="text-2xl md:text-3xl font-black text-slate-900 font-ideia leading-tight max-w-2xl">
-          Pronto para transformar o atendimento da sua empresa?
-        </h2>
-
-        {/*
-          Valores: editar aqui ou puxar de product_facts / CMS quando a tabela estiver aprovada.
-          Manter id para deep links e futuro conteúdo dinâmico.
-        */}
-        <div
-          id="secao-valores"
-          className="rounded-2xl border border-slate-200 bg-slate-50/90 p-6 md:p-8 max-w-3xl"
-        >
-          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">Valores e investimento</h3>
-          <p className="text-slate-600 leading-relaxed mb-3">
-            O investimento varia conforme porte da equipe, volume de atendimentos e recursos contratados
-            (API oficial Meta, IA, integrações). Use referência em{" "}
-            <code className="text-xs bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">
-              ideiapages/references/product_facts.md
-            </code>{" "}
-            ou a tabela comercial vigente — substitua este parágrafo por faixas ou tabela quando o conteúdo
-            estiver publicado.
-          </p>
-          <p className="text-sm text-slate-500 leading-relaxed">
-            Na demonstração, o time confirma valores atualizados e monta a proposta para o seu cenário.
-          </p>
-        </div>
-
-        <p className="text-slate-500 leading-relaxed max-w-2xl">
-          Depois de ter uma ideia de investimento, fale com um especialista pelo WhatsApp para agendar a
-          demonstração e ver o Ideia Chat no seu contexto.
-        </p>
-
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <PageCTA
-            paginaId={paginaId}
-            variacaoId={variacaoId}
-            whatsappNumber={whatsappNumber}
-            label="Agendar demonstração no WhatsApp"
-            size="lg"
-            buttonVariant="whatsapp"
-            className="shadow-lg font-bold"
-          />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────
    FAQ Section
 ───────────────────────────────────────────────────────────────── */
 function FaqSection({ faqs }: { faqs: FaqItem[] }) {
@@ -862,31 +802,6 @@ function FaqSection({ faqs }: { faqs: FaqItem[] }) {
         </dl>
       </div>
     </section>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   Imagem inline
-───────────────────────────────────────────────────────────────── */
-const PEXELS_HOST = "images.pexels.com";
-function InlineFig({ fig }: { fig: InlineFigure }) {
-  if (!fig.src) return null;
-  return (
-    <figure className="w-full overflow-hidden">
-      <div className="relative aspect-[21/9] min-h-[180px] bg-slate-100">
-        {fig.src.includes(PEXELS_HOST) ? (
-          <Image src={fig.src} alt={fig.alt} fill className="object-cover" sizes="100vw" />
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={fig.src} alt={fig.alt} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-        )}
-      </div>
-      {fig.credit ? (
-        <figcaption className="py-2 text-xs text-slate-400 text-center bg-white">
-          Foto: {fig.credit} · Pexels
-        </figcaption>
-      ) : null}
-    </figure>
   );
 }
 
@@ -963,7 +878,7 @@ export async function PageContentSections({
         <>
           <StatsStrip />
           <FaqSection faqs={faqs} />
-          <MidPageCta paginaId={paginaId} variacaoId={variacaoId} whatsappNumber={whatsappNumber} />
+          <PricingAndDemoCta paginaId={paginaId} variacaoId={variacaoId} whatsappNumber={whatsappNumber} />
         </>
       )}
     </>

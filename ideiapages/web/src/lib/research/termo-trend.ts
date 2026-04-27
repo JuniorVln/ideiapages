@@ -2,6 +2,14 @@
 export const trendBadgeLayoutClass =
   "inline-flex shrink-0 items-center whitespace-nowrap font-medium";
 
+/** Média do índice 0–100 (últimos 12 meses), se presente no JSON da coleta Trends. */
+export function interesseMedio12mFromPytrendsJson(raw: unknown): number | null {
+  if (!raw || typeof raw !== "object") return null;
+  const v = (raw as Record<string, unknown>).interesse_medio_12m;
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  return null;
+}
+
 /** Extrai rótulo amigável de `termos.tendencia_pytrends` (JSON do pipeline pytrends). */
 export function trendLabelFromPytrendsJson(raw: unknown): string {
   if (!raw || typeof raw !== "object") return "—";

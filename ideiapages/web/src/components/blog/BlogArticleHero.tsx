@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import Image from "next/image";
 import { ScrollToSectionButton } from "@/components/ui/ScrollToSectionButton";
 import { IDEIA } from "@/lib/ideia-brand";
@@ -47,7 +48,7 @@ export function SalesPageHero({
           {heroImageSrc.includes(pexelsHost) ? (
             <Image
               src={heroImageSrc}
-              alt=""
+              alt={heroImageAlt}
               fill
               className="object-cover object-[center_30%]"
               sizes="100vw"
@@ -57,7 +58,7 @@ export function SalesPageHero({
             // eslint-disable-next-line @next/next/no-img-element -- URL dinâmica (storage/OG)
             <img
               src={heroImageSrc}
-              alt=""
+              alt={heroImageAlt}
               className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
               loading="eager"
               decoding="async"
@@ -126,7 +127,7 @@ export function SalesPageHero({
       <div className="relative z-20 max-w-container mx-auto px-4 pt-10 pb-14 md:pt-12 md:pb-16">
         {/* Logo + tag */}
         <div className="flex flex-wrap items-center gap-3 mb-8">
-          <Link href={IDEIA.homeUrl} className="flex items-center gap-2 shrink-0">
+          <Link href={IDEIA.homeUrl as Route} className="flex items-center gap-2 shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element -- URL externa da marca */}
             <img
               src={IDEIA.logoUrl}

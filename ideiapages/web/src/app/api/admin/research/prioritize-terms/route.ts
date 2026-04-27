@@ -2,7 +2,7 @@ import { getAdminUser } from "@/lib/admin/session";
 import { isResearchCliAllowed, runIdeiaPagesResearchCli } from "@/lib/admin/research-cli";
 import { NextRequest, NextResponse } from "next/server";
 
-/** Promove `analisado` (score ≥ min) → `priorizado` (exclui tendência decrescente por padrão). */
+/** Promove `analisado` (score ≥ min) → `priorizado`; ordena por score×(1+ln(1+volume)). Exclui decrescente salvo exceção. */
 export async function POST(req: NextRequest) {
   const user = await getAdminUser();
   if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });

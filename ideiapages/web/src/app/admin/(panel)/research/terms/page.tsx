@@ -2,11 +2,13 @@ import { AdminNeedSupabaseEnv } from "@/components/AdminNeedSupabaseEnv";
 import { requireAdmin } from "@/lib/admin/require-admin";
 import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 import Link from "next/link";
+import type { Route } from "next";
 import {
   trendBadgeClass,
   trendBadgeLayoutClass,
   trendLabelFromPytrendsJson,
 } from "@/lib/research/termo-trend";
+import { oportunidadeResumo } from "@/lib/research/termo-oportunidade";
 import { StatusBadge } from "../research-status";
 
 interface SearchParams {
@@ -15,6 +17,7 @@ interface SearchParams {
   cluster?: string;
   q?: string;
   page?: string;
+  ordem?: string;
 }
 
 const INTENCOES = ["informacional", "transacional", "comparativa", "navegacional"];
@@ -32,6 +35,7 @@ export default async function TermsPage({
 
   const page = Math.max(1, Number(sp.page ?? 1));
   const offset = (page - 1) * PAGE_SIZE;
+  const ordem = sp.ordem === "volume" || sp.ordem === "score" ? sp.ordem : "relevancia";
 
   let query = db
     .from("termos")
@@ -39,8 +43,19 @@ export default async function TermsPage({
       "id, keyword, status, intencao, cluster, score_conversao, volume_estimado, dificuldade, created_at, tendencia_pytrends",
       { count: "exact" },
     )
-    .order("score_conversao", { ascending: false, nullsFirst: false })
     .range(offset, offset + PAGE_SIZE - 1);
+
+  if (ordem === "volume") {
+    query = query
+      .order("volume_estimado", { ascending: false, nullsFirst: false })
+      .order("score_conversao", { ascending: false, nullsFirst: false });
+  } else if (ordem === "score") {
+    query = query.order("score_conversao", { ascending: false, nullsFirst: false });
+  } else {
+    query = query
+      .order("score_conversao", { ascending: false, nullsFirst: false })
+      .order("volume_estimado", { ascending: false, nullsFirst: false });
+  }
 
   if (sp.status) query = query.eq("status", sp.status);
   if (sp.intencao) query = query.eq("intencao", sp.intencao);
@@ -57,8 +72,7 @@ export default async function TermsPage({
     .limit(200);
   const uniqueClusters = [...new Set((clusters ?? []).map((r) => r.cluster).filter(Boolean))].sort();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const buildLink = (extra: Partial<SearchParams>): any => {
+  const buildLink = (extra: Partial<SearchParams>): string => {
     const p = { ...sp, ...extra };
     const qs = Object.entries(p)
       .filter(([, v]) => v)
@@ -142,13 +156,25 @@ export default async function TermsPage({
             ))}
           </select>
         </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-500">Ordenar</label>
+          <select
+            name="ordem"
+            defaultValue={ordem}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-sm min-w-[11rem] focus:outline-none focus:border-blue-500"
+          >
+            <option value="relevancia">Score, depois volume</option>
+            <option value="score">Só score</option>
+            <option value="volume">Volume, depois score</option>
+          </select>
+        </div>
         <button
           type="submit"
           className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium"
         >
           Filtrar
         </button>
-        {(sp.status || sp.intencao || sp.cluster || sp.q) && (
+        {(sp.status || sp.intencao || sp.cluster || sp.q || sp.ordem) && (
           <Link
             href="/admin/research/terms"
             className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm"
@@ -169,52 +195,71 @@ export default async function TermsPage({
               <th className="text-left px-4 py-2.5">Intenção</th>
               <th className="text-right px-4 py-2.5">Score</th>
               <th className="text-right px-4 py-2.5">Volume</th>
+              <th className="text-left px-4 py-2.5 min-w-[9rem]">Oportunidade</th>
+              <th className="text-right px-4 py-2.5">Índice</th>
               <th className="text-right px-4 py-2.5">KD</th>
               <th className="text-left px-4 py-2.5">Cluster</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800 text-slate-200">
-            {(termos ?? []).map((t) => (
-              <tr key={t.id} className="hover:bg-slate-900/40">
-                <td className="px-4 py-2">
-                  <Link
-                    href={`/admin/research/terms/${t.id}`}
-                    className="text-blue-400 hover:underline"
+            {(termos ?? []).map((t) => {
+              const op = oportunidadeResumo(t.score_conversao, t.volume_estimado);
+              return (
+                <tr key={t.id} className="hover:bg-slate-900/40">
+                  <td className="px-4 py-2">
+                    <Link
+                      href={`/admin/research/terms/${t.id}`}
+                      className="text-blue-400 hover:underline"
+                    >
+                      {t.keyword}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-2 align-middle whitespace-nowrap">
+                    <StatusBadge status={t.status} />
+                  </td>
+                  <td className="px-4 py-2 align-middle whitespace-nowrap">
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full border ${trendBadgeLayoutClass} ${trendBadgeClass(t.tendencia_pytrends)}`}
+                      title="Google Trends (pytrends)"
+                    >
+                      {trendLabelFromPytrendsJson(t.tendencia_pytrends)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 text-slate-400">{t.intencao ?? "—"}</td>
+                  <td className="px-4 py-2 text-right font-mono text-slate-300">
+                    {t.score_conversao ?? "—"}
+                  </td>
+                  <td className="px-4 py-2 text-right text-slate-400">
+                    {t.volume_estimado != null
+                      ? Number(t.volume_estimado).toLocaleString("pt-BR")
+                      : "—"}
+                  </td>
+                  <td className="px-4 py-2">
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full border inline-block uppercase font-bold tracking-wider ${op.badgeClass}`}
+                      title={op.descricao}
+                    >
+                      {op.label}
+                    </span>
+                  </td>
+                  <td
+                    className="px-4 py-2 text-right font-mono text-slate-500 text-xs"
+                    title="score×(1+ln(1+volume)) — ordenação de Priorizar termos (CLI)"
                   >
-                    {t.keyword}
-                  </Link>
-                </td>
-                <td className="px-4 py-2 align-middle whitespace-nowrap">
-                  <StatusBadge status={t.status} />
-                </td>
-                <td className="px-4 py-2 align-middle whitespace-nowrap">
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full border ${trendBadgeLayoutClass} ${trendBadgeClass(t.tendencia_pytrends)}`}
-                    title="Google Trends (pytrends)"
-                  >
-                    {trendLabelFromPytrendsJson(t.tendencia_pytrends)}
-                  </span>
-                </td>
-                <td className="px-4 py-2 text-slate-400">{t.intencao ?? "—"}</td>
-                <td className="px-4 py-2 text-right font-mono text-slate-300">
-                  {t.score_conversao ?? "—"}
-                </td>
-                <td className="px-4 py-2 text-right text-slate-400">
-                  {t.volume_estimado != null
-                    ? Number(t.volume_estimado).toLocaleString("pt-BR")
-                    : "—"}
-                </td>
-                <td className="px-4 py-2 text-right text-slate-400">
-                  {t.dificuldade ?? "—"}
-                </td>
-                <td className="px-4 py-2 text-slate-500 max-w-[140px] truncate">
-                  {t.cluster ?? "—"}
-                </td>
-              </tr>
-            ))}
+                    {op.indiceTexto}
+                  </td>
+                  <td className="px-4 py-2 text-right text-slate-400">
+                    {t.dificuldade ?? "—"}
+                  </td>
+                  <td className="px-4 py-2 text-slate-500 max-w-[140px] truncate">
+                    {t.cluster ?? "—"}
+                  </td>
+                </tr>
+              );
+            })}
             {(termos ?? []).length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
+                <td colSpan={10} className="px-4 py-8 text-center text-slate-500">
                   Nenhum termo encontrado para os filtros selecionados.
                 </td>
               </tr>
@@ -228,7 +273,7 @@ export default async function TermsPage({
         <div className="flex items-center gap-2 justify-end text-sm">
           {page > 1 && (
             <Link
-              href={buildLink({ page: String(page - 1) })}
+              href={buildLink({ page: String(page - 1) }) as Route}
               className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
             >
               ← Anterior
@@ -239,7 +284,7 @@ export default async function TermsPage({
           </span>
           {page < totalPages && (
             <Link
-              href={buildLink({ page: String(page + 1) })}
+              href={buildLink({ page: String(page + 1) }) as Route}
               className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
             >
               Próxima →

@@ -45,8 +45,8 @@ export function runQualityGate(
   }
 
   // Softened price check logic:
-  const precos = body.match(/R\$\s*[\d]{1,3}(?:\.\d{3})*,\d{2}/g) ?? [];
-  const allowedPrecos = productFactsRaw.match(/R\$\s*[\d]{1,3}(?:\.\d{3})*,\d{2}/g) ?? [];
+  const precos: string[] = body.match(/R\$\s*[\d]{1,3}(?:\.\d{3})*,\d{2}/g) ?? [];
+  const allowedPrecos: string[] = productFactsRaw.match(/R\$\s*[\d]{1,3}(?:\.\d{3})*,\d{2}/g) ?? [];
   for (const p of precos) {
     if (!allowedPrecos.includes(p) && !productFactsRaw.includes(p.replace(/\s+/g, ""))) {
       warnings.push(`Possível preço fora de product_facts: ${p}`);

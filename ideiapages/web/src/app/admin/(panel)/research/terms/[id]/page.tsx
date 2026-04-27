@@ -4,7 +4,9 @@ import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { briefingPageTitle, briefingTopicosStrings } from "@/lib/research/briefing-json";
+import { oportunidadeResumo } from "@/lib/research/termo-oportunidade";
 import {
+  interesseMedio12mFromPytrendsJson,
   trendBadgeClass,
   trendBadgeLayoutClass,
   trendLabelFromPytrendsJson,
@@ -62,6 +64,8 @@ export default async function TermDetailPage({
     .maybeSingle();
 
   const hasBriefing = (briefings ?? []).length > 0;
+  const op = oportunidadeResumo(termo.score_conversao, termo.volume_estimado);
+  const interesseMedio12m = interesseMedio12mFromPytrendsJson(termo.tendencia_pytrends);
 
   return (
     <div className="space-y-8">
@@ -128,6 +132,48 @@ export default async function TermDetailPage({
         />
         <MetaCard label="KD" value={termo.dificuldade ?? "—"} />
         <MetaCard label="Intenção" value={termo.intencao ?? "—"} />
+      </div>
+
+      <p className="text-xs text-slate-500 max-w-3xl -mt-2">
+        O <span className="text-slate-400">volume estimado</span> é preenchido ao rodar a coleta Google
+        Trends (pytrends): calculamos um <strong className="text-slate-400">proxy de buscas/mês</strong>{" "}
+        a partir do índice relativo 0–100 (média dos últimos 12 meses). Não equivale ao volume absoluto
+        do Keyword Planner; serve para priorizar termos entre si. Use &quot;Atualizar tendência&quot; abaixo
+        se estiver vazio.
+        {interesseMedio12m != null && (
+          <>
+            {" "}
+            Índice médio 12m nesta coleta:{" "}
+            <span className="text-slate-300 font-mono">
+              {interesseMedio12m.toLocaleString("pt-BR", {
+                maximumFractionDigits: 1,
+              })}
+            </span>
+            /100.
+          </>
+        )}
+      </p>
+
+      <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 sm:p-5">
+        <h2 className="text-sm font-semibold text-slate-300 mb-1">Score × volume (oportunidade)</h2>
+        <p className="text-xs text-slate-500 mb-3">
+          Compara intenção de conversão (score) com demanda de busca (volume). O índice{" "}
+          <code className="text-slate-400">score×(1+ln(1+volume))</code> é o mesmo critério de ordenação
+          ao promover termos de analisado → priorizado (pipeline / botão Priorizar).
+        </p>
+        <div className="flex flex-wrap items-start gap-3">
+          <span
+            className={`text-xs px-3 py-1 rounded-full border font-semibold ${op.badgeClass}`}
+            title={op.descricao}
+          >
+            {op.label}
+          </span>
+          <div className="text-sm text-slate-300">
+            <span className="text-slate-500">Índice:</span>{" "}
+            <span className="font-mono text-white">{op.indiceTexto}</span>
+          </div>
+        </div>
+        <p className="text-xs text-slate-500 mt-2 leading-relaxed">{op.descricao}</p>
       </div>
 
       {/* Tendência (Google Trends) */}
