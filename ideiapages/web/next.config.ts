@@ -35,8 +35,6 @@ const HSTS_HEADER = {
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  /** Incluir o repo inteiro no tracing — na Vercel o cwd é `…/ideiapages/web` dentro do clone; sem isto pode falhar o bundle (`noop.js` / next-server). */
-  outputFileTracingRoot: workspaceRoot,
   typedRoutes: true,
   images: {
     formats: ["image/avif", "image/webp"],
