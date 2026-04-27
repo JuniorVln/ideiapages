@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { formatThrown } from "@/lib/format-thrown";
 
 type Props = {
   keyword: string;
@@ -18,25 +19,30 @@ export function AtualizarTrendsButton({ keyword, forceDefault = false }: Props) 
   async function run() {
     setLoading(true);
     setErr(null);
-    const res = await fetch("/api/admin/research/collect-trends", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ keyword: keyword.trim(), force }),
-    });
-    const data = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      stderr?: string;
-      stdout?: string;
-    };
-    setLoading(false);
-    if (res.ok && data.ok) {
-      router.refresh();
-      return;
+    try {
+      const res = await fetch("/api/admin/research/collect-trends", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword: keyword.trim(), force }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        stderr?: string;
+        stdout?: string;
+      };
+      if (res.ok && data.ok) {
+        router.refresh();
+        return;
+      }
+      setErr(
+        [data.error, data.stderr].filter(Boolean).join("\n") || "Falha ao atualizar tendência.",
+      );
+    } catch (e) {
+      setErr(formatThrown(e));
+    } finally {
+      setLoading(false);
     }
-    setErr(
-      [data.error, data.stderr].filter(Boolean).join("\n") || "Falha ao atualizar tendência.",
-    );
   }
 
   return (

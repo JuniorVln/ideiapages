@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { formatThrown } from "@/lib/format-thrown";
 
 const card =
   "rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900/80 to-slate-950/90 p-6 shadow-lg shadow-slate-950/40";
@@ -146,25 +147,30 @@ export function ResearchMainPanel({ allowRemote }: Props) {
     setSuggestLoading(true);
     setSuggestErr(null);
     setContexto(null);
-    const res = await fetch("/api/admin/research/suggest-seeds", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: siteUrl.trim(), gscQueriesText }),
-    });
-    const data = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      seeds?: string[];
-      contextoResumo?: string;
-    };
-    setSuggestLoading(false);
-    if (res.ok && data.ok && data.seeds?.length) {
-      setText(data.seeds.join("\n"));
-      setContexto(data.contextoResumo ?? null);
-      router.refresh();
-      return;
+    try {
+      const res = await fetch("/api/admin/research/suggest-seeds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: siteUrl.trim(), gscQueriesText }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        seeds?: string[];
+        contextoResumo?: string;
+      };
+      if (res.ok && data.ok && data.seeds?.length) {
+        setText(data.seeds.join("\n"));
+        setContexto(data.contextoResumo ?? null);
+        router.refresh();
+        return;
+      }
+      setSuggestErr(data.error ?? "Não foi possível gerar sementes.");
+    } catch (e) {
+      setSuggestErr(formatThrown(e));
+    } finally {
+      setSuggestLoading(false);
     }
-    setSuggestErr(data.error ?? "Não foi possível gerar sementes.");
   }
 
   async function importGscQueries() {
@@ -174,68 +180,82 @@ export function ResearchMainPanel({ allowRemote }: Props) {
     }
     setGscImportLoading(true);
     setGscListErr(null);
-    const res = await fetch("/api/admin/gsc/import-queries", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ siteUrl: gscSite.trim(), days: gscDays, maxQueries: 100 }),
-    });
-    const data = (await res.json()) as { ok?: boolean; error?: string; queries?: string[] };
-    setGscImportLoading(false);
-    if (res.ok && data.ok && data.queries?.length) {
-      setGscQueriesText(data.queries.join("\n"));
-      return;
+    try {
+      const res = await fetch("/api/admin/gsc/import-queries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ siteUrl: gscSite.trim(), days: gscDays, maxQueries: 100 }),
+      });
+      const data = (await res.json()) as { ok?: boolean; error?: string; queries?: string[] };
+      if (res.ok && data.ok && data.queries?.length) {
+        setGscQueriesText(data.queries.join("\n"));
+        return;
+      }
+      setGscListErr(data.error ?? "Falha ao importar consultas.");
+    } catch (e) {
+      setGscListErr(formatThrown(e));
+    } finally {
+      setGscImportLoading(false);
     }
-    setGscListErr(data.error ?? "Falha ao importar consultas.");
   }
 
   async function disconnectGsc() {
     setGscListErr(null);
-    const res = await fetch("/api/admin/gsc/disconnect", { method: "POST", credentials: "include" });
-    const data = (await res.json()) as { ok?: boolean; error?: string };
-    if (res.ok && data.ok) {
-      setGscStatus((s) =>
-        s
-          ? { ...s, connected: false }
-          : { connected: false, oauthConfigured: true, supabase: true },
-      );
-      setGscSites(null);
-      setGscSite("");
-      router.refresh();
-      return;
+    try {
+      const res = await fetch("/api/admin/gsc/disconnect", { method: "POST", credentials: "include" });
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+      if (res.ok && data.ok) {
+        setGscStatus((s) =>
+          s
+            ? { ...s, connected: false }
+            : { connected: false, oauthConfigured: true, supabase: true },
+        );
+        setGscSites(null);
+        setGscSite("");
+        router.refresh();
+        return;
+      }
+      setGscListErr(data.error ?? "Não foi possível desligar.");
+    } catch (e) {
+      setGscListErr(formatThrown(e));
     }
-    setGscListErr(data.error ?? "Não foi possível desligar.");
   }
 
   async function run() {
     setLoading(true);
     setLog(null);
     setErr(null);
-    const res = await fetch("/api/admin/research/run-pipeline", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        seeds,
-        dryRun: false,
-        skipTrends: false,
-        skipGaps: true,
-      }),
-    });
-    const data = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      stdout?: string;
-      stderr?: string;
-    };
-    setLoading(false);
-    const out = [data.stdout, data.stderr].filter(Boolean).join("\n---\n") || "";
-    if (res.ok && data.ok) {
-      setLog(out || "Concluído.");
-      router.refresh();
-      return;
+    try {
+      const res = await fetch("/api/admin/research/run-pipeline", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          seeds,
+          dryRun: false,
+          skipTrends: false,
+          skipGaps: true,
+        }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        stdout?: string;
+        stderr?: string;
+      };
+      const out = [data.stdout, data.stderr].filter(Boolean).join("\n---\n") || "";
+      if (res.ok && data.ok) {
+        setLog(out || "Concluído.");
+        router.refresh();
+        return;
+      }
+      setErr([data.error, data.stderr, data.stdout].filter(Boolean).join("\n") || "Falha.");
+      if (out) setLog(out);
+    } catch (e) {
+      setErr(formatThrown(e));
+    } finally {
+      setLoading(false);
     }
-    setErr([data.error, data.stderr, data.stdout].filter(Boolean).join("\n") || "Falha.");
-    if (out) setLog(out);
   }
 
   return (

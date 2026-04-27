@@ -113,7 +113,8 @@ export function WhatsAppModal({
           </div>
           <button
             ref={closeButtonRef}
-            onClick={onClose}
+            type="button"
+            onClick={() => onClose()}
             aria-label="Fechar modal"
             className="
               ml-4 flex-shrink-0 p-1.5 rounded-lg text-text-subtle

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatThrown, safeJsonStringify } from "@/lib/format-thrown";
 
 type QueueRow = {
   id: string;
@@ -42,30 +43,39 @@ export function AutocuraClient({
   const [pauseReason, setPauseReason] = useState("");
 
   async function refreshState() {
-    const res = await fetch("/api/admin/automation/state");
-    const j = (await res.json()) as { state?: AutomationState; error?: string };
-    if (res.ok && j.state) setState(j.state);
+    try {
+      const res = await fetch("/api/admin/automation/state");
+      const j = (await res.json()) as { state?: AutomationState; error?: string };
+      if (res.ok && j.state) setState(j.state);
+    } catch {
+      /* melhor esforço após acções manuais */
+    }
   }
 
   async function setPaused(paused: boolean) {
     setLoading("pause");
     setErr(null);
     setMessage(null);
-    const res = await fetch("/api/admin/automation/state", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        automations_paused: paused,
-        pause_reason: paused ? pauseReason || "Pausa manual" : null,
-      }),
-    });
-    const j = (await res.json()) as { state?: AutomationState; error?: string };
-    setLoading(null);
-    if (res.ok && j.state) {
-      setState(j.state);
-      setMessage(paused ? "Automações pausadas." : "Automações reativadas.");
-    } else {
-      setErr(j.error ?? "Falha ao atualizar.");
+    try {
+      const res = await fetch("/api/admin/automation/state", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          automations_paused: paused,
+          pause_reason: paused ? pauseReason || "Pausa manual" : null,
+        }),
+      });
+      const j = (await res.json()) as { state?: AutomationState; error?: string };
+      if (res.ok && j.state) {
+        setState(j.state);
+        setMessage(paused ? "Automações pausadas." : "Automações reativadas.");
+      } else {
+        setErr(j.error ?? "Falha ao atualizar.");
+      }
+    } catch (e) {
+      setErr(formatThrown(e));
+    } finally {
+      setLoading(null);
     }
   }
 
@@ -73,21 +83,24 @@ export function AutocuraClient({
     setLoading(step);
     setErr(null);
     setMessage(null);
-    const res = await fetch("/api/admin/monitoring/run", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ step }),
-    });
-    const j = (await res.json()) as { ok?: boolean; error?: string;[k: string]: unknown };
-    setLoading(null);
-    if (res.ok) {
-      const summary = JSON.stringify(j);
-      setMessage(
-        `Concluído: ${step} — ${summary.length > 600 ? summary.slice(0, 600) + "…" : summary}`,
-      );
-      void refreshState();
-    } else {
-      setErr(j.error ?? "Falha.");
+    try {
+      const res = await fetch("/api/admin/monitoring/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ step }),
+      });
+      const j = (await res.json()) as { ok?: boolean; error?: string; [k: string]: unknown };
+      if (res.ok) {
+        const summary = safeJsonStringify(j, 600);
+        setMessage(`Concluído: ${step} — ${summary}`);
+        void refreshState();
+      } else {
+        setErr((typeof j.error === "string" && j.error) || "Falha.");
+      }
+    } catch (e) {
+      setErr(formatThrown(e));
+    } finally {
+      setLoading(null);
     }
   }
 

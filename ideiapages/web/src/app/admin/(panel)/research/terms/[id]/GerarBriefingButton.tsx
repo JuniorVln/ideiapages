@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { formatThrown } from "@/lib/format-thrown";
 
 type Props = {
   termoId: string;
@@ -20,25 +21,30 @@ export function GerarBriefingButton({ termoId, allowRemote, variant = "block" }:
   async function run() {
     setLoading(true);
     setErr(null);
-    const res = await fetch("/api/admin/research/analyze-gaps", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ termo_id: termoId, topN: 10, force }),
-    });
-    const data = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      stderr?: string;
-      stdout?: string;
-    };
-    setLoading(false);
-    if (res.ok && data.ok) {
-      router.refresh();
-      return;
+    try {
+      const res = await fetch("/api/admin/research/analyze-gaps", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ termo_id: termoId, topN: 10, force }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        stderr?: string;
+        stdout?: string;
+      };
+      if (res.ok && data.ok) {
+        router.refresh();
+        return;
+      }
+      setErr(
+        [data.error, data.stderr].filter(Boolean).join("\n") || "Falha ao gerar briefing (analyze-gaps).",
+      );
+    } catch (e) {
+      setErr(formatThrown(e));
+    } finally {
+      setLoading(false);
     }
-    setErr(
-      [data.error, data.stderr].filter(Boolean).join("\n") || "Falha ao gerar briefing (analyze-gaps).",
-    );
   }
 
   if (!allowRemote) {
