@@ -1,0 +1,14 @@
+{
+  "workspace": "C:\\Users\\junio\\Projects\\Rede Ideia\\ideiapages\\docs\\estrategia-mvp\\apresentacao-victor",
+  "pptx": "C:\\Users\\junio\\Projects\\Rede Ideia\\ideiapages\\docs\\estrategia-mvp\\apresentacao-victor\\output\\ideia-multichat-estrategia-mvp-victor.pptx",
+  "checks": {
+    "output_hygiene": {
+      "output_dir": "C:\\Users\\junio\\Projects\\Rede Ideia\\ideiapages\\docs\\estrategia-mvp\\apresentacao-victor\\output",
+      "unexpected_files": []
+    }
+  },
+  "failures": [
+    "PPTX package inspection failed: unzip -Z1 C:\\Users\\junio\\Projects\\Rede Ideia\\ideiapages\\docs\\estrategia-mvp\\apresentacao-victor\\output\\ideia-multichat-estrategia-mvp-victor.pptx failed"
+  ],
+  "warnings": []
+}

@@ -26,19 +26,28 @@ pnpm generate-page -- --termo-id <uuid> [--providers claude,gpt,gemini] [--activ
 pnpm declare-winner -- [--apply] [--min-per-arm 30]
 ```
 
-## Deploy na Vercel (Fase 1 — piloto)
+## Deploy no Railway
 
-1. **Repositório**: conecte o GitHub ao Vercel e defina **Root Directory** = `ideiapages/web` (se o repo for a pasta `ideiapages`; se o mono for `Rede Ideia`, use `ideiapages/web`).
-2. **Framework**: Next.js (auto). O arquivo `vercel.json` fixa `pnpm install` + `pnpm run build`.
-3. **Variáveis de ambiente** (Production + Preview), espelhando `ideiapages/.env.example`:
+O projeto usa **Dockerfile** na raiz de `ideiapages/` como ponto de entrada do Railway. O build instala o Python/research com `uv` e depois faz `pnpm build` do Next.js.
+
+1. **Serviço no Railway**: conecte o repositório GitHub; defina **Root Directory** = `ideiapages` (onde está o `Dockerfile`).
+2. **Variáveis de ambiente** no painel Railway (Settings → Variables), espelhando `ideiapages/.env.example`:
    - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY` (somente servidor — necessário para `POST /api/leads`)
-   - `NEXT_PUBLIC_SITE_URL` — URL pública final (ex.: `https://ideiamultichat.com.br` ou o domínio `.vercel.app` até o proxy)
-   - `NEXT_PUBLIC_WHATSAPP_NUMBER` — só dígitos, ex. `5511999999999`
-   - `NEXT_PUBLIC_GA4_ID` ou `NEXT_PUBLIC_GA4_MEASUREMENT_ID`
-   - **`NEXT_PUBLIC_ENV=production`** em **Production** (ativa GA4 e `robots` liberando crawl). Em Preview use outro valor para manter `robots` bloqueado.
-4. **Domínio em `/blog` no site principal**: faça o proxy reverso do host principal para este projeto **preservando o path** `/blog` e `/blog/*` (ex.: Nginx `location /blog/` → upstream Vercel com URI intacta; ou Cloudflare Workers / rewrite equivalente). O app já expõe rotas em `/blog` e `/blog/[slug]`.
-5. **Pós-deploy**: enviar `https://<domínio>/sitemap.xml` no GSC (ver seção GSC acima); testar um lead real e o evento `lead_submit` no GA4 DebugView.
+   - `SUPABASE_SERVICE_ROLE_KEY` (server-only — necessário para `POST /api/leads`)
+   - `NEXT_PUBLIC_SITE_URL` — URL pública final (ex.: `https://ideiamultichat.com.br`)
+   - `NEXT_PUBLIC_WHATSAPP_NUMBER` — só dígitos, ex. `5551995232447`
+   - `NEXT_PUBLIC_GA4_MEASUREMENT_ID`
+   - **`NEXT_PUBLIC_ENV=production`** em produção (ativa GA4 e libera indexação no `robots.ts`).
+   - `ADMIN_ALLOWED_EMAILS` — e-mails separados por vírgula
+   - `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_AI_API_KEY`
+   - `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GSC_OAUTH_STATE_SECRET` — para o fluxo OAuth do Search Console
+3. **Cron jobs (Railway)**: as rotas `/api/cron/*` ficam protegidas por `CRON_SECRET`. Configure Cron Services no Railway apontando para o serviço com os seguintes schedules:
+   - `0 6 * * *` → `GET /api/cron/gsc-sync` — sincroniza queries GSC
+   - `30 6 * * *` → `GET /api/cron/detect-ranking-drop` — detecta queda de ranking
+   - `15 7 * * *` → `GET /api/cron/auto-rewrite` — reescrita automática
+   - Cada request deve incluir o header `Authorization: Bearer <CRON_SECRET>`.
+4. **Domínio**: configure o domínio customizado no painel Railway ou use o gerado (ex.: `*.up.railway.app`). Adicione proxy reverso no host principal para `/blog/*` apontar para este serviço preservando o path.
+5. **Pós-deploy**: enviar `https://<domínio>/sitemap.xml` no GSC; testar um lead real e o evento `lead_submit` no GA4 DebugView.
 
 ### Publicar páginas piloto (Supabase)
 

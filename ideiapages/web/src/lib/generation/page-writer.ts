@@ -8,7 +8,12 @@ export async function writeFullPageWithAI({
   briefingJson: Record<string, unknown>;
   keyword: string;
   productFacts: string;
-}): Promise<string> {
+}): Promise<{ 
+  text: string; 
+  tokens_input: number; 
+  tokens_output: number; 
+  model_version: string;
+}> {
   const system = `Você é um Redator SEO Senior e Especialista em Conversão (pt-BR).
 Sua tarefa é transformar um ROTEIRO (briefing) em um ARTIGO COMPLETO, PERSUASIVO e OTIMIZADO.
 
@@ -39,7 +44,7 @@ Incorpore as palavras-chave LSI de forma natural.
 O tom deve ser: ${(typeof briefingJson.tom_de_voz === "string" ? briefingJson.tom_de_voz : null) || "profissional e direto"}.
 `;
 
-  const model = process.env.CLAUDE_MODEL ?? "claude-sonnet-4-20250514";
+  const model = process.env.CLAUDE_MODEL ?? "claude-sonnet-4-6";
   const client = new Anthropic();
   const msg = await client.messages.create({
     model,
@@ -50,5 +55,11 @@ O tom deve ser: ${(typeof briefingJson.tom_de_voz === "string" ? briefingJson.to
   const text = msg.content
     .map((b) => (b.type === "text" ? (b as { text: string }).text : ""))
     .join("");
-  return text.trim();
+
+  return {
+    text: text.trim(),
+    tokens_input: msg.usage?.input_tokens ?? 0,
+    tokens_output: msg.usage?.output_tokens ?? 0,
+    model_version: model,
+  };
 }

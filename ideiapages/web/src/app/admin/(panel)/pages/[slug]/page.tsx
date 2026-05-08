@@ -116,6 +116,7 @@ export default async function AdminPageDetail({ params }: Props) {
                 <th className="text-left px-4 py-2">Ativa</th>
                 <th className="text-left px-4 py-2">Modelo</th>
                 <th className="text-right px-4 py-2">Custo USD (est.)</th>
+                <th className="text-right px-4 py-2">Ver como visitante</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 text-slate-200">
@@ -133,6 +134,23 @@ export default async function AdminPageDetail({ params }: Props) {
                   <td className="px-4 py-2 text-xs text-slate-400">{v.model_version ?? "—"}</td>
                   <td className="px-4 py-2 text-right font-mono text-xs text-slate-400">
                     {v.custo_estimado_usd != null ? `$${v.custo_estimado_usd.toFixed(4)}` : "—"}
+                  </td>
+                  <td className="px-4 py-2 text-right">
+                    {isPublic ? (
+                      <a
+                        href={`${PUBLIC_CONTENT_BASE_PATH}/${slug}?variacao=${encodeURIComponent(v.id)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-blue-400 hover:underline whitespace-nowrap"
+                        title="Abre a página pública já com este braço (só funciona com sessão admin)"
+                      >
+                        Pré-visualizar ↗
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-600" title="Publique a página para usar a URL pública">
+                        —
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}

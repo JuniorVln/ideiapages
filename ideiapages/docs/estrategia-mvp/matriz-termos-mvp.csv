@@ -1,0 +1,159 @@
+grupo,nicho,termo,intencao_esperada,uso_provavel,prioridade_inicial,observacao
+horizontal,,sistema de atendimento whatsapp,comercial,landing_page,A,categoria geral com alta relevancia para o produto
+horizontal,,plataforma de atendimento whatsapp,comercial,landing_page,A,categoria geral com alta relevancia para o produto
+horizontal,,whatsapp com multiplos atendentes,comercial,landing_page,A,dor central de equipe e multiatendimento
+horizontal,,multiatendimento whatsapp,comercial,landing_page,A,dor central de equipe e multiatendimento
+horizontal,,crm para whatsapp,comercial,landing_page,A,categoria proxima ao produto
+horizontal,,crm whatsapp,comercial,landing_page,A,variacao curta para validar volume
+horizontal,,sistema omnichannel whatsapp,comercial,landing_page,A,categoria mais tecnica
+horizontal,,atendimento omnichannel whatsapp,comercial,landing_page,A,categoria mais tecnica
+horizontal,,centralizar atendimento whatsapp,dor_comercial,landing_page_ou_blog,A,dor de centralizacao
+horizontal,,organizar atendimento whatsapp,dor_comercial,landing_page_ou_blog,A,dor de organizacao
+horizontal,,gestao de atendimento whatsapp,comercial,landing_page,A,dor de gestao e performance
+horizontal,,controle de atendimento whatsapp,comercial,landing_page_ou_blog,A,dor de controle operacional
+horizontal,,chatbot whatsapp para empresas,comercial,landing_page,B,pode competir com demanda de chatbot puro
+horizontal,,automacao whatsapp para empresas,comercial,landing_page,B,pode competir com demanda de automacao pura
+horizontal,,plataforma de atendimento ao cliente whatsapp,comercial,landing_page,B,variacao de categoria
+horizontal,,sistema de atendimento ao cliente whatsapp,comercial,landing_page,B,variacao de categoria
+nicho,Contabilidade,sistema de atendimento para contabilidade,comercial,landing_page,A,padrao principal por segmento
+nicho,Contabilidade,sistema de whatsapp para contabilidade,comercial,landing_page,A,padrao principal por segmento
+nicho,Contabilidade,whatsapp para contadores,comercial,landing_page,A,termo natural do publico
+nicho,Contabilidade,whatsapp para escritorio contabil,comercial,landing_page,A,variacao natural do nicho
+nicho,Contabilidade,crm whatsapp para contabilidade,comercial,landing_page,A,categoria aplicada ao nicho
+nicho,Contabilidade,chatbot whatsapp para contabilidade,comercial,landing_page_ou_blog,A,categoria aplicada ao nicho
+nicho,Contabilidade,automacao whatsapp para contabilidade,comercial,landing_page_ou_blog,A,dor de processos recorrentes
+nicho,Contabilidade,atendimento whatsapp para contadores,comercial,landing_page,A,termo de atendimento aplicado ao nicho
+nicho,Contabilidade,plataforma de atendimento para contabilidade,comercial,landing_page,A,categoria aplicada ao nicho
+nicho,Contabilidade,sistema de atendimento para escritorio contabil,comercial,landing_page,A,variacao natural do nicho
+nicho,Contabilidade,sistema de atendimento para escritório contábil,comercial,landing_page,A,variacao brasileira/accentuada validada na primeira coleta
+nicho,Contabilidade,sistema de whatsapp para escritório contábil,comercial,landing_page,A,variacao brasileira/accentuada com sinais nichados
+nicho,Contabilidade,whatsapp para escritórios contábeis,comercial,landing_page,A,variacao brasileira/accentuada com sinais nichados
+nicho,Contabilidade,whatsapp para contadores brasil,comercial,landing_page,A,variacao brasileira para reduzir ruido internacional
+nicho,Contabilidade,atendimento whatsapp escritório contábil,comercial,landing_page,A,variacao brasileira/accentuada com sinais nichados
+nicho,Contabilidade,gestão de whatsapp para contadores,comercial,landing_page_ou_blog,A,termo de dor e gestao para contabilidade
+nicho,Contabilidade,whatsapp contábil,comercial,landing_page_ou_blog,A,termo curto do nicho
+nicho,Contabilidade,sistema de atendimento whatsapp para contabilidade,comercial,landing_page,A,variacao combinando categoria e nicho
+nicho,Clinicas,sistema de atendimento para clinicas,comercial,landing_page,A,padrao principal por segmento
+nicho,Clinicas,sistema de whatsapp para clinicas,comercial,landing_page,A,padrao principal por segmento
+nicho,Clinicas,whatsapp para clinicas,comercial,landing_page,A,termo natural do publico
+nicho,Clinicas,crm whatsapp para clinicas,comercial,landing_page,A,categoria aplicada ao nicho
+nicho,Clinicas,chatbot whatsapp para clinicas,comercial,landing_page_ou_blog,A,categoria aplicada ao nicho
+nicho,Clinicas,automacao whatsapp para clinicas,comercial,landing_page_ou_blog,A,dor de agendamentos e comunicacoes
+nicho,Clinicas,atendimento whatsapp para clinicas,comercial,landing_page,A,termo de atendimento aplicado ao nicho
+nicho,Clinicas,plataforma de atendimento para clinicas,comercial,landing_page,A,categoria aplicada ao nicho
+nicho,Clinicas,sistema para atendimento de pacientes,comercial,landing_page_ou_blog,A,termo de dor especifica
+nicho,Clinicas,whatsapp para atendimento de pacientes,comercial,landing_page_ou_blog,A,termo de dor especifica
+nicho,Odontologia,sistema de atendimento para odontologia,comercial,landing_page,A,padrao principal por segmento
+nicho,Odontologia,sistema de whatsapp para dentistas,comercial,landing_page,A,padrao principal por segmento
+nicho,Odontologia,whatsapp para dentistas,comercial,landing_page,A,termo natural do publico
+nicho,Odontologia,whatsapp para clinica odontologica,comercial,landing_page,A,variacao natural do nicho
+nicho,Odontologia,crm whatsapp para dentistas,comercial,landing_page,A,categoria aplicada ao nicho
+nicho,Odontologia,chatbot whatsapp para odontologia,comercial,landing_page_ou_blog,A,categoria aplicada ao nicho
+nicho,Odontologia,automacao whatsapp para odontologia,comercial,landing_page_ou_blog,A,dor de agendamentos e comunicacoes
+nicho,Odontologia,atendimento whatsapp para dentistas,comercial,landing_page,A,termo de atendimento aplicado ao nicho
+nicho,Odontologia,plataforma de atendimento para odontologia,comercial,landing_page,A,categoria aplicada ao nicho
+nicho,Odontologia,sistema para atendimento odontologico,comercial,landing_page_ou_blog,A,termo de dor especifica
+nicho,Imobiliarias,sistema de atendimento para imobiliarias,comercial,landing_page,A,padrao principal por segmento
+nicho,Imobiliarias,sistema de whatsapp para imobiliarias,comercial,landing_page,A,padrao principal por segmento
+nicho,Imobiliarias,whatsapp para imobiliarias,comercial,landing_page,A,termo natural do publico
+nicho,Imobiliarias,whatsapp para corretores,comercial,landing_page,A,termo natural do publico
+nicho,Imobiliarias,crm whatsapp para imobiliarias,comercial,landing_page,A,categoria aplicada ao nicho
+nicho,Imobiliarias,chatbot whatsapp para imobiliarias,comercial,landing_page_ou_blog,A,categoria aplicada ao nicho
+nicho,Imobiliarias,automacao whatsapp para imobiliarias,comercial,landing_page_ou_blog,A,dor de follow-up e distribuicao
+nicho,Imobiliarias,atendimento whatsapp para imobiliarias,comercial,landing_page,A,termo de atendimento aplicado ao nicho
+nicho,Imobiliarias,plataforma de atendimento para imobiliarias,comercial,landing_page,A,categoria aplicada ao nicho
+nicho,Imobiliarias,sistema para atendimento de leads imobiliarios,comercial,landing_page_ou_blog,A,termo de dor especifica
+nicho,Oficinas mecanicas,sistema de atendimento para oficinas,comercial,landing_page,B,padrao principal por segmento
+nicho,Oficinas mecanicas,sistema de whatsapp para oficinas,comercial,landing_page,B,padrao principal por segmento
+nicho,Oficinas mecanicas,whatsapp para oficina mecanica,comercial,landing_page,B,termo natural do publico
+nicho,Oficinas mecanicas,crm whatsapp para oficinas,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Oficinas mecanicas,chatbot whatsapp para oficinas,comercial,landing_page_ou_blog,B,categoria aplicada ao nicho
+nicho,Oficinas mecanicas,automacao whatsapp para oficinas,comercial,landing_page_ou_blog,B,dor de processos recorrentes
+nicho,Oficinas mecanicas,atendimento whatsapp para oficina mecanica,comercial,landing_page,B,termo de atendimento aplicado ao nicho
+nicho,Oficinas mecanicas,plataforma de atendimento para oficinas,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Oficinas mecanicas,sistema para atendimento de clientes oficina,comercial,landing_page_ou_blog,B,termo de dor especifica
+nicho,Estetica,sistema de atendimento para estetica,comercial,landing_page,B,padrao principal por segmento
+nicho,Estetica,sistema de whatsapp para estetica,comercial,landing_page,B,padrao principal por segmento
+nicho,Estetica,whatsapp para clinica de estetica,comercial,landing_page,B,termo natural do publico
+nicho,Estetica,crm whatsapp para estetica,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Estetica,chatbot whatsapp para estetica,comercial,landing_page_ou_blog,B,categoria aplicada ao nicho
+nicho,Estetica,automacao whatsapp para estetica,comercial,landing_page_ou_blog,B,dor de agendamento e relacionamento
+nicho,Estetica,atendimento whatsapp para estetica,comercial,landing_page,B,termo de atendimento aplicado ao nicho
+nicho,Estetica,plataforma de atendimento para estetica,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Estetica,sistema para atendimento em estetica,comercial,landing_page_ou_blog,B,termo de dor especifica
+nicho,Advocacia,sistema de atendimento para advocacia,comercial,landing_page,B,padrao principal por segmento
+nicho,Advocacia,sistema de whatsapp para advogados,comercial,landing_page,B,padrao principal por segmento
+nicho,Advocacia,whatsapp para advogados,comercial,landing_page,B,termo natural do publico
+nicho,Advocacia,whatsapp para escritorio de advocacia,comercial,landing_page,B,variacao natural do nicho
+nicho,Advocacia,crm whatsapp para advocacia,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Advocacia,chatbot whatsapp para advocacia,comercial,landing_page_ou_blog,B,categoria aplicada ao nicho
+nicho,Advocacia,automacao whatsapp para advocacia,comercial,landing_page_ou_blog,B,dor de processos recorrentes
+nicho,Advocacia,atendimento whatsapp para advogados,comercial,landing_page,B,termo de atendimento aplicado ao nicho
+nicho,Advocacia,plataforma de atendimento para advocacia,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Escolas e cursos,sistema de atendimento para escolas,comercial,landing_page,B,padrao principal por segmento
+nicho,Escolas e cursos,sistema de whatsapp para escolas,comercial,landing_page,B,padrao principal por segmento
+nicho,Escolas e cursos,whatsapp para escolas,comercial,landing_page,B,termo natural do publico
+nicho,Escolas e cursos,whatsapp para cursos,comercial,landing_page,B,variacao natural do nicho
+nicho,Escolas e cursos,crm whatsapp para escolas,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Escolas e cursos,chatbot whatsapp para escolas,comercial,landing_page_ou_blog,B,categoria aplicada ao nicho
+nicho,Escolas e cursos,automacao whatsapp para escolas,comercial,landing_page_ou_blog,B,dor de comunicacoes programadas
+nicho,Escolas e cursos,atendimento whatsapp para alunos,comercial,landing_page_ou_blog,B,termo de dor especifica
+nicho,Escolas e cursos,plataforma de atendimento para escolas,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Assistencia tecnica,sistema de atendimento para assistencia tecnica,comercial,landing_page,B,padrao principal por segmento
+nicho,Assistencia tecnica,sistema de whatsapp para assistencia tecnica,comercial,landing_page,B,padrao principal por segmento
+nicho,Assistencia tecnica,whatsapp para assistencia tecnica,comercial,landing_page,B,termo natural do publico
+nicho,Assistencia tecnica,crm whatsapp para assistencia tecnica,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Assistencia tecnica,chatbot whatsapp para assistencia tecnica,comercial,landing_page_ou_blog,B,categoria aplicada ao nicho
+nicho,Assistencia tecnica,automacao whatsapp para assistencia tecnica,comercial,landing_page_ou_blog,B,dor de chamados e status
+nicho,Assistencia tecnica,atendimento whatsapp para assistencia tecnica,comercial,landing_page,B,termo de atendimento aplicado ao nicho
+nicho,Assistencia tecnica,plataforma de atendimento para assistencia tecnica,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Provedores de internet,sistema de atendimento para provedores,comercial,landing_page,B,padrao principal por segmento
+nicho,Provedores de internet,sistema de whatsapp para provedores,comercial,landing_page,B,padrao principal por segmento
+nicho,Provedores de internet,whatsapp para provedores de internet,comercial,landing_page,B,termo natural do publico
+nicho,Provedores de internet,crm whatsapp para provedores,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Provedores de internet,chatbot whatsapp para provedores,comercial,landing_page_ou_blog,B,categoria aplicada ao nicho
+nicho,Provedores de internet,automacao whatsapp para provedores,comercial,landing_page_ou_blog,B,dor de suporte e segunda via
+nicho,Provedores de internet,atendimento whatsapp para provedor de internet,comercial,landing_page,B,termo de atendimento aplicado ao nicho
+nicho,Provedores de internet,plataforma de atendimento para provedores,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Seguros e corretoras,sistema de atendimento para corretoras de seguros,comercial,landing_page,B,padrao principal por segmento
+nicho,Seguros e corretoras,sistema de whatsapp para corretoras,comercial,landing_page,B,padrao principal por segmento
+nicho,Seguros e corretoras,whatsapp para corretora de seguros,comercial,landing_page,B,termo natural do publico
+nicho,Seguros e corretoras,crm whatsapp para corretoras,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Seguros e corretoras,chatbot whatsapp para seguros,comercial,landing_page_ou_blog,B,categoria aplicada ao nicho
+nicho,Seguros e corretoras,automacao whatsapp para corretoras,comercial,landing_page_ou_blog,B,dor de follow-up e renovacoes
+nicho,Seguros e corretoras,atendimento whatsapp para corretora,comercial,landing_page,B,termo de atendimento aplicado ao nicho
+nicho,Seguros e corretoras,plataforma de atendimento para corretoras,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Lojas e e-commerce,sistema de atendimento para ecommerce,comercial,landing_page,B,padrao principal por segmento
+nicho,Lojas e e-commerce,sistema de whatsapp para ecommerce,comercial,landing_page,B,padrao principal por segmento
+nicho,Lojas e e-commerce,whatsapp para loja virtual,comercial,landing_page,B,termo natural do publico
+nicho,Lojas e e-commerce,crm whatsapp para ecommerce,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Lojas e e-commerce,chatbot whatsapp para ecommerce,comercial,landing_page_ou_blog,B,categoria aplicada ao nicho
+nicho,Lojas e e-commerce,automacao whatsapp para ecommerce,comercial,landing_page_ou_blog,B,dor de vendas e pos-venda
+nicho,Lojas e e-commerce,atendimento whatsapp para ecommerce,comercial,landing_page,B,termo de atendimento aplicado ao nicho
+nicho,Lojas e e-commerce,plataforma de atendimento para ecommerce,comercial,landing_page,B,categoria aplicada ao nicho
+nicho,Lojas e e-commerce,whatsapp para vendas online,comercial,landing_page_ou_blog,B,termo de dor especifica
+dor,,como organizar atendimento pelo whatsapp,informacional_comercial,blog,A,dor de organizacao
+dor,,como controlar atendimento pelo whatsapp,informacional_comercial,blog,A,dor de controle operacional
+dor,,como distribuir atendimento no whatsapp,informacional_comercial,blog,A,dor de distribuicao de equipe
+dor,,como atender clientes pelo whatsapp com equipe,informacional_comercial,blog,A,dor de multiatendimento
+dor,,como medir atendimento da equipe,informacional_comercial,blog,A,dor de metricas e performance
+dor,,como padronizar atendimento ao cliente,informacional_comercial,blog,A,dor de padronizacao
+dor,,como automatizar atendimento no whatsapp,informacional_comercial,blog,A,dor de automacao
+dor,,como centralizar atendimento no whatsapp,informacional_comercial,blog,A,dor de centralizacao
+dor,,como evitar perda de mensagens no whatsapp da empresa,informacional_comercial,blog,A,dor de controle e rastreabilidade
+dor,,como profissionalizar atendimento pelo whatsapp,informacional_comercial,blog,A,dor de profissionalizacao
+dor,,como acompanhar desempenho dos atendentes,informacional_comercial,blog,B,dor de performance
+dor,,como usar tags no atendimento whatsapp,informacional_comercial,blog,B,dor de segmentacao
+dor,,mensagens programadas para clientes whatsapp,informacional_comercial,blog,B,dor de agendamentos e comunicacoes
+dor,,atendimento whatsapp para equipe comercial,comercial,blog_ou_landing_page,B,dor de vendas e equipe
+dor,,atendimento whatsapp para suporte ao cliente,comercial,blog_ou_landing_page,B,dor de suporte
+comparativo,,alternativa ao zap contabil,comparativo,comparativo_ou_blog,A,alta intencao se houver demanda
+comparativo,,zap contabil alternativa,comparativo,comparativo_ou_blog,A,variacao de alternativa
+comparativo,,zap contabil ou digisac,comparativo,blog,B,comparativo direto exige cuidado
+comparativo,,alternativa digisac,comparativo,comparativo_ou_blog,B,alta intencao se houver demanda
+comparativo,,digisac alternativa,comparativo,comparativo_ou_blog,B,variacao de alternativa
+comparativo,,melhor sistema de atendimento whatsapp,comparativo_generico,blog_ou_landing_page,A,termo de escolha de fornecedor
+comparativo,,melhor sistema de whatsapp para empresas,comparativo_generico,blog_ou_landing_page,A,termo de escolha de fornecedor
+comparativo,,melhor crm para whatsapp,comparativo_generico,blog,B,termo de escolha de fornecedor
+comparativo,,sistema de whatsapp para contabilidade,categoria_nichada,landing_page,A,termo comercial de contabilidade
+comparativo,,melhor whatsapp para contadores,comparativo_nichado,blog_ou_landing_page,B,termo de escolha nichada

@@ -310,7 +310,7 @@ export default async function AdminDashboardPage() {
         <div>
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <p className="text-slate-500 text-sm mt-1">
-            Resumo de páginas, testes e leads (o atalho &quot;Performance&quot; abre esta tela).
+            Resumo de páginas, testes e leads.
           </p>
         </div>
         <p className="text-slate-500 text-xs sm:text-sm whitespace-nowrap">

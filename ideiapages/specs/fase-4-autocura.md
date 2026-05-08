@@ -78,7 +78,7 @@ Reusa integralmente os behaviors anteriores (`collect-serp`, `scrape-competitors
 - Fases 0-3 aprovadas e estáveis
 - ≥ 20 páginas publicadas com histórico de pelo menos 30 dias de dados GSC
 - Google Search Console API habilitada com credenciais (`service account` ou OAuth) com acesso à propriedade
-- Cron scheduler definido (Vercel Cron / GitHub Actions / Supabase cron) e orçamento de jobs aprovado
+- Cron scheduler definido (Railway Cron Services / Supabase pg_cron) e orçamento de jobs aprovado
 - `product_facts.md` e `references/prompts/*.md` em estado estável (drift de prompt é risco conhecido)
 
 ## Saídas

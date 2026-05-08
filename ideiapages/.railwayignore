@@ -1,0 +1,8 @@
+.git
+.vercel
+node_modules
+web/.next
+research/.venv
+research/.mypy_cache
+research/.pytest_cache
+temp_repos

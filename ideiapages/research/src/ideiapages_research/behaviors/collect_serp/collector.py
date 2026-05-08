@@ -130,18 +130,21 @@ def _write_raw_json(keyword: str, payload: list[dict[str, Any]]) -> Path:
 def log_metricas_serp(log: dict[str, Any], *, items_ok: int, items_fail: int, cost: float) -> None:
     started = datetime.now(UTC)
     sb = get_supabase()
-    sb.table("metricas_coleta").insert(
-        {
-            "behavior": BEHAVIOR,
-            "comecou_em": started.isoformat(),
-            "terminou_em": datetime.now(UTC).isoformat(),
-            "items_processados": items_ok + items_fail,
-            "items_sucesso": items_ok,
-            "items_falha": items_fail,
-            "custo_brl": round(cost, 4),
-            "log_jsonb": log,
-        }
-    ).execute()
+    try:
+        sb.table("metricas_coleta").insert(
+            {
+                "behavior": BEHAVIOR,
+                "comecou_em": started.isoformat(),
+                "terminou_em": datetime.now(UTC).isoformat(),
+                "items_processados": items_ok + items_fail,
+                "items_sucesso": items_ok,
+                "items_falha": items_fail,
+                "custo_brl": round(cost, 4),
+                "log_jsonb": log,
+            }
+        ).execute()
+    except Exception as e:
+        print(f"WARN: log_metricas_serp failed (missing table?): {e}")
 
 
 def snapshot_serp_for_term(

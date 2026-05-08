@@ -7,7 +7,7 @@
 
 ## Status atual
 
-- **Marco em andamento**: **construção Fase 2 + 3 no app** antes do teste live ampliado; deploy piloto (**`f1-piloto-deploy`**) quando o Júnior validar na Vercel.
+- **Marco em andamento**: **construção Fase 2 + 3 no app** antes do teste live ampliado; deploy piloto (**`f1-piloto-deploy`**) quando o Júnior validar no Railway.
 - **Aprovação Fase 0**: **assinada** em `[FASE-0-APROVACAO.md](./FASE-0-APROVACAO.md)` — 19 briefings prontos (meta 20 flexibilizada pelo Júnior).
 - **Próxima ação concreta**: aplicar migration **`0012_fase2_experiments`** no Supabase; configurar **`ADMIN_ALLOWED_EMAILS`** + Auth (magic link); rodar **`pnpm generate-page`** / **`pnpm declare-winner`** conforme doc em `web/README.md`.
 - **`f1-validacao` (2 semanas)**: **adiada** de propósito — primeiro finalizar construção e deploy de verificação.

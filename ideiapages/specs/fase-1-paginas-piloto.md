@@ -10,7 +10,7 @@ owner: junior
 
 ## Objetivo
 
-Publicar **5 a 10 páginas SEO piloto** em `ideiamultichat.com.br/blog` (via proxy reverso Vercel), construídas a partir dos briefings da Fase 0, capturando leads qualificados e validando o funil `visita → lead → WhatsApp → comercial`. Sem isso, não sabemos se o modelo "briefing → página → lead" funciona antes de escalar com multi-IA (Fase 2).
+Publicar **5 a 10 páginas SEO piloto** em `ideiamultichat.com.br/blog` (via proxy reverso Railway), construídas a partir dos briefings da Fase 0, capturando leads qualificados e validando o funil `visita → lead → WhatsApp → comercial`. Sem isso, não sabemos se o modelo "briefing → página → lead" funciona antes de escalar com multi-IA (Fase 2).
 
 ## Contexto
 
@@ -76,7 +76,7 @@ Cada behavior ganhará seu `contract.md` quando não for trivial (ex: `lead-form
 - Design system base definido em `references/design_system.md` (tokens Tailwind + componentes shadcn)
 - `references/seo_rules.md`, `references/conversion_principles.md`, `references/product_facts.md` atualizados
 - Credenciais em `.env`: Supabase (anon + service_role), GA4 Measurement ID, número WhatsApp oficial, GSC property
-- Domínio `ideiamultichat.com.br` com proxy reverso Vercel configurado para `/blog/*`
+- Domínio `ideiamultichat.com.br` com proxy reverso Railway configurado para `/blog/*`
 
 ## Saídas
 
@@ -142,7 +142,7 @@ Cada behavior ganhará seu `contract.md` quando não for trivial (ex: `lead-form
 
 ## Riscos / decisões em aberto
 
-1. **Proxy reverso Vercel em `ideiamultichat.com.br/blog`** — exige configuração no DNS/servidor do site principal; confirmar acesso e janela de deploy com o time de infra
+1. **Proxy reverso Railway em `ideiamultichat.com.br/blog`** — exige configuração no DNS/servidor do site principal apontando para o serviço Railway; confirmar acesso e janela de deploy com o time de infra
 2. **Fonte de conteúdo das páginas piloto** — gerado manualmente por Júnior a partir do briefing, ou usando um prompt único Claude Sonnet "gerador piloto"? Decisão no `/break`
 3. **Edição de conteúdo** — MDX em repo vs. JSON na tabela `paginas`? Trade-off: MDX é mais legível/versionado; tabela permite edição sem deploy. Sugestão MVP: tabela + rascunho local em repo
 4. **Número WhatsApp oficial** — qual número recebe os leads? Precisa estar com capacidade para múltiplos atendentes (Ideia Chat mesmo, naturalmente)

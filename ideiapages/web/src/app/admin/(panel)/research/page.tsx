@@ -156,6 +156,7 @@ export default async function ResearchDashboardPage() {
                 <th className="text-right px-4 py-2">Volume</th>
                 <th className="text-left px-4 py-2 min-w-[9rem]">Oportunidade</th>
                 <th className="text-left px-4 py-2">Cluster</th>
+                <th className="text-left px-4 py-2">Criado em</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 text-slate-200">
@@ -212,6 +213,9 @@ export default async function ResearchDashboardPage() {
                     </td>
                     <td className="px-4 py-2 text-slate-400 max-w-[120px] truncate">
                       {t.cluster ?? "—"}
+                    </td>
+                    <td className="px-4 py-2 text-slate-500 text-xs">
+                      {t.created_at ? new Date(t.created_at).toLocaleDateString("pt-BR") : "—"}
                     </td>
                   </tr>
                 );

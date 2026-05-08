@@ -13,13 +13,13 @@ export type GenerateOk = {
   modelVersion: string;
 };
 
-function estimateUsd(provider: ProviderName, input: number, output: number): number {
+export function estimateUsd(provider: ProviderName, input: number, output: number): number {
   // Aproximações para telemetria — ajuste conforme tabela de preços vigente.
   const pin = input / 1_000_000;
   const pout = output / 1_000_000;
   if (provider === "claude") return pin * 3 + pout * 15;
-  if (provider === "gpt") return pin * 0.15 + pout * 0.6;
-  if (provider === "gemini") return pin * 0.1 + pout * 0.4;
+  if (provider === "gpt") return pin * 5 + pout * 15; // GPT-4o prices
+  if (provider === "gemini") return pin * 3.5 + pout * 10.5; // Gemini 1.5 Pro prices
   return 0;
 }
 
@@ -28,7 +28,8 @@ export function usdEstimateFor(provider: ProviderName, input: number, output: nu
 }
 
 export async function generateWithClaude(prompt: string): Promise<GenerateOk> {
-  const model = process.env.CLAUDE_MODEL ?? "claude-sonnet-4-20250514";
+  // IDs estáveis da doc Anthropic (ex.: claude-sonnet-4-6). Datas tipo 20250514 podem sumir da API.
+  const model = process.env.CLAUDE_MODEL ?? "claude-sonnet-4-6";
   const client = new Anthropic();
   const msg = await client.messages.create({
     model,
@@ -49,7 +50,7 @@ export async function generateWithClaude(prompt: string): Promise<GenerateOk> {
 }
 
 export async function generateWithGpt(prompt: string): Promise<GenerateOk> {
-  const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
+  const model = process.env.OPENAI_MODEL ?? "gpt-4o";
   const client = new OpenAI();
   const r = await client.chat.completions.create({
     model,
@@ -69,7 +70,8 @@ export async function generateWithGpt(prompt: string): Promise<GenerateOk> {
 }
 
 export async function generateWithGemini(prompt: string): Promise<GenerateOk> {
-  const model = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+  // gemini-2.0-flash ficou restrito a contas antigas; novos projetos: gemini-2.5-flash (doc Google AI).
+  const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
   const key = process.env.GOOGLE_AI_API_KEY ?? process.env.GEMINI_API_KEY;
   if (!key) throw new Error("GOOGLE_AI_API_KEY (ou GEMINI_API_KEY) não definido.");
   const gen = new GoogleGenerativeAI(key);

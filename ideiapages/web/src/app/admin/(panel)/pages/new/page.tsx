@@ -80,7 +80,7 @@ export default async function NewPagePage({
   void termoIds;
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-slate-500">
         <Link href="/admin/pages" className="hover:text-slate-300">

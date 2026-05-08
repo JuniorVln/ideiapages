@@ -11,22 +11,43 @@ const PROVIDER_COLORS: Record<string, { bg: string; text: string; border: string
   gemini: { bg: "bg-blue-500/20", text: "text-blue-300", border: "border-blue-500/30" },
 };
 
-export default async function ProvidersPage() {
+interface SearchParams {
+  desde?: string;
+  ate?: string;
+}
+
+export default async function ProvidersPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   await requireAdmin();
   const db = getSupabaseAdminOptional();
   if (!db) return <AdminNeedSupabaseEnv />;
 
+  const sp = await searchParams;
+
   // Variações por provider
-  const { data: variacoes } = await db
+  let varQuery = db
     .from("variacoes")
     .select("id, provider, pagina_id, ativa, custo_estimado_usd, tokens_input, tokens_output, criado_em");
 
+  if (sp.desde) varQuery = varQuery.gte("criado_em", sp.desde);
+  if (sp.ate) varQuery = varQuery.lte("criado_em", `${sp.ate}T23:59:59`);
+
+  const { data: variacoes } = await varQuery;
+
   // Leads por variação
   const varIds = (variacoes ?? []).map((v) => v.id);
-  const { data: leads } = await db
+  let leadsQuery = db
     .from("leads")
     .select("variacao_id")
     .in("variacao_id", varIds);
+
+  if (sp.desde) leadsQuery = leadsQuery.gte("criado_em", sp.desde);
+  if (sp.ate) leadsQuery = leadsQuery.lte("criado_em", `${sp.ate}T23:59:59`);
+
+  const { data: leads } = await leadsQuery;
 
   const leadsByVar: Record<string, number> = {};
   for (const l of leads ?? []) {
@@ -34,10 +55,15 @@ export default async function ProvidersPage() {
   }
 
   // Métricas de sessão por variação
-  const { data: metricas } = await db
+  let metQuery = db
     .from("metricas_diarias")
     .select("variacao_id, sessoes, leads")
     .in("variacao_id", varIds);
+
+  if (sp.desde) metQuery = metQuery.gte("data", sp.desde);
+  if (sp.ate) metQuery = metQuery.lte("data", sp.ate);
+
+  const { data: metricas } = await metQuery;
 
   const sessoesByVar: Record<string, number> = {};
   for (const m of metricas ?? []) {
@@ -123,6 +149,43 @@ export default async function ProvidersPage() {
           Performance de Claude, GPT e Gemini nas variações geradas
         </p>
       </div>
+
+      <form method="GET" className="flex flex-wrap gap-3 items-end bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-500 uppercase font-semibold">Desde</label>
+          <input
+            type="date"
+            name="desde"
+            defaultValue={sp.desde ?? ""}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-500 uppercase font-semibold">Até</label>
+          <input
+            type="date"
+            name="ate"
+            defaultValue={sp.ate ?? ""}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-colors"
+          >
+            Filtrar
+          </button>
+          {(sp.desde || sp.ate) && (
+            <Link
+              href="/admin/providers"
+              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm transition-colors"
+            >
+              Limpar
+            </Link>
+          )}
+        </div>
+      </form>
 
       {/* Cards de provider */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

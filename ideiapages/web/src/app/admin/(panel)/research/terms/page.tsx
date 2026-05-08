@@ -18,6 +18,8 @@ interface SearchParams {
   q?: string;
   page?: string;
   ordem?: string;
+  desde?: string;
+  ate?: string;
 }
 
 const INTENCOES = ["informacional", "transacional", "comparativa", "navegacional"];
@@ -61,6 +63,8 @@ export default async function TermsPage({
   if (sp.intencao) query = query.eq("intencao", sp.intencao);
   if (sp.cluster) query = query.ilike("cluster", `%${sp.cluster}%`);
   if (sp.q) query = query.ilike("keyword", `%${sp.q}%`);
+  if (sp.desde) query = query.gte("created_at", sp.desde);
+  if (sp.ate) query = query.lte("created_at", `${sp.ate}T23:59:59`);
 
   const { data: termos, count } = await query;
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE);
@@ -168,13 +172,31 @@ export default async function TermsPage({
             <option value="volume">Volume, depois score</option>
           </select>
         </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-500">Desde</label>
+          <input
+            type="date"
+            name="desde"
+            defaultValue={sp.desde ?? ""}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-500">Até</label>
+          <input
+            type="date"
+            name="ate"
+            defaultValue={sp.ate ?? ""}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+          />
+        </div>
         <button
           type="submit"
           className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium"
         >
           Filtrar
         </button>
-        {(sp.status || sp.intencao || sp.cluster || sp.q || sp.ordem) && (
+        {(sp.status || sp.intencao || sp.cluster || sp.q || sp.ordem || sp.desde || sp.ate) && (
           <Link
             href="/admin/research/terms"
             className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm"
@@ -199,6 +221,7 @@ export default async function TermsPage({
               <th className="text-right px-4 py-2.5">Índice</th>
               <th className="text-right px-4 py-2.5">KD</th>
               <th className="text-left px-4 py-2.5">Cluster</th>
+              <th className="text-left px-4 py-2.5">Criado em</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800 text-slate-200">
@@ -254,12 +277,15 @@ export default async function TermsPage({
                   <td className="px-4 py-2 text-slate-500 max-w-[140px] truncate">
                     {t.cluster ?? "—"}
                   </td>
+                  <td className="px-4 py-2 text-slate-500 text-xs">
+                    {t.created_at ? new Date(t.created_at).toLocaleDateString("pt-BR") : "—"}
+                  </td>
                 </tr>
               );
             })}
             {(termos ?? []).length === 0 && (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-slate-500">
+                <td colSpan={11} className="px-4 py-8 text-center text-slate-500">
                   Nenhum termo encontrado para os filtros selecionados.
                 </td>
               </tr>

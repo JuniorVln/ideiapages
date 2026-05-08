@@ -2,8 +2,11 @@ import type { Database } from "@/lib/database.types";
 import { generateWithClaude, generateWithGemini, generateWithGpt, usdEstimateFor } from "@/lib/generation/providers";
 import { runQualityGate } from "@/lib/generation/quality-gate";
 import { createClient } from "@supabase/supabase-js";
+import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "fs";
 import { resolve } from "path";
+
+const LLM_PROVIDERS = new Set(["claude", "gpt", "gemini"]);
 
 const PROMPTS_DIR = resolve(process.cwd(), "..", "references", "prompts");
 const CONTENT_QUALITY_FILE = "content-quality-and-briefing.md";
@@ -107,26 +110,28 @@ export async function generatePageVariationsForPagina(
       .replace(/\{\{product_facts\}\}/g, productFacts)
       .replace(/\{\{briefing_json\}\}/g, briefingJson) + geoBlock;
 
-  const results: GenerateVariationsResult[] = [];
+  if (replace_existing) {
+    const toDeactivate = providers.filter((p) => LLM_PROVIDERS.has(p));
+    if (toDeactivate.length > 0) {
+      await db
+        .from("variacoes")
+        .update({ ativa: false })
+        .eq("pagina_id", pagina_id)
+        .in("provider", toDeactivate);
+    }
+  }
 
-  for (const provider of providers) {
+  /** Em paralelo: tempo total ≈ o mais lento (evita timeout somando Claude+Gemini em série). */
+  async function runOneProvider(provider: string): Promise<GenerateVariationsResult> {
     try {
-      if (replace_existing) {
-        await db
-          .from("variacoes")
-          .update({ ativa: false })
-          .eq("pagina_id", pagina_id)
-          .eq("provider", provider);
+      if (!LLM_PROVIDERS.has(provider)) {
+        return { ok: false, provider, error: `Provider desconhecido: ${provider}` };
       }
 
       let result;
       if (provider === "claude") result = await generateWithClaude(prompt);
       else if (provider === "gpt") result = await generateWithGpt(prompt);
-      else if (provider === "gemini") result = await generateWithGemini(prompt);
-      else {
-        results.push({ ok: false, provider, error: `Provider desconhecido: ${provider}` });
-        continue;
-      }
+      else result = await generateWithGemini(prompt);
 
       const qgResult = runQualityGate(result.page, keyword, productFacts);
       const qgErrors = qgResult.ok ? [] : qgResult.reasons;
@@ -136,7 +141,7 @@ export async function generatePageVariationsForPagina(
         result.tokensOutput,
       );
 
-      const nome = `${provider}-v${Date.now()}`;
+      const nome = `${provider}-v${Date.now()}-${randomUUID().slice(0, 8)}`;
       const { error: insertErr } = await db.from("variacoes").insert({
         pagina_id: pagina_id,
         nome,
@@ -155,19 +160,20 @@ export async function generatePageVariationsForPagina(
       });
 
       if (insertErr) {
-        results.push({ ok: false, provider, error: insertErr.message });
-        continue;
+        return { ok: false, provider, error: insertErr.message };
       }
 
-      results.push({ ok: true, provider, model: result.modelVersion, cost: costUsd });
+      return { ok: true, provider, model: result.modelVersion, cost: costUsd };
     } catch (err) {
-      results.push({
+      return {
         ok: false,
         provider,
         error: err instanceof Error ? err.message : String(err),
-      });
+      };
     }
   }
+
+  const results = await Promise.all(providers.map((p) => runOneProvider(p)));
 
   if (activate && results.some((r) => r.ok)) {
     await db

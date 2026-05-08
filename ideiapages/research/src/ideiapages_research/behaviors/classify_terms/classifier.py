@@ -413,17 +413,20 @@ def _persist_llm_log(
     latency_ms: int,
     payload: dict[str, Any],
 ) -> None:
-    sb.table("llm_calls_log").insert(
-        {
-            "behavior": BEHAVIOR,
-            "purpose": "classify_batch",
-            "model": model,
-            "prompt_version": prompt_version,
-            "tokens_input": tin,
-            "tokens_output": tout,
-            "custo_brl": cost_brl,
-            "latencia_ms": latency_ms,
-            "termo_id": None,
-            "payload_resumido_jsonb": payload,
-        }
-    ).execute()
+    try:
+        sb.table("llm_calls_log").insert(
+            {
+                "behavior": BEHAVIOR,
+                "purpose": "classify_batch",
+                "model": model,
+                "prompt_version": prompt_version,
+                "tokens_input": tin,
+                "tokens_output": tout,
+                "custo_brl": cost_brl,
+                "latencia_ms": latency_ms,
+                "termo_id": None,
+                "payload_resumido_jsonb": payload,
+            }
+        ).execute()
+    except Exception as e:
+        print(f"WARN: _persist_llm_log failed (missing table?): {e}")

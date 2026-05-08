@@ -15,6 +15,7 @@ import {
   Sparkles,
   ArrowRight,
   History,
+  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -115,6 +116,25 @@ export default async function AdminHubPage() {
               Ferramentas
             </h2>
           </div>
+
+          {/* Dossiê Link Card */}
+          <Link 
+            href="/admin/hub/dossie"
+            className="group relative block rounded-2xl border border-blue-500/30 bg-blue-500/5 p-6 overflow-hidden transition-all hover:bg-blue-500/10 hover:border-blue-500/50"
+          >
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <ShieldCheck className="w-20 h-20 rotate-12" />
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg text-white">Dossiê do Sistema</h3>
+                <p className="text-sm text-blue-200/70">O que significa cada status e como funcionam os processos internos.</p>
+              </div>
+            </div>
+          </Link>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {ADMIN_NAV_SECTIONS.map((sec, idx) => {

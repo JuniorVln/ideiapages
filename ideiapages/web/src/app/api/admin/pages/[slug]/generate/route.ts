@@ -3,6 +3,9 @@ import { generatePageVariationsForPagina } from "@/lib/generation/generate-page-
 import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
+/** Vários LLMs em paralelo podem levar 1–3 min; evita corte em ambientes com limite baixo. */
+export const maxDuration = 300;
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },

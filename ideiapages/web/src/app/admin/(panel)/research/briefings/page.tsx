@@ -10,14 +10,30 @@ import Link from "next/link";
 
 import { BriefingCard } from "./BriefingCard";
 
-export default async function BriefingsPage() {
+interface SearchParams {
+  desde?: string;
+  ate?: string;
+}
+
+export default async function BriefingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   await requireAdmin();
   const db = getSupabaseAdminOptional();
   if (!db) return <AdminNeedSupabaseEnv />;
 
-  const { data: briefings } = await db
+  const sp = await searchParams;
+
+  let query = db
     .from("briefings_seo")
-    .select("id, termo_id, briefing_jsonb, criado_em, termos(keyword, intencao, cluster, status)")
+    .select("id, termo_id, briefing_jsonb, criado_em, termos(keyword, intencao, cluster, status)");
+
+  if (sp.desde) query = query.gte("criado_em", sp.desde);
+  if (sp.ate) query = query.lte("criado_em", `${sp.ate}T23:59:59`);
+
+  const { data: briefings } = await query
     .order("criado_em", { ascending: false })
     .limit(200);
 
@@ -50,6 +66,43 @@ export default async function BriefingsPage() {
           ← Visão geral
         </Link>
       </div>
+
+      <form method="GET" className="flex flex-wrap gap-3 items-end bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-500 uppercase font-semibold">Desde</label>
+          <input
+            type="date"
+            name="desde"
+            defaultValue={sp.desde ?? ""}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-slate-500 uppercase font-semibold">Até</label>
+          <input
+            type="date"
+            name="ate"
+            defaultValue={sp.ate ?? ""}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-sm focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-colors"
+          >
+            Filtrar
+          </button>
+          {(sp.desde || sp.ate) && (
+            <Link
+              href="/admin/research/briefings"
+              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm transition-colors"
+            >
+              Limpar
+            </Link>
+          )}
+        </div>
+      </form>
 
       {/* Briefings sem página */}
       <section>

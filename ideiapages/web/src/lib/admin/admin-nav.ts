@@ -48,7 +48,6 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     id: "intelligence",
     title: "Inteligência",
     items: [
-      { href: "/admin/dashboard", label: "Performance" },
       { href: "/admin/autocura", label: "Autocura" },
       { href: "/admin/recommendations", label: "Alertas" },
       { href: "/admin/experiments", label: "Relatório A/B" },
@@ -66,6 +65,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { href: "/admin/export", label: "Exportar CSV" },
       { href: "/admin/costs", label: "Custos" },
       { href: "/admin/hub", label: "Mapa do painel" },
+      { href: "/admin/hub/dossie", label: "Dossiê do Sistema" },
       { href: "/", label: "Ver site público" },
     ],
   },

@@ -2,6 +2,7 @@ import { getAdminUser } from "@/lib/admin/session";
 import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 import { buildImagenContextFromBriefing } from "@/lib/blog/briefing-imagens";
 import { pexelsDiversifyIndex, searchPexelsPhoto } from "@/lib/pexels";
+import { estimateUsd } from "@/lib/generation/providers";
 import {
   briefingJsonToMdx,
   faqJsonbFromBriefing,
@@ -73,17 +74,25 @@ export async function POST(req: NextRequest) {
   const slug = slugify(meta.titulo);
   
   let corpo_mdx = "";
+  let aiTelemetry = null;
+
   if (body.refine_with_ai) {
     const { writeFullPageWithAI } = await import("@/lib/generation/page-writer");
     const { loadProductFacts } = await import("@/lib/research/product-facts");
     const productFacts = await loadProductFacts();
     
     try {
-      corpo_mdx = await writeFullPageWithAI({
+      const result = await writeFullPageWithAI({
         briefingJson: bj,
         keyword,
         productFacts,
       });
+      corpo_mdx = result.text;
+      aiTelemetry = {
+        tokensInput: result.tokens_input,
+        tokensOutput: result.tokens_output,
+        modelVersion: result.model_version,
+      };
     } catch (e) {
       console.error("AI Generation failed, falling back to basic conversion:", e);
       corpo_mdx = briefingJsonToMdx(bj, keyword);
@@ -134,6 +143,20 @@ export async function POST(req: NextRequest) {
       .insert(retry)
       .select("id, slug, status")
       .single());
+  }
+
+  if (inserted && aiTelemetry) {
+    const custo = estimateUsd("claude", aiTelemetry.tokensInput, aiTelemetry.tokensOutput);
+    await db
+      .from("variacoes")
+      .update({
+        provider: "claude",
+        tokens_input: aiTelemetry.tokensInput,
+        tokens_output: aiTelemetry.tokensOutput,
+        model_version: aiTelemetry.modelVersion,
+        custo_estimado_usd: custo,
+      })
+      .match({ pagina_id: inserted.id, nome: "controle" });
   }
 
   if (error || !inserted) {

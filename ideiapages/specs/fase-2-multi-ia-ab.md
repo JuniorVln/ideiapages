@@ -76,7 +76,7 @@ Cada generator compartilha **contrato único** (input = briefing, output = estru
 - ≥ 20 termos com `briefing_pronto` (pode ser o mesmo pool da Fase 0/1, expandindo se necessário)
 - Credenciais em `.env`: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_AI_API_KEY` (ou equivalente)
 - Orçamento de geração aprovado (ex: até R$ 500 para a fase inteira)
-- Infra de edge middleware no Next.js (Vercel Edge) habilitada
+- Infra de edge middleware no Next.js (Railway + Node.js runtime) habilitada
 - Design system + componentes de render da Fase 1 estáveis
 
 ## Saídas

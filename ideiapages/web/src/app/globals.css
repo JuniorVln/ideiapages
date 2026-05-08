@@ -82,6 +82,12 @@ body {
   color: var(--color-text);
 }
 
+/* Previne scroll duplo no Admin */
+body:has(.admin-root) {
+  overflow: hidden;
+  height: 100vh;
+}
+
 /* Utilitários de layout (Fase 1 design tokens) */
 .py-section-y {
   padding-top: var(--section-y);
@@ -195,3 +201,39 @@ body {
   animation-play-state: paused;
 }
 
+/* ── Custom Scrollbar for Admin ── */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b transparent;
+}
+
+/* Estilo para a sidebar especificamente se necessário */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
+}

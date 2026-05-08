@@ -16,6 +16,7 @@ import {
   type PaginaExperimentContext,
   type VariacaoArm,
 } from "@/lib/experiments/pick-variation";
+import { getAdminUser } from "@/lib/admin/session";
 import { loadBlogPost } from "@/lib/blog/load-post";
 import { parseMarkdownToSections } from "@/lib/blog/parse-sections";
 import type { VariacaoPagina } from "@/lib/blog/get-pagina";
@@ -25,8 +26,14 @@ import { getSiteUrl } from "@/lib/site-url";
 const SITE_URL = getSiteUrl();
 const WA_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5511999999999";
 
+function firstQueryString(v: string | string[] | undefined): string | undefined {
+  if (v == null) return undefined;
+  return Array.isArray(v) ? v[0] : v;
+}
+
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -69,7 +76,7 @@ function parseFaq(raw: unknown): FaqItem[] {
   );
 }
 
-export default async function PublicSalesPage({ params }: Props) {
+export default async function PublicSalesPage({ params, searchParams }: Props) {
   const { slug: rawSlug } = await params;
   const data = await loadBlogPost(rawSlug);
   if (!data) notFound();
@@ -89,6 +96,14 @@ export default async function PublicSalesPage({ params }: Props) {
       }))
     : [];
 
+  const sp = searchParams ? await searchParams : {};
+  const previewVariacaoId = firstQueryString(sp.variacao);
+  const adminUser = await getAdminUser();
+  const isAdminPreview =
+    !!adminUser &&
+    !!previewVariacaoId &&
+    arms.some((v) => v.id === previewVariacaoId);
+
   const cookieStore = await cookies();
   const visitorId = cookieStore.get(VISITOR_COOKIE)?.value ?? "anon";
   const ctx: PaginaExperimentContext = {
@@ -97,9 +112,19 @@ export default async function PublicSalesPage({ params }: Props) {
     variacao_vencedora_id: pagina.variacao_vencedora_id ?? null,
     variacoes: arms,
   };
-  const cookieVid = cookieStore.get(variacaoCookieName(pagina.id))?.value;
-  const variacaoAtivaId = resolveVariacaoId(visitorId, ctx, cookieVid);
-  const variacaoAtiva = arms.find((v) => v.id === variacaoAtivaId);
+
+  let variacaoAtivaId: string | undefined;
+  let variacaoAtiva: VariacaoArm | undefined;
+
+  if (isAdminPreview) {
+    variacaoAtivaId = previewVariacaoId;
+    variacaoAtiva = arms.find((v) => v.id === previewVariacaoId);
+  } else {
+    const cookieVid = cookieStore.get(variacaoCookieName(pagina.id))?.value;
+    variacaoAtivaId = resolveVariacaoId(visitorId, ctx, cookieVid);
+    variacaoAtiva = arms.find((v) => v.id === variacaoAtivaId);
+  }
+
   const corpoMdx =
     variacaoAtiva?.corpo_mdx && variacaoAtiva.corpo_mdx.trim().length > 0
       ? variacaoAtiva.corpo_mdx
@@ -112,7 +137,17 @@ export default async function PublicSalesPage({ params }: Props) {
 
   return (
     <>
-      {variacaoAtivaId ? (
+      {isAdminPreview && variacaoAtiva ? (
+        <div
+          role="status"
+          className="bg-amber-400/95 text-amber-950 text-center text-sm font-medium py-2.5 px-4 border-b border-amber-500/80"
+        >
+          Pré-visualização admin: <strong>{variacaoAtiva.nome}</strong> ({variacaoAtiva.provider}) — não
+          contabiliza exposição A/B
+        </div>
+      ) : null}
+
+      {variacaoAtivaId && !isAdminPreview ? (
         <ExposureTracker paginaId={pagina.id} variacaoId={variacaoAtivaId} />
       ) : null}
 

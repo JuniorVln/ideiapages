@@ -16,7 +16,7 @@
 | Backend (web)      | Next.js Route Handlers             | runtime: nodejs ou edge |
 | Banco              | Supabase PostgreSQL                | latest                  |
 | ORM                | Supabase JS Client + tipos gerados | `@supabase/supabase-js` |
-| Hosting            | Vercel                             | Free → Pro              |
+| Hosting            | Railway                            | Starter → Pro           |
 | Tools de pesquisa  | Python                             | 3.11+                   |
 | Gerenciador Python | uv                                 | latest                  |
 | LLMs               | Claude, GPT, Gemini                | mais recente disponível |

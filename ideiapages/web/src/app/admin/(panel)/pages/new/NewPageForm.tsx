@@ -109,9 +109,9 @@ export function NewPageForm({
   const kw = briefingData?.termos?.keyword;
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       {/* Coluna de Configuração */}
-      <div className="xl:col-span-2 space-y-6">
+      <div className="lg:col-span-4 space-y-6">
         <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 backdrop-blur-sm">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <Layout className="w-5 h-5 text-blue-400" />
@@ -228,7 +228,7 @@ export function NewPageForm({
       </div>
 
       {/* Coluna de Preview Visual */}
-      <div className="xl:col-span-3">
+      <div className="lg:col-span-8">
         <div className="sticky top-8 space-y-4">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wider flex items-center gap-2">
@@ -254,7 +254,7 @@ export function NewPageForm({
               </p>
             </div>
           ) : bj ? (
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-2xl flex flex-col max-h-[750px]">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-2xl flex flex-col max-h-[850px]">
               {/* Header do Preview */}
               <div className="bg-slate-800/50 border-b border-slate-700/50 p-5">
                 <div className="flex items-center gap-2 mb-2">
@@ -268,7 +268,7 @@ export function NewPageForm({
                 <h2 className="text-xl font-bold text-white leading-tight mb-2">
                   {bj.title_seo || "Título SEO pendente"}
                 </h2>
-                <p className="text-sm text-slate-400 line-clamp-2 italic">
+                <p className="text-base text-slate-400 line-clamp-3 italic">
                   &ldquo;{bj.meta_description || "Sem descrição disponível..."}&rdquo;
                 </p>
               </div>
@@ -281,7 +281,7 @@ export function NewPageForm({
                     <span className="w-4 h-px bg-blue-400/30" />
                     Gancho de Abertura (Hook)
                   </h4>
-                  <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 text-slate-300 text-sm leading-relaxed border-l-2 border-l-blue-500">
+                  <div className="p-5 rounded-xl bg-blue-500/5 border border-blue-500/10 text-slate-200 text-base leading-relaxed border-l-2 border-l-blue-500">
                     {bj.gancho_vendas}
                   </div>
                 </div>
@@ -298,12 +298,12 @@ export function NewPageForm({
                       <div key={i} className="group p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:bg-slate-800/50 transition-all">
                         <div className="flex items-start gap-3">
                           <span className="text-xs font-mono text-slate-600 mt-1">H2</span>
-                          <h5 className="text-slate-200 font-semibold">{block.h2}</h5>
+                          <h5 className="text-slate-100 font-semibold text-lg">{block.h2}</h5>
                         </div>
                         {Array.isArray(block.h3s) && block.h3s.length > 0 && (
                           <div className="mt-3 ml-8 grid grid-cols-1 md:grid-cols-2 gap-2">
                             {block.h3s.map((h3: string, j: number) => (
-                              <div key={j} className="flex items-center gap-2 text-xs text-slate-400">
+                              <div key={j} className="flex items-center gap-2 text-sm text-slate-300">
                                 <ChevronRight className="w-3 h-3 text-emerald-500/50" />
                                 <span>{h3}</span>
                               </div>

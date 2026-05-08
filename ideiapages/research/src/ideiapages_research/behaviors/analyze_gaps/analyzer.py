@@ -286,20 +286,23 @@ def _persist_llm_log(
     latency_ms: int,
     payload: dict[str, Any],
 ) -> None:
-    sb.table("llm_calls_log").insert(
-        {
-            "behavior": BEHAVIOR,
-            "purpose": "analyze_gaps_for_term",
-            "model": model,
-            "prompt_version": prompt_version,
-            "tokens_input": tin,
-            "tokens_output": tout,
-            "custo_brl": cost_brl,
-            "latencia_ms": latency_ms,
-            "termo_id": str(termo_id) if termo_id else None,
-            "payload_resumido_jsonb": payload,
-        }
-    ).execute()
+    try:
+        sb.table("llm_calls_log").insert(
+            {
+                "behavior": BEHAVIOR,
+                "purpose": "analyze_gaps_for_term",
+                "model": model,
+                "prompt_version": prompt_version,
+                "tokens_input": tin,
+                "tokens_output": tout,
+                "custo_brl": cost_brl,
+                "latencia_ms": latency_ms,
+                "termo_id": str(termo_id) if termo_id else None,
+                "payload_resumido_jsonb": payload,
+            }
+        ).execute()
+    except Exception as e:
+        print(f"WARN: _persist_llm_log failed (missing table?): {e}")
 
 
 def _recent_briefing_blocks(
@@ -350,18 +353,21 @@ def _clear_falha_briefing(sb: Client, termo_id: UUID) -> None:
 
 
 def _log_metricas_parse_error(sb: Client, termo_id: UUID, err: str) -> None:
-    sb.table("metricas_coleta").insert(
-        {
-            "behavior": BEHAVIOR,
-            "comecou_em": datetime.now(UTC).isoformat(),
-            "terminou_em": datetime.now(UTC).isoformat(),
-            "items_processados": 1,
-            "items_sucesso": 0,
-            "items_falha": 1,
-            "custo_brl": None,
-            "log_jsonb": {"termo_id": str(termo_id), "erro_validacao": err[:8000]},
-        }
-    ).execute()
+    try:
+        sb.table("metricas_coleta").insert(
+            {
+                "behavior": BEHAVIOR,
+                "comecou_em": datetime.now(UTC).isoformat(),
+                "terminou_em": datetime.now(UTC).isoformat(),
+                "items_processados": 1,
+                "items_sucesso": 0,
+                "items_falha": 1,
+                "custo_brl": None,
+                "log_jsonb": {"termo_id": str(termo_id), "erro_validacao": err[:8000]},
+            }
+        ).execute()
+    except Exception as e:
+        print(f"WARN: _log_metricas_parse_error failed (missing table?): {e}")
 
 
 def briefing_to_markdown(b: BriefingSEO, *, keyword: str) -> str:

@@ -32,7 +32,7 @@ export function GenerateForm({ paginaId, slug }: { paginaId: string; slug: strin
     }
     setLoading(true);
     setError(null);
-    setLogs(["Iniciando geração..."]);
+    setLogs(["Iniciando geração (vários providers em paralelo para não estourar tempo da requisição)..."]);
 
     const res = await fetch(`/api/admin/pages/${slug}/generate`, {
       method: "POST",

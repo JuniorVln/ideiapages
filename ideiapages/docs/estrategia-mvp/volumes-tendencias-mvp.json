@@ -1,0 +1,202 @@
+{
+  "collected_at": "2026-05-08",
+  "source": "Apify scrapepilot/google-keyword-finder",
+  "method": "10 chamadas seed-by-seed, country=br language=pt, autocomplete + estimativa de volume/CPC/competition/trend",
+  "limitacoes": [
+    "Volumes sao estimativas baseadas em autocomplete PT-BR, nao Google Ads Keyword Planner oficial",
+    "Quando o termo exato nao aparece nos resultados de autocomplete da seed, usamos a variante mais proxima como proxy e listamos as variantes do ecossistema",
+    "Google Trends ficou abaixo do threshold de display para todos os 10 termos (esperado para termos nichados de cauda longa) - tendencia vem da propria scrapepilot",
+    "Mesma keyword retorna volumes ligeiramente diferentes em queries diferentes - ordem de grandeza e confiavel, valor exato e indicativo"
+  ],
+  "termos": [
+    {
+      "n": 1,
+      "termo": "sistema de whatsapp para escritório contábil",
+      "cluster": "Contabilidade",
+      "volume_estimado": 600,
+      "fonte_volume": "variante: sistema de whatsapp para escritorio de contabilidade",
+      "cpc": 0.69,
+      "competition": "Medium",
+      "trend": "Stable",
+      "ecossistema_top5": [
+        {"keyword": "sistema para whatsapp business", "volume": 1800, "cpc": 3.43},
+        {"keyword": "sistema de atendimento whatsapp para empresas", "volume": 1600, "cpc": 2.85},
+        {"keyword": "mais de uma conta whatsapp business", "volume": 1600, "cpc": 3.09, "trend": "Rising"},
+        {"keyword": "whatsapp business de escritorio", "volume": 2200, "cpc": 3.13},
+        {"keyword": "whatsapp para escritório de contabilidade", "volume": 400, "cpc": 4.73}
+      ]
+    },
+    {
+      "n": 2,
+      "termo": "atendimento whatsapp escritório contábil",
+      "cluster": "Contabilidade",
+      "volume_estimado": 700,
+      "fonte_volume": "variante: whatsapp para escritório de contabilidade",
+      "cpc": 2.01,
+      "competition": "Medium",
+      "trend": "Stable",
+      "ecossistema_top5": [
+        {"keyword": "gestão de atendimento whatsapp", "volume": 1300, "cpc": 2.87},
+        {"keyword": "atendimento ao cliente pelo whatsapp", "volume": 600, "cpc": 4.93},
+        {"keyword": "aplicativo de atendimento whatsapp", "volume": 400, "cpc": 1.38},
+        {"keyword": "app de atendimento whatsapp", "volume": 400, "cpc": 1.52}
+      ]
+    },
+    {
+      "n": 3,
+      "termo": "whatsapp para escritórios contábeis",
+      "cluster": "Contabilidade",
+      "volume_estimado": 700,
+      "fonte_volume": "variante: whatsapp para escritório de contabilidade (do cluster #2)",
+      "cpc": 2.01,
+      "competition": "Medium",
+      "trend": "Stable",
+      "obs": "Autocomplete da seed retornou variantes mais relacionadas a 'whatsapp escritorio para PC' que ao recorte contabil; volume de variante de #2 e o melhor proxy disponivel"
+    },
+    {
+      "n": 4,
+      "termo": "sistema de whatsapp para contabilidade",
+      "cluster": "Contabilidade",
+      "volume_estimado": 100,
+      "fonte_volume": "match exato",
+      "cpc": 0.81,
+      "competition": "Medium",
+      "trend": "Stable",
+      "ecossistema_top5": [
+        {"keyword": "sistemas de atendimento whatsapp", "volume": 1500, "cpc": 4.53},
+        {"keyword": "sistema de atendimento whatsapp para empresas", "volume": 1400, "cpc": 3.30},
+        {"keyword": "grupos de contabilidade whatsapp", "volume": 1300, "cpc": 2.39},
+        {"keyword": "grupo de whatsapp de contabilidade", "volume": 1100, "cpc": 4.78},
+        {"keyword": "sistema de whatsapp para escritorio de contabilidade", "volume": 600, "cpc": 0.69}
+      ]
+    },
+    {
+      "n": 5,
+      "termo": "atendimento whatsapp para imobiliárias",
+      "cluster": "Imobiliarias",
+      "volume_estimado": 1600,
+      "fonte_volume": "variante: plataforma de atendimento whatsapp (proxy de mercado)",
+      "cpc": 4.65,
+      "competition": "Medium",
+      "trend": "Stable",
+      "ecossistema_top5": [
+        {"keyword": "ia para atendimento whatsapp", "volume": 2100, "cpc": 2.11},
+        {"keyword": "atendimento pelo whatsapp benefícios", "volume": 2100, "cpc": 3.62},
+        {"keyword": "atendimento pelo whatsapp empresa", "volume": 2000, "cpc": 4.00},
+        {"keyword": "whatsapp aluguel de imóveis", "volume": 2000, "cpc": 4.66},
+        {"keyword": "sistemas de atendimento whatsapp", "volume": 1900, "cpc": 1.55},
+        {"keyword": "grupo de whatsapp corretores de imóveis", "volume": 900, "cpc": 3.97}
+      ]
+    },
+    {
+      "n": 6,
+      "termo": "automação whatsapp para imobiliárias",
+      "cluster": "Imobiliarias",
+      "volume_estimado": 2300,
+      "fonte_volume": "variante: automação whatsapp para empresas (mais proximo do ecossistema)",
+      "cpc": 1.36,
+      "competition": "Medium",
+      "trend": "Stable",
+      "ecossistema_top5": [
+        {"keyword": "app para automação whatsapp", "volume": 2400, "cpc": 2.81},
+        {"keyword": "automação no whatsapp business", "volume": 2400, "cpc": 3.44},
+        {"keyword": "whatsapp aluguel de imóveis", "volume": 2400, "cpc": 1.17},
+        {"keyword": "automação para whatsapp grátis", "volume": 2300, "cpc": 3.63},
+        {"keyword": "automação de whatsapp gratis", "volume": 2200, "cpc": 2.50},
+        {"keyword": "automação de atendimento whatsapp", "volume": 2100, "cpc": 4.73},
+        {"keyword": "sistema de automação whatsapp", "volume": 2100, "cpc": 2.71},
+        {"keyword": "automação whatsapp com ia", "volume": 1100, "cpc": 4.30}
+      ]
+    },
+    {
+      "n": 7,
+      "termo": "sistema de atendimento whatsapp",
+      "cluster": "Horizontal",
+      "volume_estimado": 1000,
+      "fonte_volume": "match exato",
+      "cpc": 4.78,
+      "competition": "Medium",
+      "trend": "Stable",
+      "ecossistema_top5": [
+        {"keyword": "plataforma para atendimento whatsapp", "volume": 2100, "cpc": 4.48},
+        {"keyword": "plataforma de atendimento de whatsapp", "volume": 2000, "cpc": 4.70},
+        {"keyword": "atendimento pelo whatsapp como funciona", "volume": 2000, "cpc": 3.41},
+        {"keyword": "sistema de whatsapp business", "volume": 1900, "cpc": 1.56},
+        {"keyword": "atendimento pelo whatsapp dicas", "volume": 1900, "cpc": 2.06},
+        {"keyword": "sistema de atendimento automatico whatsapp", "volume": 1700, "cpc": 0.94},
+        {"keyword": "sistema de atendimento whatsapp com ia", "volume": 1700, "cpc": 1.61},
+        {"keyword": "sistema de atendimento whatsapp grátis", "volume": 1600, "cpc": 2.75},
+        {"keyword": "sistema de atendimento whatsapp white label", "volume": 1400, "cpc": 2.58}
+      ]
+    },
+    {
+      "n": 8,
+      "termo": "whatsapp com múltiplos atendentes",
+      "cluster": "Horizontal",
+      "volume_estimado": 2200,
+      "fonte_volume": "match exato (whatsapp com multiplos atendentes)",
+      "cpc": 3.35,
+      "competition": "Medium",
+      "trend": "Stable",
+      "ecossistema_top5": [
+        {"keyword": "whatsapp com vários atendentes", "volume": 2500, "cpc": 4.96},
+        {"keyword": "whatsapp business vários atendentes", "volume": 2100, "cpc": 2.43},
+        {"keyword": "colocar atendentes no whatsapp", "volume": 2100, "cpc": 3.51},
+        {"keyword": "whatsapp para vários atendentes", "volume": 2000, "cpc": 3.18},
+        {"keyword": "multiatendimento whatsapp como funciona", "volume": 2000, "cpc": 2.54},
+        {"keyword": "whatsapp business multiplos atendentes", "volume": 1900, "cpc": 2.23},
+        {"keyword": "multiatendimento whatsapp para empresas", "volume": 1700, "cpc": 3.35},
+        {"keyword": "sistema multi atendimento whatsapp", "volume": 1700, "cpc": 4.62}
+      ]
+    },
+    {
+      "n": 9,
+      "termo": "como organizar atendimento pelo whatsapp",
+      "cluster": "Dor/Blog",
+      "volume_estimado": 1900,
+      "fonte_volume": "match exato",
+      "cpc": 3.36,
+      "competition": "Medium",
+      "trend": "Stable",
+      "obs": "Termo de dor com volume forte e CPC comercial - excelente sinal para LP de captura de intencao educacional"
+    },
+    {
+      "n": 10,
+      "termo": "centralizar atendimento whatsapp",
+      "cluster": "Dor/Blog",
+      "volume_estimado": 1600,
+      "fonte_volume": "match exato",
+      "cpc": 0.98,
+      "competition": "Medium",
+      "trend": "Stable",
+      "obs": "Volume bom para termo de dor; CPC mais baixo indica menos disputa direta - oportunidade de organico"
+    }
+  ],
+  "totais_por_cluster": {
+    "Contabilidade (4 termos)": {
+      "volume_principal_somado": 2100,
+      "obs": "Soma dos volumes estimados dos 4 termos contabeis. Cluster valida-se mais por SERP nichada (96% de sinal em 25 resultados) do que por volume puro - termos especificos de nicho tem volume menor mas conversao maior."
+    },
+    "Imobiliarias (2 termos)": {
+      "volume_ecossistema_somado": 3900,
+      "obs": "Mercado de imobiliarias + WhatsApp tem volume forte no ecossistema (2000+/mo em variantes), mesmo com termos exatos de seed nao retornando match direto."
+    },
+    "Horizontais + Dor (4 termos)": {
+      "volume_principal_somado": 6700,
+      "obs": "Maior volume agregado do lote. Termos #8 e #9 sao destaques: 2200 e 1900 sessoes/mes potenciais."
+    }
+  },
+  "totalizacao_lote": {
+    "volume_total_estimado": 12700,
+    "media_cpc": 2.40,
+    "termos_match_exato": 5,
+    "termos_via_variante": 5,
+    "tendencia_geral": "Stable em 100% dos termos do lote",
+    "sinais_rising_no_ecossistema": [
+      "mais de uma conta whatsapp business",
+      "como sair da conta whatsapp business",
+      "falar com atendente caixa whatsapp",
+      "whatsapp business mais de um atendente"
+    ]
+  }
+}

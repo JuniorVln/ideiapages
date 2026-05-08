@@ -4,8 +4,8 @@ import { AdminSignOut } from "@/components/AdminSignOut";
 
 export function AdminPanelSidebar() {
   return (
-    <aside className="hidden md:flex md:flex-col w-56 shrink-0 border-b-0 border-r border-slate-800 bg-slate-900/95 md:sticky md:top-0 md:h-screen md:overflow-y-auto">
-      <div className="p-4 border-b border-slate-800 md:border-b-0">
+    <aside className="hidden md:flex md:flex-col w-56 shrink-0 border-r border-slate-800 bg-slate-900/95 fixed top-0 left-0 h-screen z-30">
+      <div className="p-4 shrink-0">
         <Link href="/admin/hub" className="font-semibold text-white hover:text-blue-200 block">
           IDeiaPages
         </Link>
@@ -24,10 +24,10 @@ export function AdminPanelSidebar() {
           <span className="text-[11px] font-medium text-emerald-200/90 uppercase tracking-tight">IA Ativa</span>
         </div>
       </div>
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto px-2 pb-4 sidebar-scrollbar">
         <AdminPanelNavList />
       </div>
-      <div className="shrink-0 p-3 border-t border-slate-800">
+      <div className="shrink-0 p-3 border-t border-slate-800 bg-slate-900/40">
         <AdminSignOut />
       </div>
     </aside>
