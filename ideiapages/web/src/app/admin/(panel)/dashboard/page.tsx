@@ -1,4 +1,5 @@
 import { AdminNeedSupabaseEnv } from "@/components/AdminNeedSupabaseEnv";
+import { buildAutoridadeSerie, type AutoridadeSnapshot } from "@/lib/admin/autoridade-aggregate";
 import {
   addDaysYmd,
   collapsePageDay,
@@ -19,10 +20,12 @@ import {
   type SerpRow,
   siteHostFromPublicUrl,
 } from "@/lib/admin/serp-seo-aggregate";
+import { normalizeDominio } from "@/lib/monitoring/autoridade-sync";
 import { requireAdmin } from "@/lib/admin/require-admin";
 import { getSiteUrl } from "@/lib/site-url";
 import { getSupabaseAdminOptional } from "@/lib/supabase/admin";
 import Link from "next/link";
+import { AutoridadeChart } from "./AutoridadeChart";
 import { ProviderLeadsChart } from "./ProviderLeadsChart";
 import { ProviderWinsDonut, type WinSlice } from "./ProviderWinsDonut";
 import { TrafficLeadsChart, type TrafficLeadsRow } from "./TrafficLeadsChart";
@@ -292,6 +295,23 @@ export default async function AdminDashboardPage() {
     (paginasList.data ?? []).map((p) => ({ id: p.id, termo_id: p.termo_id })),
   );
 
+  const siteDominio = normalizeDominio(getSiteUrl());
+  const autoridadeDesde = addDaysYmd(todaySp, -180);
+  const { data: autoridadeRows } = await db
+    .from("autoridade_dominio")
+    .select("dominio, data, rank_decimal")
+    .eq("fonte", "openpagerank")
+    .gte("data", autoridadeDesde)
+    .order("data", { ascending: true });
+  const autoridade = buildAutoridadeSerie(
+    (autoridadeRows ?? []) as AutoridadeSnapshot[],
+    siteDominio,
+  );
+  const autoridadeDelta =
+    autoridade.atual != null && autoridade.anterior != null
+      ? autoridade.atual - autoridade.anterior
+      : null;
+
   const insights = buildInsights({
     candidatos,
     expPages: expPages.data ?? [],
@@ -361,6 +381,17 @@ export default async function AdminDashboardPage() {
           deltaPct={null}
           hint={geoCheckHint}
         />
+        <Kpi
+          title="Autoridade do domínio"
+          value={autoridade.atual != null ? autoridade.atual.toFixed(2) : "—"}
+          deltaPct={null}
+          deltaOverride={
+            autoridadeDelta == null
+              ? "sem comparação de 30 dias"
+              : `${autoridadeDelta >= 0 ? "+" : ""}${autoridadeDelta.toFixed(2)} vs 30 dias atrás`
+          }
+          hint="Open PageRank (0-10) · coleta semanal"
+        />
         <Kpi title="Experimentos ativos" value={expAtivos ?? 0} deltaPct={null} hint="A/B em andamento" />
       </div>
 
@@ -376,6 +407,19 @@ export default async function AdminDashboardPage() {
           <ProviderWinsDonut data={winSlices} />
         </section>
       </div>
+
+      <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
+        <h2 className="text-lg font-semibold text-white mb-1">Autoridade de domínio</h2>
+        <p className="text-slate-500 text-sm mb-4">
+          Open PageRank (escala 0-10), coleta semanal · últimos 180 dias
+          {autoridade.ultimaData ? ` · última coleta ${autoridade.ultimaData.split("-").reverse().join("/")}` : ""}.
+        </p>
+        <AutoridadeChart data={autoridade.chartRows} dominios={autoridade.dominios} />
+        <p className="text-slate-500 text-xs mt-3">
+          Escala do Open PageRank não é o DA da Moz nem o DR do Ahrefs — não comparar números de réguas
+          diferentes. Domínios referentes seguem em leitura manual mensal (fonte `ahrefs_manual`).
+        </p>
+      </section>
 
       <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
         <h2 className="text-lg font-semibold text-white mb-1">Leads vs cliques WhatsApp</h2>

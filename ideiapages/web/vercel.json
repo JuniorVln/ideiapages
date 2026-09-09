@@ -12,6 +12,11 @@
       "description": "Detecta quedas de ranking SERP"
     },
     {
+      "path": "/api/cron/autoridade-sync",
+      "schedule": "0 5 * * 1",
+      "description": "Coleta a autoridade de dominio (Open PageRank) - semanal, antes do relatorio de segunda"
+    },
+    {
       "path": "/api/cron/auto-rewrite",
       "schedule": "15 7 * * *",
       "description": "Reescrita automatica de paginas em queda"

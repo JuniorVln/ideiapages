@@ -103,6 +103,45 @@ export type Database = {
         }
         Relationships: []
       }
+      autoridade_dominio: {
+        Row: {
+          id: string
+          dominio: string
+          data: string
+          fonte: string
+          rank_decimal: number | null
+          rank_posicao: number | null
+          dominios_referentes: number | null
+          detalhe: Json | null
+          coletado_em: string
+          criado_em: string
+        }
+        Insert: {
+          id?: string
+          dominio: string
+          data: string
+          fonte?: string
+          rank_decimal?: number | null
+          rank_posicao?: number | null
+          dominios_referentes?: number | null
+          detalhe?: Json | null
+          coletado_em?: string
+          criado_em?: string
+        }
+        Update: {
+          id?: string
+          dominio?: string
+          data?: string
+          fonte?: string
+          rank_decimal?: number | null
+          rank_posicao?: number | null
+          dominios_referentes?: number | null
+          detalhe?: Json | null
+          coletado_em?: string
+          criado_em?: string
+        }
+        Relationships: []
+      }
       auto_rewrite_queue: {
         Row: {
           concluido_em: string | null
