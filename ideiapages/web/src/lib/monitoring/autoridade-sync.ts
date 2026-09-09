@@ -7,30 +7,43 @@ type AdminClient = ReturnType<typeof createClient<Database>>;
  * Autoridade de domínio — coleta e série histórica.
  *
  * Pedido do Victor (12/08/2026): acompanhar a autoridade subindo/descendo, não
- * uma foto isolada por apresentação. A fonte automática é o Open PageRank
- * (escala 0-10, API gratuita com chave). DR do Ahrefs e domínios referentes
- * entram como leitura manual (fonte `ahrefs_manual`) — escalas diferentes,
- * por isso a coluna `fonte` sempre acompanha o número.
+ * uma foto isolada por apresentação.
+ *
+ * Fonte automática: OpenPageRank (escala 0-10 derivada do grafo do Common Crawl),
+ * que devolve score, posição global, domínios referentes e o histórico mensal
+ * desde 2018 — dá pra popular a série inteira na primeira coleta.
+ *
+ * ⚠️ Domínio pequeno pode simplesmente NÃO estar no índice do Common Crawl
+ * (`found: false`). Foi o caso do ideiamultichat.com.br em 09/09/2026: sem
+ * dado nenhum, enquanto redeideia.com.br marcava 2,74 com 9 domínios
+ * referentes. Nesse caso gravamos a linha com valor nulo (o buraco é o próprio
+ * diagnóstico) e o número da nossa autoridade entra por leitura manual do
+ * Ahrefs Webmaster Tools, com `fonte = 'ahrefs_manual'`.
  */
 
-export const OPENPAGERANK_ENDPOINT = "https://openpagerank.com/api/v1.0/getPageRank";
+export const OPENPAGERANK_ENDPOINT = "https://openpagerank.keywordseverywhere.com/v1/domains/bulk";
 export const FONTE_OPENPAGERANK = "openpagerank";
 
 export type AutoridadeSyncResult = {
   data: string;
   dominios: string[];
   rowsUpserted: number;
+  semDados: string[];
   errors: string[];
 };
 
-type OprItem = {
-  status_code?: number;
-  error?: string;
-  page_rank_integer?: number;
-  page_rank_decimal?: number;
-  rank?: string | number | null;
+type OprHistoryPoint = { date?: string; open_page_rank?: number | null };
+
+type OprResult = {
   domain?: string;
+  found?: boolean;
+  open_page_rank?: number | null;
+  rank?: number | string | null;
+  referring_domains?: number | null;
+  history?: OprHistoryPoint[];
 };
+
+type AutoridadeRowInsert = Database["public"]["Tables"]["autoridade_dominio"]["Insert"];
 
 /** Normaliza "https://www.dominio.com.br/" -> "dominio.com.br". */
 export function normalizeDominio(input: string): string {
@@ -63,29 +76,40 @@ export function hojeSaoPaulo(now = new Date()): string {
   }).format(now);
 }
 
+function toInt(v: unknown): number | null {
+  const n = Number(String(v ?? "").replace(/[^\d.-]/g, ""));
+  return Number.isFinite(n) && n > 0 ? Math.round(n) : null;
+}
+
 export async function fetchOpenPageRank(
   dominios: string[],
   apiKey: string,
-): Promise<{ items: OprItem[]; error: string | null }> {
-  if (dominios.length === 0) return { items: [], error: null };
+  includeHistory: boolean,
+): Promise<{ results: OprResult[]; error: string | null }> {
+  if (dominios.length === 0) return { results: [], error: null };
 
-  const qs = dominios.map((d) => `domains%5B%5D=${encodeURIComponent(d)}`).join("&");
   let res: Response;
   try {
-    res = await fetch(`${OPENPAGERANK_ENDPOINT}?${qs}`, {
-      headers: { "API-OPR": apiKey },
+    res = await fetch(OPENPAGERANK_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ domains: dominios, include_history: includeHistory }),
       cache: "no-store",
     });
   } catch (e) {
-    return { items: [], error: e instanceof Error ? e.message : String(e) };
+    return { results: [], error: e instanceof Error ? e.message : String(e) };
   }
 
   if (!res.ok) {
-    return { items: [], error: `Open PageRank HTTP ${String(res.status)}` };
+    const detalhe = await res.text().catch(() => "");
+    return { results: [], error: `OpenPageRank HTTP ${String(res.status)} ${detalhe.slice(0, 200)}` };
   }
 
-  const body = (await res.json()) as { response?: OprItem[] };
-  return { items: body.response ?? [], error: null };
+  const body = (await res.json()) as { results?: OprResult[] };
+  return { results: body.results ?? [], error: null };
 }
 
 export async function runAutoridadeSync(args: {
@@ -93,46 +117,68 @@ export async function runAutoridadeSync(args: {
   apiKey: string;
   dominios: string[];
   data?: string;
+  /** Grava também o histórico mensal devolvido pela API (roda uma vez, é idempotente). */
+  incluirHistorico?: boolean;
 }): Promise<AutoridadeSyncResult> {
   const { db, apiKey } = args;
+  const incluirHistorico = args.incluirHistorico ?? true;
   const data = args.data ?? hojeSaoPaulo();
   const dominios = [...new Set(args.dominios.map(normalizeDominio).filter(Boolean))];
   const errors: string[] = [];
+  const semDados: string[] = [];
   let rowsUpserted = 0;
 
-  const { items, error } = await fetchOpenPageRank(dominios, apiKey);
+  const { results, error } = await fetchOpenPageRank(dominios, apiKey, incluirHistorico);
   if (error) errors.push(error);
 
-  for (const item of items) {
+  const rows: AutoridadeRowInsert[] = [];
+
+  for (const item of results) {
     const dominio = normalizeDominio(item.domain ?? "");
     if (!dominio) continue;
-    if (item.status_code != null && item.status_code !== 200) {
-      errors.push(`${dominio}: ${item.error || `status ${String(item.status_code)}`}`);
-      continue;
+
+    const encontrado = item.found !== false && item.open_page_rank != null;
+    if (!encontrado) semDados.push(dominio);
+
+    rows.push({
+      dominio,
+      data,
+      fonte: FONTE_OPENPAGERANK,
+      rank_decimal: encontrado ? item.open_page_rank ?? null : null,
+      rank_posicao: toInt(item.rank),
+      dominios_referentes: toInt(item.referring_domains),
+      detalhe: { found: encontrado },
+      coletado_em: new Date().toISOString(),
+    });
+
+    if (incluirHistorico) {
+      for (const h of item.history ?? []) {
+        if (!h.date || h.open_page_rank == null) continue;
+        if (h.date >= data) continue;
+        rows.push({
+          dominio,
+          data: h.date,
+          fonte: FONTE_OPENPAGERANK,
+          rank_decimal: h.open_page_rank,
+          detalhe: { historico: true },
+        });
+      }
     }
+  }
 
-    const rankPosicao = Number(item.rank);
-    const { error: uErr } = await db.from("autoridade_dominio").upsert(
-      {
-        dominio,
-        data,
-        fonte: FONTE_OPENPAGERANK,
-        rank_decimal: item.page_rank_decimal ?? null,
-        rank_posicao: Number.isFinite(rankPosicao) && rankPosicao > 0 ? rankPosicao : null,
-        detalhe: { page_rank_integer: item.page_rank_integer ?? null },
-        coletado_em: new Date().toISOString(),
-      },
-      { onConflict: "dominio,data,fonte" },
-    );
-
-    if (uErr) errors.push(`upsert ${dominio}: ${uErr.message}`);
-    else rowsUpserted += 1;
+  for (let i = 0; i < rows.length; i += 200) {
+    const chunk = rows.slice(i, i + 200);
+    const { error: uErr } = await db
+      .from("autoridade_dominio")
+      .upsert(chunk, { onConflict: "dominio,data,fonte" });
+    if (uErr) errors.push(`upsert: ${uErr.message}`);
+    else rowsUpserted += chunk.length;
   }
 
   const semRetorno = dominios.filter(
-    (d) => !items.some((i) => normalizeDominio(i.domain ?? "") === d),
+    (d) => !results.some((i) => normalizeDominio(i.domain ?? "") === d),
   );
   for (const d of semRetorno) errors.push(`${d}: sem retorno da API`);
 
-  return { data, dominios, rowsUpserted, errors };
+  return { data, dominios, rowsUpserted, semDados, errors };
 }

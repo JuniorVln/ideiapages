@@ -416,8 +416,9 @@ export default async function AdminDashboardPage() {
         </p>
         <AutoridadeChart data={autoridade.chartRows} dominios={autoridade.dominios} />
         <p className="text-slate-500 text-xs mt-3">
-          Escala do Open PageRank não é o DA da Moz nem o DR do Ahrefs — não comparar números de réguas
-          diferentes. Domínios referentes seguem em leitura manual mensal (fonte `ahrefs_manual`).
+          Escala do OpenPageRank (0-10, grafo do Common Crawl) não é o DA da Moz nem o DR do Ahrefs — não
+          comparar réguas diferentes. Domínio ainda fora do índice do Common Crawl aparece sem ponto: nesse
+          caso o número entra por leitura manual do Ahrefs Webmaster Tools (fonte `ahrefs_manual`).
         </p>
       </section>
 

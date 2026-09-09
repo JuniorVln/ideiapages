@@ -15,7 +15,7 @@ async function handle(req: NextRequest) {
 
   const apiKey = process.env.OPENPAGERANK_API_KEY?.trim();
   if (!apiKey) {
-    return jsonError("Defina OPENPAGERANK_API_KEY (chave gratuita em openpagerank.com).", 503);
+    return jsonError("Defina OPENPAGERANK_API_KEY (chave em openpagerank.keywordseverywhere.com).", 503);
   }
 
   const dominios = dominiosMonitorados();
@@ -32,7 +32,7 @@ async function handle(req: NextRequest) {
     const out = await runAutoridadeSync({ db, apiKey, dominios });
     await logAutomation(db, "autoridade-sync", {
       detalhe: { data: out.data, dominios: out.dominios },
-      resultado: { rowsUpserted: out.rowsUpserted, errors: out.errors },
+      resultado: { rowsUpserted: out.rowsUpserted, semDados: out.semDados, errors: out.errors },
     });
     return NextResponse.json({ ok: true, ...out });
   } catch (e) {
