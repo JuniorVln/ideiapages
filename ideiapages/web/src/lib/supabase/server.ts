@@ -7,9 +7,18 @@ export async function getSupabaseServerClient() {
 
   const cookieMethods: CookieMethodsServer = {
     getAll: () => cookieStore.getAll(),
+    // Server Component não pode escrever cookie: quando o access_token expira, o
+    // supabase-ssr tenta gravar o token renovado aqui e o Next lança
+    // "Cookies can only be modified in a Server Action or Route Handler",
+    // derrubando a página inteira com 500. Engolir o erro é o padrão do Supabase:
+    // a renovação real acontece no /auth/callback e no client. (10/09/2026)
     setAll: (toSet) => {
-      for (const { name, value, options } of toSet) {
-        cookieStore.set(name, value, options);
+      try {
+        for (const { name, value, options } of toSet) {
+          cookieStore.set(name, value, options);
+        }
+      } catch {
+        /* leitura em Server Component — sessão segue válida em memória */
       }
     },
   };
