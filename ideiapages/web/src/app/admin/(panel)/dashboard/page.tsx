@@ -299,17 +299,26 @@ export default async function AdminDashboardPage() {
   const autoridadeDesde = addDaysYmd(todaySp, -180);
   const { data: autoridadeRows } = await db
     .from("autoridade_dominio")
-    .select("dominio, data, rank_decimal")
-    .eq("fonte", "openpagerank")
+    .select("dominio, data, fonte, rank_decimal, dominios_referentes")
     .gte("data", autoridadeDesde)
     .order("data", { ascending: true });
+  const autoridadeTodas = autoridadeRows ?? [];
+
+  // Gráfico: OpenPageRank (0-10) — serve de comparação com os domínios de referência.
   const autoridade = buildAutoridadeSerie(
-    (autoridadeRows ?? []) as AutoridadeSnapshot[],
+    autoridadeTodas.filter((r) => r.fonte === "openpagerank") as AutoridadeSnapshot[],
     siteDominio,
   );
-  const autoridadeDelta =
-    autoridade.atual != null && autoridade.anterior != null
-      ? autoridade.atual - autoridade.anterior
+
+  // KPI: o número do NOSSO domínio é o DR do Ahrefs (leitura manual), quando existir.
+  const leiturasAhrefs = autoridadeTodas.filter(
+    (r) => r.fonte === "ahrefs_manual" && r.dominio === siteDominio,
+  );
+  const ahrefsAtual = leiturasAhrefs[leiturasAhrefs.length - 1] ?? null;
+  const ahrefsAnterior = leiturasAhrefs[leiturasAhrefs.length - 2] ?? null;
+  const drDelta =
+    ahrefsAtual?.rank_decimal != null && ahrefsAnterior?.rank_decimal != null
+      ? ahrefsAtual.rank_decimal - ahrefsAnterior.rank_decimal
       : null;
 
   const insights = buildInsights({
@@ -382,15 +391,21 @@ export default async function AdminDashboardPage() {
           hint={geoCheckHint}
         />
         <Kpi
-          title="Autoridade do domínio"
-          value={autoridade.atual != null ? autoridade.atual.toFixed(2) : "—"}
+          title="Autoridade do domínio (DR)"
+          value={ahrefsAtual?.rank_decimal != null ? String(ahrefsAtual.rank_decimal) : "—"}
           deltaPct={null}
           deltaOverride={
-            autoridadeDelta == null
-              ? "sem comparação de 30 dias"
-              : `${autoridadeDelta >= 0 ? "+" : ""}${autoridadeDelta.toFixed(2)} vs 30 dias atrás`
+            drDelta == null
+              ? ahrefsAtual
+                ? `leitura de ${ahrefsAtual.data.split("-").reverse().join("/")}`
+                : "sem leitura registrada"
+              : `${drDelta >= 0 ? "+" : ""}${drDelta.toFixed(0)} vs leitura anterior`
           }
-          hint="Open PageRank (0-10) · coleta semanal"
+          hint={
+            ahrefsAtual?.dominios_referentes != null
+              ? `Ahrefs (0-100) · ${String(ahrefsAtual.dominios_referentes)} domínios referentes`
+              : "Ahrefs Webmaster Tools (0-100) · leitura manual"
+          }
         />
         <Kpi title="Experimentos ativos" value={expAtivos ?? 0} deltaPct={null} hint="A/B em andamento" />
       </div>
@@ -411,14 +426,15 @@ export default async function AdminDashboardPage() {
       <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
         <h2 className="text-lg font-semibold text-white mb-1">Autoridade de domínio</h2>
         <p className="text-slate-500 text-sm mb-4">
-          Open PageRank (escala 0-10), coleta semanal · últimos 180 dias
+          Comparação com os domínios de referência — OpenPageRank (escala 0-10) · últimos 180 dias
           {autoridade.ultimaData ? ` · última coleta ${autoridade.ultimaData.split("-").reverse().join("/")}` : ""}.
         </p>
         <AutoridadeChart data={autoridade.chartRows} dominios={autoridade.dominios} />
         <p className="text-slate-500 text-xs mt-3">
-          Escala do OpenPageRank (0-10, grafo do Common Crawl) não é o DA da Moz nem o DR do Ahrefs — não
-          comparar réguas diferentes. Domínio ainda fora do índice do Common Crawl aparece sem ponto: nesse
-          caso o número entra por leitura manual do Ahrefs Webmaster Tools (fonte `ahrefs_manual`).
+          Duas réguas, de propósito: o KPI acima é o <strong>DR do Ahrefs</strong> (0-100), que é o número do
+          nosso domínio; o gráfico é o <strong>OpenPageRank</strong> (0-10, grafo do Common Crawl), que existe
+          para os concorrentes e serve de comparação. Não misturar as duas escalas. O ideiamultichat.com.br
+          ainda não aparece no gráfico porque não está no índice do Common Crawl.
         </p>
       </section>
 
