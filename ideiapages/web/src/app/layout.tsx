@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Maven_Pro } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
@@ -7,6 +7,14 @@ import "./globals.css";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+// Mesma fonte de display do site público (ideiamultichat.com.br) — usada via `font-ideia`.
+const maven = Maven_Pro({
+  subsets: ["latin"],
+  weight: ["500", "700", "900"],
+  variable: "--font-maven",
   display: "swap",
 });
 
@@ -27,7 +35,7 @@ const IS_PROD = process.env.NEXT_PUBLIC_ENV === "production";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
+    <html lang="pt-BR" className={`${inter.variable} ${maven.variable}`} suppressHydrationWarning>
       <body className="min-h-screen bg-surface text-text antialiased font-sans">
         {children}
         {IS_PROD && GA4_ID && <GoogleAnalytics gaId={GA4_ID} />}
