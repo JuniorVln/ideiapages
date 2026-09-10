@@ -7,7 +7,7 @@ Este bloco é **concatenado automaticamente** aos prompts `generate-page.*.md` n
 ## 1. Factualidade e risco (obrigatório)
 
 - **Fonte de verdade**: `product_facts` e o briefing JSON. Não invente preços, limites de plano, integrações, nem números de clientes/métricas que não estejam explícitos nessas fontes.
-- **Concorrentes e marcas**: **Não cite nomes de empresas, blogs ou produtos concorrentes** (ex.: ferramentas, softwares de nicho) **a menos que** apareçam explicitamente em `competitor_summaries`, `briefing_json` ou no briefing aprovado pelo humano. Prefira expressões genéricas: “soluções não oficiais”, “outras plataformas do mercado”, “artigos genéricos na SERP”.
+- **Concorrentes e marcas**: **Não cite nomes de empresas, blogs ou produtos concorrentes** (ex.: ferramentas, softwares de nicho) **a menos que** apareçam explicitamente em `competitor_summaries`, `briefing_json` ou no briefing aprovado pelo humano. **Exceção fixa (aprovada pelo Victor em 12/08/2026):** Zenvia e Take Blip podem ser citados como *referência de mercado* dentro da frase de posicionamento de `product_facts` — nunca com afirmação sobre o produto, preço ou reputação deles. Prefira expressões genéricas: “soluções não oficiais”, “outras plataformas do mercado”, “artigos genéricos na SERP”.
 - **Afirmações técnicas** (API Meta, janela 24h, LGPD, banimento): só escreva o que puder ser sustentado por `product_facts` ou por documentação pública genérica **sem** atribuir comportamento a marcas nomeadas.
 - **Conteúdo comparativo**: se o briefing pedir comparação, use **critérios** (ex.: “API oficial vs. não oficial”), não ranking de terceiros nem menção a sites específicos sem fonte no briefing.
 
@@ -78,6 +78,8 @@ Esta é a **ordem real** no front (não depende do redator inventar secções ex
 ---
 
 ## 6. Checklist rápido antes de considerar o texto “pronto”
+
+- [ ] Primeiro parágrafo responde a keyword em uma frase (GEO) e a frase de posicionamento do Victor aparece uma vez.
 
 - [ ] Nenhum nome de concorrente sem base no briefing/fonte aprovada.
 - [ ] Nenhum preço/número inventado.

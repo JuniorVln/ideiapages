@@ -131,3 +131,27 @@ Para cada concorrente, levantar pontos onde Ideia Chat é melhor (e ser honesto 
 - "API Oficial do WhatsApp (Meta)"
 - "Centralizar comunicação"
 - "Atendimento humanizado + automação"
+
+---
+
+## Posicionamento oficial (ditado pelo Victor, reunião de 12/08/2026) — usar em TODA página
+
+> Para a pequena e média empresa, o Ideia Chat é a **porta de entrada para profissionalizar o atendimento**: entrega o que
+> ela realmente precisa — vários atendentes, filas, IA e API oficial — com o **melhor custo-benefício** frente a plataformas
+> desenhadas para grandes corporações, como Zenvia e Take Blip.
+
+- "Sua empresa não é uma corporação grande" é o eixo. O comprador é a PME; o argumento é custo-benefício + o que ela precisa.
+- **Pode citar Zenvia e Take Blip pelo nome, só como referência de mercado** (para a IA entender o contexto). Nunca afirmar
+  nada sobre o produto, preço ou defeito deles; nunca usar comentário de Reclame Aqui ou de terceiro como fato (risco jurídico
+  levantado pelo Victor).
+- Frase-modelo para o 5.º `##` ou para a síntese: a citação acima, literal ou levemente adaptada ao tema da página.
+
+## GEO — como a página é lida por IA (obrigatório desde 10/09/2026)
+
+- **Primeiro parágrafo responde a pergunta da keyword em uma frase** (definição direta, sem preâmbulo). É o trecho que
+  ChatGPT/Perplexity/Gemini citam.
+- Keyword principal nos primeiros 600 caracteres e no `titulo`; variações de maior volume (ver GATE de 10/09) nos `##`.
+- FAQ vai em `faq_jsonb` (o site já emite schema FAQPage) — 5 a 7 perguntas na linguagem real de busca, resposta direta
+  em 1–3 frases, cada uma sustentável por `product_facts`.
+- Números só os deste arquivo (400+ empresas, 7 dias de teste sem cartão, planos). Nada de "48h", "97%" etc. sem fonte.
+- Todo texto termina com 1–2 links internos para o pilar da API oficial e para a LP de plataforma de atendimento.
