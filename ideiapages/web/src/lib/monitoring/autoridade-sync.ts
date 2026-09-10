@@ -132,6 +132,7 @@ export async function runAutoridadeSync(args: {
   if (error) errors.push(error);
 
   const rows: AutoridadeRowInsert[] = [];
+  const agora = new Date().toISOString();
 
   for (const item of results) {
     const dominio = normalizeDominio(item.domain ?? "");
@@ -148,7 +149,7 @@ export async function runAutoridadeSync(args: {
       rank_posicao: toInt(item.rank),
       dominios_referentes: toInt(item.referring_domains),
       detalhe: { found: encontrado },
-      coletado_em: new Date().toISOString(),
+      coletado_em: agora,
     });
 
     if (incluirHistorico) {
@@ -160,7 +161,10 @@ export async function runAutoridadeSync(args: {
           data: h.date,
           fonte: FONTE_OPENPAGERANK,
           rank_decimal: h.open_page_rank,
+          rank_posicao: null,
+          dominios_referentes: null,
           detalhe: { historico: true },
+          coletado_em: agora,
         });
       }
     }
