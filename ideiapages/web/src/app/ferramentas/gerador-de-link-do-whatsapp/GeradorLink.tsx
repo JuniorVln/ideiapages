@@ -140,9 +140,9 @@ export function GeradorLink() {
       {/* ── GERADOR ──────────────────────────────────────────────────── */}
       <section id="gerador" className="scroll-mt-6 bg-white py-14 md:py-18">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-10 lg:grid-cols-[1fr_.9fr]">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
             {/* entradas */}
-            <div className="space-y-7">
+            <div className="min-w-0 space-y-7">
               <div>
                 <label className="block">
                   <span className="mb-2 block text-sm font-semibold text-slate-900">
@@ -211,8 +211,8 @@ export function GeradorLink() {
               {/* resultado */}
               <div className="rounded-2xl border border-blue-200/60 bg-blue-50 p-5">
                 <p className="text-sm font-semibold text-slate-900">3. Seu link está pronto</p>
-                <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <code className="flex-1 overflow-x-auto whitespace-nowrap rounded-lg border border-blue-200 bg-white px-3 py-3 text-[13px] text-slate-800">
+                <div className="mt-3 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
+                  <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap rounded-lg border border-blue-200 bg-white px-3 py-3 text-[13px] text-slate-800">
                     {link || "https://wa.me/…"}
                   </code>
                   <button
