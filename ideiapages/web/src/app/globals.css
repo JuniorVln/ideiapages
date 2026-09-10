@@ -1,5 +1,52 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Tema do Tailwind v4 (10/09/2026)
+
+   O projeto tem um `tailwind.config.ts` herdado da v3, mas a v4 só lê o config
+   via `@config` — sem isto, classes como `bg-ideia-primary`, `text-text-muted`,
+   `bg-surface-alt`, `border-border` e `font-ideia` NÃO existiam no CSS gerado e
+   eram silenciosamente ignoradas (era o motivo de páginas saírem "brancas e só
+   texto"). O bloco abaixo declara os mesmos tokens no formato da v4.
+   ───────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Marca */
+  --color-brand-primary: #1e40af;
+  --color-brand-primary-dark: #1e3a8a;
+  --color-brand-dark: #0f172a;
+  --color-brand-cta: #25d366;
+  --color-brand-cta-dark: #128c7e;
+  --color-brand-accent: #075e54;
+
+  /* Ideia Chat */
+  --color-ideia-primary: #1e40af;
+  --color-ideia-primary-dark: #1e3a8a;
+  --color-ideia-chat: #2282c7;
+  --color-ideia-chat-dark: #1b6a9e;
+  --color-ideia-chat-bright: #4eb0ee;
+  --color-ideia-secondary: #60a5fa;
+  --color-ideia-accent: #93c5fd;
+  --color-ideia-link: #2563eb;
+  --color-ideia-bg: #0f172a;
+
+  /* Superfície / texto / borda */
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8fafc;
+  --color-surface-card: #f1f5f9;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-text-subtle: #94a3b8;
+  --color-border: #e2e8f0;
+  --color-border-focus: #1e40af;
+}
+
+/* Famílias tipográficas: `inline` porque apontam para as vars do next/font. */
+@theme inline {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-inter), system-ui, sans-serif;
+  --font-ideia: var(--font-maven), ui-sans-serif, system-ui, sans-serif;
+}
+
 /* ── Design Tokens ── */
 :root {
   /* Brand (Azul “corporativo” em textos/CTA gerais) */
