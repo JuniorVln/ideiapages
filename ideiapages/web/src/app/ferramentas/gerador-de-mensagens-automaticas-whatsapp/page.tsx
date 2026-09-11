@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { GeradorMensagens } from "./GeradorMensagens";
+import { WhatsAppFlutuante } from "../_components/WhatsAppFlutuante";
 
 /**
  * Ferramenta-isca (autorizada pelo Victor em 12/08/2026).
@@ -168,6 +169,8 @@ export default function GeradorMensagensPage() {
           </div>
         </div>
       </section>
+
+      <WhatsAppFlutuante mensagem="Oi! Usei o gerador de mensagens automáticas do Ideia Chat e quero falar com o comercial." />
 
       <footer className="border-t border-border bg-white py-8 text-center text-xs text-text-subtle">
         Gerador de mensagens automáticas para WhatsApp — uma ferramenta gratuita do{" "}

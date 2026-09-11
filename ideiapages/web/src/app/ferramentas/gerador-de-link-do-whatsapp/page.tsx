@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { GeradorLink } from "./GeradorLink";
+import { WhatsAppFlutuante } from "../_components/WhatsAppFlutuante";
 
 /**
  * Ferramenta-isca 2 — gerador de link do WhatsApp.
@@ -172,6 +173,8 @@ export default function GeradorLinkPage() {
           </div>
         </div>
       </section>
+
+      <WhatsAppFlutuante mensagem="Oi! Usei o gerador de link do WhatsApp do Ideia Chat e quero falar com o comercial." />
 
       <footer className="border-t border-border bg-white py-8 text-center text-xs text-text-subtle">
         Gerador de link do WhatsApp — uma ferramenta gratuita do{" "}
