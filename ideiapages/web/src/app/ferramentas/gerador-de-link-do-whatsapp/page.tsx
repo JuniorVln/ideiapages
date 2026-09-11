@@ -12,12 +12,12 @@ const URL_CANONICA =
   "https://pages.ideiabusiness.com.br/ferramentas/gerador-de-link-do-whatsapp";
 
 export const metadata: Metadata = {
-  title: "Gerador de link do WhatsApp (grátis, com mensagem e QR code)",
+  title: "Gerador de link do WhatsApp grátis (com mensagem e QR code)",
   description:
     "Gere o link do WhatsApp com mensagem pronta, QR code e botão para o site. Grátis, sem cadastro: digite o número com DDD e copie o link para a bio do Instagram, site ou anúncio.",
   alternates: { canonical: URL_CANONICA },
   openGraph: {
-    title: "Gerador de link do WhatsApp (grátis)",
+    title: "Gerador de link do WhatsApp grátis, sem cadastro",
     description:
       "Crie o link wa.me com mensagem já escrita, QR code e botão pronto para o site. Sem cadastro.",
     url: URL_CANONICA,

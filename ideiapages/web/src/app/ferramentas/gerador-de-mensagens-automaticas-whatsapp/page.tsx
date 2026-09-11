@@ -12,12 +12,12 @@ const URL_CANONICA =
   "https://pages.ideiabusiness.com.br/ferramentas/gerador-de-mensagens-automaticas-whatsapp";
 
 export const metadata: Metadata = {
-  title: "Gerador de mensagens automáticas para WhatsApp (grátis)",
+  title: "Gerador de mensagens automáticas para WhatsApp grátis (sem cadastro)",
   description:
     "Gere mensagens automáticas de WhatsApp prontas para copiar: saudação, menu de setores, fora do horário, confirmação, lembrete e pós-atendimento — por tipo de negócio. Grátis e sem cadastro.",
   alternates: { canonical: URL_CANONICA },
   openGraph: {
-    title: "Gerador de mensagens automáticas para WhatsApp (grátis)",
+    title: "Gerador de mensagens automáticas para WhatsApp grátis",
     description:
       "Modelos prontos de mensagem automática por categoria e por tipo de negócio. Copie, ajuste e use hoje.",
     url: URL_CANONICA,

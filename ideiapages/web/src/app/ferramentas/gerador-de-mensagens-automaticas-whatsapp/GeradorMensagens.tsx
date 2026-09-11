@@ -204,7 +204,8 @@ export function GeradorMensagens() {
               Ferramenta gratuita · Ideia Chat
             </p>
             <h1 className="mt-4 font-ideia text-4xl font-black leading-[1.05] sm:text-5xl lg:text-[3.6rem]">
-              Gerador de mensagens automáticas para WhatsApp
+              Gerador de mensagens automáticas para WhatsApp{" "}
+              <span className="text-[#25D366]">grátis</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-blue-100/85">
               Escolha o tipo de mensagem e o seu ramo, coloque o nome da empresa e copie o texto
@@ -440,6 +441,18 @@ export function GeradorMensagens() {
                   {copiada === 100 + idx ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   {copiada === 100 + idx ? "Copiado para a área de transferência" : "Copiar este modelo"}
                 </button>
+                <a
+                  href={WHATSAPP}
+                  target="_blank"
+                  rel="noopener"
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/25 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/60"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Tirar dúvida no WhatsApp
+                </a>
+                <p className="mt-3 text-center text-[12px] leading-relaxed text-white/50">
+                  A ferramenta é gratuita. A conversa também.
+                </p>
               </div>
             </div>
           </div>

@@ -96,7 +96,7 @@ export function GeradorLink() {
             Ferramenta gratuita · Ideia Chat
           </p>
           <h1 className="mt-4 max-w-3xl font-ideia text-4xl font-black leading-[1.05] sm:text-5xl">
-            Gerador de link do WhatsApp
+            Gerador de link do WhatsApp <span className="text-[#25D366]">grátis</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-blue-100/85">
             Crie o link que abre a conversa no seu WhatsApp <b className="text-white">já com a mensagem
@@ -257,6 +257,22 @@ export function GeradorLink() {
                     {copiado === "botao" ? "Código copiado" : "Copiar botão para o site"}
                   </button>
                 </div>
+                <div className="mt-4 flex flex-col gap-3 rounded-xl border border-blue-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-[13px] leading-relaxed text-slate-600">
+                    Link pronto e o WhatsApp já lotando? Falamos com você pelo próprio WhatsApp e
+                    mostramos como a equipe inteira atende pelo mesmo número.
+                  </p>
+                  <a
+                    href={WHATSAPP}
+                    target="_blank"
+                    rel="noopener"
+                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1fb457]"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Falar no WhatsApp
+                  </a>
+                </div>
+
                 {verQr && link && (
                   <div className="mt-4 flex items-center gap-4 rounded-xl border border-blue-200 bg-white p-4">
                     {/* eslint-disable-next-line @next/next/no-img-element -- QR gerado sob demanda */}
