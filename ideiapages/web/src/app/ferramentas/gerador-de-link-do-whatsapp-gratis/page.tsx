@@ -10,7 +10,7 @@ import { WhatsAppFlutuante } from "../_components/WhatsAppFlutuante";
  */
 
 const URL_CANONICA =
-  "https://pages.ideiabusiness.com.br/ferramentas/gerador-de-link-do-whatsapp";
+  "https://pages.ideiabusiness.com.br/ferramentas/gerador-de-link-do-whatsapp-gratis";
 
 export const metadata: Metadata = {
   title: "Gerador de link do WhatsApp grátis (com mensagem e QR code)",
@@ -67,7 +67,7 @@ const FAQ = [
 
 const LEITURAS = [
   {
-    href: "/ferramentas/gerador-de-mensagens-automaticas-whatsapp",
+    href: "/ferramentas/gerador-de-mensagens-automaticas-whatsapp-gratis",
     titulo: "Gerador de mensagens automáticas",
     desc: "Saudação, fora do horário, confirmação e cobrança — texto pronto por tipo de negócio.",
   },

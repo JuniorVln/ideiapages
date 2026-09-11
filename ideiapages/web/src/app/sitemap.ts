@@ -22,6 +22,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    // Ferramentas-isca: paginas estaticas, fora da tabela `paginas`.
+    {
+      url: `${SITE_URL}/ferramentas/gerador-de-link-do-whatsapp-gratis`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/ferramentas/gerador-de-mensagens-automaticas-whatsapp-gratis`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
   ];
 
   try {

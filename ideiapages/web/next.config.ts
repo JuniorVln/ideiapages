@@ -64,6 +64,21 @@ const nextConfig: NextConfig = {
     return [
       { source: "/admin", destination: "/admin/hub", permanent: false },
       { source: "/admin/", destination: "/admin/hub", permanent: false },
+      /**
+       * As ferramentas-isca nasceram sem "gratis" na URL (10/09) e ganharam o termo em
+       * 11/09, a pedido do Victor, para reforcar o posicionamento. Os links antigos ja
+       * circularam, entao ficam como 308 permanente.
+       */
+      {
+        source: "/ferramentas/gerador-de-link-do-whatsapp",
+        destination: "/ferramentas/gerador-de-link-do-whatsapp-gratis",
+        permanent: true,
+      },
+      {
+        source: "/ferramentas/gerador-de-mensagens-automaticas-whatsapp",
+        destination: "/ferramentas/gerador-de-mensagens-automaticas-whatsapp-gratis",
+        permanent: true,
+      },
     ];
   },
 };

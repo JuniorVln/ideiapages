@@ -30,7 +30,7 @@ const WHATSAPP =
   );
 const LP_PLATAFORMA =
   "https://www.ideiamultichat.com.br/solucoes/sistema-de-atendimento-whatsapp-para-empresas";
-const GERADOR_MENSAGENS = "/ferramentas/gerador-de-mensagens-automaticas-whatsapp";
+const GERADOR_MENSAGENS = "/ferramentas/gerador-de-mensagens-automaticas-whatsapp-gratis";
 
 export function GeradorLink() {
   const [numero, setNumero] = useState("");

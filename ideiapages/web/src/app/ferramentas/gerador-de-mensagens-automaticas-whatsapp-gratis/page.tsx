@@ -10,7 +10,7 @@ import { WhatsAppFlutuante } from "../_components/WhatsAppFlutuante";
  */
 
 const URL_CANONICA =
-  "https://pages.ideiabusiness.com.br/ferramentas/gerador-de-mensagens-automaticas-whatsapp";
+  "https://pages.ideiabusiness.com.br/ferramentas/gerador-de-mensagens-automaticas-whatsapp-gratis";
 
 export const metadata: Metadata = {
   title: "Gerador de mensagens automáticas para WhatsApp grátis (sem cadastro)",
