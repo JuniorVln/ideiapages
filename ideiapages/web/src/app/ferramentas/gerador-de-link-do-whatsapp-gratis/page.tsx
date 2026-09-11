@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { GeradorLink } from "./GeradorLink";
+import { FERRAMENTAS, urlFerramenta } from "@/lib/ferramentas/urls";
 import { WhatsAppFlutuante } from "../_components/WhatsAppFlutuante";
 
 /**
@@ -9,8 +10,7 @@ import { WhatsAppFlutuante } from "../_components/WhatsAppFlutuante";
  * É a maior fonte de tráfego orgânico do nicho e o tipo de página que ganha link de outros sites.
  */
 
-const URL_CANONICA =
-  "https://pages.ideiabusiness.com.br/ferramentas/gerador-de-link-do-whatsapp-gratis";
+const URL_CANONICA = urlFerramenta(FERRAMENTAS.linkWhatsapp);
 
 export const metadata: Metadata = {
   title: "Gerador de link do WhatsApp grátis (com mensagem e QR code)",

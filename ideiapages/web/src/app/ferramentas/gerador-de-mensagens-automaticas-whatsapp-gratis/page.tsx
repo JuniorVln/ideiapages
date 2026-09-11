@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { GeradorMensagens } from "./GeradorMensagens";
+import { FERRAMENTAS, urlFerramenta } from "@/lib/ferramentas/urls";
 import { WhatsAppFlutuante } from "../_components/WhatsAppFlutuante";
 
 /**
@@ -9,8 +10,7 @@ import { WhatsAppFlutuante } from "../_components/WhatsAppFlutuante";
  * Roda 100% no cliente — nenhum dado do visitante é enviado ou guardado.
  */
 
-const URL_CANONICA =
-  "https://pages.ideiabusiness.com.br/ferramentas/gerador-de-mensagens-automaticas-whatsapp-gratis";
+const URL_CANONICA = urlFerramenta(FERRAMENTAS.mensagensAutomaticas);
 
 export const metadata: Metadata = {
   title: "Gerador de mensagens automáticas para WhatsApp grátis (sem cadastro)",

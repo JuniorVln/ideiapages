@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getSupabasePublicReadClient } from "@/lib/supabase/public";
 import { PUBLIC_CONTENT_BASE_PATH } from "@/lib/public-pages";
 import { getSiteUrl } from "@/lib/site-url";
+import { FERRAMENTAS, urlFerramenta } from "@/lib/ferramentas/urls";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -22,15 +23,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
-    // Ferramentas-isca: paginas estaticas, fora da tabela `paginas`.
+    // Ferramentas-isca: paginas estaticas, fora da tabela `paginas`, e no dominio do Pages.
     {
-      url: `${SITE_URL}/ferramentas/gerador-de-link-do-whatsapp-gratis`,
+      url: urlFerramenta(FERRAMENTAS.linkWhatsapp),
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
-      url: `${SITE_URL}/ferramentas/gerador-de-mensagens-automaticas-whatsapp-gratis`,
+      url: urlFerramenta(FERRAMENTAS.mensagensAutomaticas),
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.9,
